@@ -11,9 +11,10 @@ class Server {
     this.name,
     this.hostName,
     this.port,
+    this.directories,
     this.user,
     this.password,
-    this.directories,
+    this.privateKey,
   });
   String id;
   String name;
@@ -25,42 +26,42 @@ class Server {
 
   String privateKey;
 
-  Server.fromMap(Map<String, dynamic> map) {
-    id = map['id'];
-    name = map['name'];
-    hostName = map['hostName'];
-    port = map['port'];
-    user = map['user'];
-    password = map['password'];
+  factory Server.fromMap(Map<String, dynamic> map) {
+    var s = Server(
+      id: map['_id'] as String,
+      name: map['name'],
+      hostName: map['hostName'],
+      port: map['port'],
+      directories: List<Diretorio>.from(map['directories'].map((x) => Diretorio.fromMap(x))),
+    );
 
-    if (map.containsKey('directories') && map['directories'] is List) {
-      directories = List<Diretorio>.from(map['directories'].map((x) => Diretorio.fromMap(x)));
-      //directories = map['directories'];
+    if (map.containsKey('user')) {
+      s.user = map['user'];
+    }
+    if (map.containsKey('password')) {
+      s.password = map['password'];
     }
 
     if (map.containsKey('privateKey')) {
-      privateKey = map['privateKey'];
+      s.privateKey = map['privateKey'];
     }
+
+    return s;
   }
 
   Map<String, dynamic> toMap() {
     var map = {
+      'id': id,
+      'name': name,
       'hostName': hostName,
       'port': port,
     };
 
-    if (id != null) {
-      map['id'] = id;
-    }
-    map['name'] = name;
     map['user'] = user;
     map['password'] = password;
+    map['directories'] = directories.map((x) => x.toMap()).toList();
+    map['privateKey'] = privateKey;
 
-    map['directories'] = directories != null ? directories.map((x) => x.toMap()).toList() : [];
-
-    if (privateKey != null) {
-      map['privateKey'] = privateKey;
-    }
     return map;
   }
 }

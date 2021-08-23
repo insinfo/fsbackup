@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:fsbackup/models/server.dart';
 import 'package:fsbackup/repositories/server_repository.dart';
 
-class ServerBloc {
+class ServerController {
   final serverController = StreamController<List<Server>>();
   Stream get getServers => serverController.stream;
   ServerRepository repository;
+  // ignore: non_constant_identifier_names
   ServerBloc() {
     repository = ServerRepository();
   }
@@ -40,5 +41,3 @@ class ServerBloc {
     return serverController.close();
   }
 }
-
-final serverBloc = ServerBloc(); // create an instance of the bloc

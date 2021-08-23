@@ -9,13 +9,13 @@ class ServerRepository extends BaseRepository {
   Future<List<Server>> all() async {
     final db = await database;
     var result = await db.find();
-    return result.map((m) => Server.fromMap(m)).toList();
+    return result.map((m) => Server.fromMap(m as Map<String, dynamic>)).toList();
   }
 
   Future<Server> getById(String id) async {
     final db = await database;
     var result = await db.first({'id': id});
-    return Server.fromMap(result);
+    return Server.fromMap(Map<String, dynamic>.from(result));
   }
 
   Future<Server> insert(Server server) async {

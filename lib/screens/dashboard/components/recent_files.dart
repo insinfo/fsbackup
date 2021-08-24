@@ -76,3 +76,5 @@ DataRow recentFileDataRow(RecentFile fileInfo) {
     ],
   );
 }
+
+///

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fsbackup/shared/routes.dart';
 
 class SideMenu extends StatelessWidget {
-  const SideMenu({
+  final GlobalObjectKey<NavigatorState> navigatorKey;
+  SideMenu({
     Key key,
+    this.navigatorKey,
   }) : super(key: key);
 
   @override
@@ -12,19 +15,29 @@ class SideMenu extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
-            child: Image.asset("assets/images/logo.png"),
+            child: Image.asset("assets/images/logo-backup-2.png"),
           ),
           DrawerListTile(
             title: "Dashboard",
             svgSrc: "assets/icons/menu_dashbord.svg",
-            press: () {},
+            press: () {
+              if (currentRoute != '/dashboard') {
+                navigatorKey.currentState.pushReplacementNamed('/dashboard');
+              }
+            },
           ),
           DrawerListTile(
-            title: "Transaction",
+            title: "Servidores",
             svgSrc: "assets/icons/menu_tran.svg",
-            press: () {},
+            press: () {
+              if (currentRoute != '/servidores') {
+                navigatorKey.currentState.pushReplacementNamed('/servidores');
+              }
+
+              // Navigator.of(context).pushNamed('/servidores');
+            },
           ),
-          DrawerListTile(
+          /*DrawerListTile(
             title: "Task",
             svgSrc: "assets/icons/menu_task.svg",
             press: () {},
@@ -53,7 +66,7 @@ class SideMenu extends StatelessWidget {
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
             press: () {},
-          ),
+          ),*/
         ],
       ),
     );

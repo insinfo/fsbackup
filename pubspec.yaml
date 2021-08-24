@@ -14,9 +14,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   #xterm: ^2.5.0-pre
-  dartssh:
-    git:
-      url: https://github.com/TerminalStudio/dartssh
+  #dartssh:
+    #git:
+      #url: https://github.com/TerminalStudio/dartssh
       #https://github.com/insinfo/dartssh
   #sqflite: ^2.0.0+3  #não funciona no windows
 
@@ -26,14 +26,16 @@ dependencies:
   path_provider: ^2.0.2 
   url_launcher: ^6.0.9
   objectdb: ^1.2.1+1 #database NoSQL
-
+  #objectbox https://pub.dev/packages/objectbox
   google_fonts: 
   flutter_svg: ^0.22.0
   fl_chart: ^0.36.4
   provider: ^6.0.0
   data_table_2: ^2.1.1
   get_it: ^7.2.0
-
+  page_transition: ^2.0.2
+  uuid:
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter

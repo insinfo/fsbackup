@@ -1,33 +1,40 @@
-import 'package:fsbackup/controllers/menu_controller.dart';
+import 'package:fsbackup/providers/menu_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../../../constants.dart';
+import '../../constants.dart';
 
 class Header extends StatelessWidget {
-  const Header({
+  final String title;
+  final List<Widget> actions;
+  Header({
     Key key,
+    @required this.title,
+    this.actions,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         if (!Responsive.isDesktop(context))
           IconButton(
             icon: Icon(Icons.menu),
-            onPressed: context.read<MenuController>().controlMenu,
+            onPressed: context.read<MenuProvider>().controlMenu,
           ),
         if (!Responsive.isMobile(context))
           Text(
-            "Dashboard",
+            title,
             style: Theme.of(context).textTheme.headline6,
           ),
-        if (!Responsive.isMobile(context)) Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
+        /*if (!Responsive.isMobile(context)) Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
         Expanded(child: SearchField()),
-        ProfileCard()
+        ProfileCard()*/
+        SizedBox(width: defaultPadding),
+        if (actions != null) ...actions
       ],
     );
   }

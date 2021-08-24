@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:fsbackup/models/diretorio.dart';
 
-Server serverFromJson(String str) => Server.fromMap(json.decode(str));
-String serverToJson(Server data) => json.encode(data.toMap());
+Servidor serverFromJson(String str) => Servidor.fromMap(json.decode(str));
+String serverToJson(Servidor data) => json.encode(data.toMap());
 
-class Server {
-  Server({
+class Servidor {
+  Servidor({
     this.id,
     this.name,
     this.hostName,
@@ -23,12 +23,13 @@ class Server {
   String user;
   String password;
   List<Diretorio> directories;
+  String icon = 'assets/icons/Figma_file.svg';
 
   String privateKey;
 
-  factory Server.fromMap(Map<String, dynamic> map) {
-    var s = Server(
-      id: map['_id'] as String,
+  factory Servidor.fromMap(Map<String, dynamic> map) {
+    var s = Servidor(
+      id: map['id'] as String,
       name: map['name'],
       hostName: map['hostName'],
       port: map['port'],

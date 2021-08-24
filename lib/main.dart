@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/constants.dart';
-import 'package:fsbackup/controllers/menu_controller.dart';
+
+import 'package:fsbackup/providers/menu_provider.dart';
+import 'package:fsbackup/providers/servidor_provider.dart';
 import 'package:fsbackup/screens/main/main_screen.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:google_fonts/google_fonts.dart';
@@ -24,13 +26,17 @@ class MyApp extends StatelessWidget {
         canvasColor: secondaryColor,
       ),
       home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => MenuController(),
-          ),
-        ],
-        child: MainScreen(),
-      ),
+          providers: [
+            ChangeNotifierProvider<ServidorProvider>(
+              create: (context) => ServidorProvider(),
+            ),
+            ChangeNotifierProvider<MenuProvider>(
+              create: (context) => MenuProvider(),
+            ),
+          ],
+          builder: (context, child) {
+            return MainScreen();
+          }),
     );
   }
 }

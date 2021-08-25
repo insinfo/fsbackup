@@ -1,16 +1,20 @@
+import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fsbackup/models/servidor.dart';
-import 'package:fsbackup/providers/servidor_provider.dart';
-import 'package:fsbackup/screens/servidores/components/edita_servidor.dart';
-import 'package:get_it/get_it.dart';
+
+import 'package:fsbackup/models/tarefa_backup.dart';
+
+import 'package:fsbackup/providers/tarefa_provider.dart';
+
+import 'package:fsbackup/screens/tarefa_backup/components/edita_tarefa_backup.dart';
+
 import 'package:provider/provider.dart';
 
-class ListaServidores extends StatelessWidget {
-  ListaServidores({
+class ListaTarefaBackup extends StatelessWidget {
+  ListaTarefaBackup({
     Key key,
   }) : super(key: key);
 
@@ -28,23 +32,22 @@ class ListaServidores extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ChangeNotifierProvider.value(
-              value: GetIt.instance.get<ServidorProvider>(),
-              builder: (context, w) => Consumer<ServidorProvider>(builder: (ctx, data, child) {
-                return FutureBuilder<List<Servidor>>(
-                    future: data.returnServers(),
+              value: locator<TarefaProvider>(),
+              builder: (context, w) => Consumer<TarefaProvider>(builder: (ctx, data, child) {
+                return FutureBuilder<List<TarefaBackup>>(
+                    future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(child: Text("Não ha servidores cadastrados"));
+                          return Center(child: Text("Não ha Tarefas de Backup"));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
                                 DataColumn(label: Text("Nome")),
-                                DataColumn(label: Text("Host")),
-                                DataColumn(label: Text("Porta")),
-                                DataColumn(label: Text("Ações")),
+                                DataColumn(label: Text("Destino")),
+                                DataColumn(label: Text("Tipo")),
                               ],
                               rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
                         }
@@ -59,26 +62,25 @@ class ListaServidores extends StatelessWidget {
     );
   }
 
-  DataRow servidorDataRow(Servidor server, BuildContext ctx) {
+  DataRow servidorDataRow(TarefaBackup tarefa, BuildContext ctx) {
     return DataRow(
       cells: [
         DataCell(
           Row(
             children: [
               SvgPicture.asset(
-                server.icon,
+                tarefa.icon,
                 height: 30,
                 width: 30,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: Text(server.name),
+                child: Text('${tarefa.nome}'),
               ),
             ],
           ),
         ),
-        DataCell(Text(server.hostName)),
-        DataCell(Text(server.port?.toString())),
+        DataCell(Text('${tarefa.diretorioDestino}')),
         DataCell(Row(
           children: [
             IconButton(
@@ -86,15 +88,34 @@ class ListaServidores extends StatelessWidget {
                 onPressed: () {
                   showDialog(
                     context: ctx,
-                    builder: (_) => EditaServidor(server: server),
+                    builder: (_) => EditaTarefa(tarefa: tarefa),
                   );
                 }),
             SizedBox(width: defaultPadding + 5),
             IconButton(
                 icon: Icon(Icons.delete),
-                onPressed: () {
-                  var sp = GetIt.instance.get<ServidorProvider>();
-                  sp.delete(server.id);
+                onPressed: () async {
+                  await showDialog(
+                    context: ctx,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Confirmar"),
+                        content: Text("Tem certeza que deseja deletar este item?"),
+                        actions: <Widget>[
+                          TextButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop(true);
+                                await locator<TarefaProvider>().delete(tarefa.id);
+                              },
+                              child: Text("DELETE")),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text("CANCEL"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 })
           ],
         )),

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/constants.dart';
-import 'package:fsbackup/providers/servidor_provider.dart';
-import 'package:fsbackup/screens/servidores/components/edita_servidor.dart';
 
+import 'package:fsbackup/screens/tarefa_backup/components/edita_tarefa_backup.dart';
+import 'package:fsbackup/screens/tarefa_backup/components/lista_tarefa_backup.dart';
 import 'package:fsbackup/shared/components/header.dart';
 
-import 'package:fsbackup/screens/servidores/components/lista_servidores.dart';
-import 'package:provider/provider.dart';
-
-class ServidoresScreen extends StatelessWidget {
+class TarefaBackupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -17,7 +14,7 @@ class ServidoresScreen extends StatelessWidget {
         child: Column(
           children: [
             Header(
-              title: 'Gerencia Servidores',
+              title: 'Tarefas',
               actions: [
                 ElevatedButton.icon(
                   style: TextButton.styleFrom(
@@ -29,7 +26,7 @@ class ServidoresScreen extends StatelessWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (_) => EditaServidor(),
+                      builder: (_) => EditaTarefa(),
                     );
                   },
                   icon: Icon(Icons.add),
@@ -45,9 +42,8 @@ class ServidoresScreen extends StatelessWidget {
                   flex: 5,
                   child: Column(
                     children: [
-                      //MyFiles(),
                       SizedBox(height: defaultPadding),
-                      ListaServidores(),
+                      ListaTarefaBackup(),
                     ],
                   ),
                 ),

@@ -1,12 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fsbackup/app_injector.dart';
 
 import 'package:fsbackup/providers/menu_provider.dart';
 import 'package:fsbackup/responsive.dart';
-import 'package:fsbackup/screens/dashboard/dashboard_screen.dart';
+
 import 'package:fsbackup/shared/routes.dart';
-import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 
 import 'components/side_menu.dart';
 
@@ -14,7 +12,8 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigatorKey = GlobalObjectKey<NavigatorState>(context);
-    var mp = GetIt.I.get<MenuProvider>();
+    var mp = locator.get<MenuProvider>();
+    print('MainScreen $mp');
     return Scaffold(
       key: mp.scaffoldKey,
       drawer: SideMenu(navigatorKey: navigatorKey),

@@ -33,16 +33,19 @@ class SideMenu extends StatelessWidget {
               if (currentRoute != '/servidores') {
                 navigatorKey.currentState.pushReplacementNamed('/servidores');
               }
-
               // Navigator.of(context).pushNamed('/servidores');
             },
           ),
-          /*DrawerListTile(
-            title: "Task",
-            svgSrc: "assets/icons/menu_task.svg",
-            press: () {},
-          ),
           DrawerListTile(
+            title: 'Tarefas',
+            svgSrc: 'assets/icons/menu_task.svg',
+            press: () {
+              if (currentRoute != '/tarefas') {
+                navigatorKey.currentState.pushReplacementNamed('/tarefas');
+              }
+            },
+          ),
+          /*DrawerListTile(
             title: "Documents",
             svgSrc: "assets/icons/menu_doc.svg",
             press: () {},

@@ -1,13 +1,19 @@
 import 'package:fsbackup/models/servidor.dart';
-import 'package:fsbackup/repositories/base_repository.dart';
+import 'package:fsbackup/db/local_database.dart';
 
-class ServerRepository extends BaseRepository {
-  ServerRepository();
+class ServidorRepository {
+  final LocalDatabase db = LocalDatabase();
+  ServidorRepository() {
+    db.collection = 'servidores';
+  }
+
+  Future<dynamic> initDB() {
+    return db.initDB();
+  }
 
   Future<List<Servidor>> all() async {
     var result = await db.find();
-    //print('ServerRepository all result $result');
-    return result.map((m) => Servidor.fromMap(m as Map<String, dynamic>)).toList();
+    return result.map((m) => Servidor.fromMap(m)).toList();
   }
 
   Future<Servidor> getById(String id) async {
@@ -17,7 +23,6 @@ class ServerRepository extends BaseRepository {
 
   Future<Servidor> insert(Servidor server) async {
     await db.insert(server.toMap());
-    //return server..id = result.toString();
     return server;
   }
 
@@ -32,9 +37,5 @@ class ServerRepository extends BaseRepository {
 
   Future<void> removeById(String id) async {
     await db.remove({'id': id});
-  }
-
-  Future<void> removeAll() async {
-    await db.cleanup();
   }
 }

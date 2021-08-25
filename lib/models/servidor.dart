@@ -8,8 +8,8 @@ String serverToJson(Servidor data) => json.encode(data.toMap());
 class Servidor {
   Servidor({
     this.id,
-    this.name,
-    this.hostName,
+    this.nome,
+    this.host,
     this.port,
     this.directories,
     this.user,
@@ -17,8 +17,8 @@ class Servidor {
     this.privateKey,
   });
   String id;
-  String name;
-  String hostName;
+  String nome;
+  String host;
   int port;
   String user;
   String password;
@@ -30,8 +30,8 @@ class Servidor {
   factory Servidor.fromMap(Map<String, dynamic> map) {
     var s = Servidor(
       id: map['id'] as String,
-      name: map['name'],
-      hostName: map['hostName'],
+      nome: map['nome'],
+      host: map['host'],
       port: map['port'],
       directories: List<Diretorio>.from(map['directories'].map((x) => Diretorio.fromMap(x))),
     );
@@ -51,10 +51,10 @@ class Servidor {
   }
 
   Map<String, dynamic> toMap() {
-    var map = {
+    var map = <String, dynamic>{
       'id': id,
-      'name': name,
-      'hostName': hostName,
+      'nome': nome,
+      'host': host,
       'port': port,
     };
 

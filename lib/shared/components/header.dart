@@ -2,8 +2,8 @@ import 'package:fsbackup/providers/menu_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
+import 'package:get_it/get_it.dart';
 import '../../constants.dart';
 
 class Header extends StatelessWidget {
@@ -23,7 +23,8 @@ class Header extends StatelessWidget {
         if (!Responsive.isDesktop(context))
           IconButton(
             icon: Icon(Icons.menu),
-            onPressed: context.read<MenuProvider>().controlMenu,
+            onPressed: GetIt.instance.get<MenuProvider>().controlMenu,
+            //onPressed: context.read<MenuProvider>().controlMenu,
           ),
         if (!Responsive.isMobile(context))
           Text(

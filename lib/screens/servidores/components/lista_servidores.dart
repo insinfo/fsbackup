@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fsbackup/models/servidor.dart';
 import 'package:fsbackup/providers/servidor_provider.dart';
 import 'package:fsbackup/screens/servidores/components/edita_servidor.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 class ListaServidores extends StatelessWidget {
@@ -15,8 +16,6 @@ class ListaServidores extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var servidorProvider = Provider.of<ServidorProvider>(context, listen: false);
-
     return Container(
       padding: EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
@@ -28,38 +27,39 @@ class ListaServidores extends StatelessWidget {
         children: [
           SizedBox(
             width: double.infinity,
-            child: Consumer<ServidorProvider>(builder: (ctx, data, child) {
-              return FutureBuilder<List<Servidor>>(
-                  future: data.returnServers(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data.length == 0) {
-                        return Center(child: Text("Não ha servidores cadastrados"));
-                      } else if (snapshot.data.length > 0) {
-                        return DataTable2(
-                            columnSpacing: defaultPadding,
-                            minWidth: 600,
-                            columns: [
-                              DataColumn(label: Text("Nome")),
-                              DataColumn(label: Text("Host")),
-                              DataColumn(label: Text("Porta")),
-                              DataColumn(label: Text("Ações")),
-                            ],
-                            rows: snapshot.data
-                                .map<DataRow>((server) => servidorDataRow(server, ctx, servidorProvider))
-                                .toList());
+            child: ChangeNotifierProvider.value(
+              value: GetIt.instance.get<ServidorProvider>(),
+              builder: (context, w) => Consumer<ServidorProvider>(builder: (ctx, data, child) {
+                return FutureBuilder<List<Servidor>>(
+                    future: data.returnServers(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data.length == 0) {
+                          return Center(child: Text("Não ha servidores cadastrados"));
+                        } else if (snapshot.data.length > 0) {
+                          return DataTable2(
+                              columnSpacing: defaultPadding,
+                              minWidth: 600,
+                              columns: [
+                                DataColumn(label: Text("Nome")),
+                                DataColumn(label: Text("Host")),
+                                DataColumn(label: Text("Porta")),
+                                DataColumn(label: Text("Ações")),
+                              ],
+                              rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
+                        }
                       }
-                    }
-                    return Center(child: CircularProgressIndicator());
-                  });
-            }),
+                      return Center(child: CircularProgressIndicator());
+                    });
+              }),
+            ),
           ),
         ],
       ),
     );
   }
 
-  DataRow servidorDataRow(Servidor server, BuildContext ctx, ServidorProvider servidorProvider) {
+  DataRow servidorDataRow(Servidor server, BuildContext ctx) {
     return DataRow(
       cells: [
         DataCell(
@@ -86,17 +86,15 @@ class ListaServidores extends StatelessWidget {
                 onPressed: () {
                   showDialog(
                     context: ctx,
-                    builder: (_) => ChangeNotifierProvider<ServidorProvider>.value(
-                      value: servidorProvider,
-                      child: EditaServidor(server: server),
-                    ),
+                    builder: (_) => EditaServidor(server: server),
                   );
                 }),
             SizedBox(width: defaultPadding + 5),
             IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
-                  servidorProvider.delete(server.id);
+                  var sp = GetIt.instance.get<ServidorProvider>();
+                  sp.delete(server.id);
                 })
           ],
         )),

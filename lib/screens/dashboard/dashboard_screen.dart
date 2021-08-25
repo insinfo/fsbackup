@@ -2,9 +2,11 @@ import 'package:fsbackup/providers/servidor_provider.dart';
 import 'package:fsbackup/responsive.dart';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
+
 import '../../shared/components/header.dart';
 
 import 'components/recent_files.dart';
@@ -19,7 +21,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    var sp = Provider.of<ServidorProvider>(context, listen: false);
+    //var sp = Provider.of<ServidorProvider>(context, listen: false);
+    var sp = GetIt.instance.get<ServidorProvider>();
     print('DashboardScreenState ServidorProvider $sp');
     sp.initializeDB();
   }

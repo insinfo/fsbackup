@@ -11,8 +11,6 @@ import 'package:provider/provider.dart';
 class ServidoresScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var servidorProvider = Provider.of<ServidorProvider>(context, listen: false);
-
     return SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.all(defaultPadding),
@@ -31,10 +29,7 @@ class ServidoresScreen extends StatelessWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (_) => ChangeNotifierProvider<ServidorProvider>.value(
-                        value: servidorProvider,
-                        child: EditaServidor(),
-                      ),
+                      builder: (_) => EditaServidor(),
                     );
                   },
                   icon: Icon(Icons.add),

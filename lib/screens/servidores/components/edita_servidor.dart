@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fsbackup/models/diretorio.dart';
 import 'package:fsbackup/models/servidor.dart';
 import 'package:fsbackup/providers/servidor_provider.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,7 +22,8 @@ class _EditaServidorState extends State<EditaServidor> {
   void edit() async {
     widget.server.name = nameController.text;
     print('edit');
-    await Provider.of<ServidorProvider>(context, listen: false).update(widget.server);
+    var sp = GetIt.instance.get<ServidorProvider>();
+    await sp.update(widget.server);
     Navigator.of(context).pop();
   }
 
@@ -35,7 +37,8 @@ class _EditaServidorState extends State<EditaServidor> {
         user: 'isaque.neves',
         password: '123',
         directories: [Diretorio(path: '/var/www/dart')]);
-    await Provider.of<ServidorProvider>(context, listen: false).insert(newServer);
+    var sp = GetIt.instance.get<ServidorProvider>();
+    await sp.insert(newServer);
     Navigator.of(context).pop();
   }
 

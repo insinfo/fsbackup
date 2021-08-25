@@ -14,21 +14,22 @@ class TarefaBackup {
   List<Servidor> servidores;
   String nome;
   String diretorioDestino;
-  StartBackup startBackup = StartBackup.manual;
+  StartBackup startBackup;
   String icon = 'assets/icons/menu_task.svg';
 
-  TarefaBackup({this.id, this.servidores, this.nome, this.diretorioDestino, this.startBackup = StartBackup.manual});
+  TarefaBackup({this.id, this.servidores, this.nome, this.diretorioDestino, this.startBackup});
 
   factory TarefaBackup.fromMap(Map<String, dynamic> map) {
     var s = TarefaBackup(
       id: map['id'] as String,
-      nome: map['name'],
+      nome: map['nome'],
       diretorioDestino: map['diretorioDestino'],
-      startBackup: map['tipoBackup'].toString().contains('manual') ? StartBackup.manual : StartBackup.agendado,
+      startBackup: map['startBackup'].toString().contains('manual') ? StartBackup.manual : StartBackup.agendado,
     );
     if (map.containsKey('servidores')) {
       s.servidores = List<Servidor>.from(map['servidores'].map((x) => Servidor.fromMap(x)));
     }
+
     return s;
   }
 

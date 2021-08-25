@@ -26,24 +26,27 @@ class _EditaTarefaState extends State<EditaTarefa> {
   var dropdownValue = StartBackup.manual;
   Servidor servidor;
 
+  @override
+  void initState() {
+    super.initState();
+    fillControls();
+  }
+
   void fillControls() {
     nomeControl.text = widget.tarefa == null ? '' : widget.tarefa.nome;
     dirDestinoControl.text = widget.tarefa == null ? '' : widget.tarefa.diretorioDestino;
-
-    if (widget.tarefa != null) {
-      if (widget.tarefa.startBackup != null) {
-        dropdownValue = widget.tarefa.startBackup;
-      }
+    dropdownValue = widget.tarefa == null ? StartBackup.manual : widget.tarefa.startBackup;
+    servidor = widget.tarefa == null ? null : widget.tarefa.servidores.first;
+    /*if (widget.tarefa != null) {
       if (widget.tarefa.servidores != null && widget.tarefa.servidores.isNotEmpty) {
         servidor = widget.tarefa.servidores.first;
       }
-    }
+    }*/
   }
 
   void fillModel(TarefaBackup model, bool isNew) {
     if (isNew) {
       model.id = Uuid().v1();
-      model.startBackup = StartBackup.manual;
       model.servidores = [servidor];
     }
     model.nome = nomeControl.text;
@@ -67,8 +70,6 @@ class _EditaTarefaState extends State<EditaTarefa> {
 
   @override
   Widget build(BuildContext context) {
-    fillControls();
-
     return AlertDialog(
       scrollable: false,
       backgroundColor: secondaryColor,
@@ -112,6 +113,7 @@ class _EditaTarefaState extends State<EditaTarefa> {
                     onChanged: (v) {
                       setState(() {
                         dropdownValue = v;
+                        print('DropdownButton onChanged ${dropdownValue.text}');
                       });
                     },
                   ),
@@ -129,6 +131,7 @@ class _EditaTarefaState extends State<EditaTarefa> {
                                     if (snapshot.data.length == 0) {
                                       return Center(child: Text("Não ha Servidores"));
                                     } else if (snapshot.data.length > 0) {
+                                      servidor = snapshot.data.first;
                                       return ServidorPicker(
                                         items: snapshot.data,
                                         initialSelection: servidor?.nome,

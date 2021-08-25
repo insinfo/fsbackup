@@ -48,6 +48,7 @@ class ListaTarefaBackup extends StatelessWidget {
                                 DataColumn(label: Text("Nome")),
                                 DataColumn(label: Text("Destino")),
                                 DataColumn(label: Text("Tipo")),
+                                DataColumn(label: Text("Ações")),
                               ],
                               rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
                         }
@@ -81,6 +82,7 @@ class ListaTarefaBackup extends StatelessWidget {
           ),
         ),
         DataCell(Text('${tarefa.diretorioDestino}')),
+        DataCell(Text('${tarefa.startBackup.text}')),
         DataCell(Row(
           children: [
             IconButton(

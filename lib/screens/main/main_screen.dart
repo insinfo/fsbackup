@@ -13,7 +13,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final navigatorKey = GlobalObjectKey<NavigatorState>(context);
     var mp = locator.get<MenuProvider>();
-    print('MainScreen $mp');
+
     return Scaffold(
       key: mp.scaffoldKey,
       drawer: SideMenu(navigatorKey: navigatorKey),

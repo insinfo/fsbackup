@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fsbackup/models/tarefa_backup.dart';
+import 'package:fsbackup/models/rotina_backup.dart';
 import 'package:fsbackup/repositories/tarefa_repository.dart';
 
-class TarefaProvider with ChangeNotifier {
-  final TarefaRepository repository;
+class RotinaBackupProvider with ChangeNotifier {
+  final RotinaBackupRepository repository;
 
-  TarefaProvider(this.repository);
+  RotinaBackupProvider(this.repository);
 
   /* final serverController = StreamController<List<Server>>();
    Stream get getServers => serverController.stream;
@@ -14,16 +14,16 @@ class TarefaProvider with ChangeNotifier {
     serverController.sink.add(await repository.all());
   }*/
 
-  Future<List<TarefaBackup>> getAll() async {
+  Future<List<RotinaBackup>> getAll() async {
     return repository.all();
   }
 
-  Future<void> insert(TarefaBackup server) async {
+  Future<void> insert(RotinaBackup server) async {
     await repository.insert(server);
     notifyListeners();
   }
 
-  Future<void> update(TarefaBackup server) async {
+  Future<void> update(RotinaBackup server) async {
     await repository.update(server);
     notifyListeners();
   }

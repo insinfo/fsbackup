@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 import 'package:fsbackup/models/servidor.dart';
-import 'package:fsbackup/models/tarefa_backup.dart';
+import 'package:fsbackup/models/rotina_backup.dart';
 import 'package:fsbackup/providers/servidor_provider.dart';
-import 'package:fsbackup/providers/tarefa_provider.dart';
+import 'package:fsbackup/providers/rotina_backup_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:fsbackup/shared/components/servidor_picker.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
@@ -12,15 +12,15 @@ import 'package:fsbackup/shared/components/custom_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class EditaTarefa extends StatefulWidget {
-  final TarefaBackup tarefa;
-  EditaTarefa({this.tarefa});
+class EditaRotinaBackup extends StatefulWidget {
+  final RotinaBackup tarefa;
+  EditaRotinaBackup({this.tarefa});
 
   @override
-  _EditaTarefaState createState() => _EditaTarefaState();
+  _EditaRotinaBackupState createState() => _EditaRotinaBackupState();
 }
 
-class _EditaTarefaState extends State<EditaTarefa> {
+class _EditaRotinaBackupState extends State<EditaRotinaBackup> {
   var nomeControl = TextEditingController();
   var dirDestinoControl = TextEditingController();
   var dropdownValue = StartBackup.manual;
@@ -44,27 +44,27 @@ class _EditaTarefaState extends State<EditaTarefa> {
     }*/
   }
 
-  void fillModel(TarefaBackup model, bool isNew) {
+  void fillModel(RotinaBackup model, bool isNew) {
     if (isNew) {
       model.id = Uuid().v1();
-      model.servidores = [servidor];
+      //model.servidores = [servidor];
     }
     model.nome = nomeControl.text;
     model.diretorioDestino = dirDestinoControl.text;
     model.startBackup = dropdownValue;
-    model.servidores = model.servidores;
+    model.servidores = [servidor];
   }
 
   void edit() async {
     fillModel(widget.tarefa, false);
-    await locator<TarefaProvider>().update(widget.tarefa);
+    await locator<RotinaBackupProvider>().update(widget.tarefa);
     Navigator.of(context).pop();
   }
 
   void add() async {
-    var newTarefa = TarefaBackup();
+    var newTarefa = RotinaBackup();
     fillModel(newTarefa, true);
-    await locator<TarefaProvider>().insert(newTarefa);
+    await locator<RotinaBackupProvider>().insert(newTarefa);
     Navigator.of(context).pop();
   }
 
@@ -131,7 +131,7 @@ class _EditaTarefaState extends State<EditaTarefa> {
                                     if (snapshot.data.length == 0) {
                                       return Center(child: Text("Não ha Servidores"));
                                     } else if (snapshot.data.length > 0) {
-                                      servidor = snapshot.data.first;
+                                      // servidor = snapshot.data.first;
                                       return ServidorPicker(
                                         items: snapshot.data,
                                         initialSelection: servidor?.nome,

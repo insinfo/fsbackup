@@ -5,16 +5,15 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'package:fsbackup/models/tarefa_backup.dart';
+import 'package:fsbackup/models/rotina_backup.dart';
 
-import 'package:fsbackup/providers/tarefa_provider.dart';
-
-import 'package:fsbackup/screens/tarefa_backup/components/edita_tarefa_backup.dart';
+import 'package:fsbackup/providers/rotina_backup_provider.dart';
+import 'package:fsbackup/screens/rotina_backup/components/edita_rotina_backup.dart';
 
 import 'package:provider/provider.dart';
 
-class ListaTarefaBackup extends StatelessWidget {
-  ListaTarefaBackup({
+class ListaRotinaBackup extends StatelessWidget {
+  ListaRotinaBackup({
     Key key,
   }) : super(key: key);
 
@@ -32,9 +31,9 @@ class ListaTarefaBackup extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ChangeNotifierProvider.value(
-              value: locator<TarefaProvider>(),
-              builder: (context, w) => Consumer<TarefaProvider>(builder: (ctx, data, child) {
-                return FutureBuilder<List<TarefaBackup>>(
+              value: locator<RotinaBackupProvider>(),
+              builder: (context, w) => Consumer<RotinaBackupProvider>(builder: (ctx, data, child) {
+                return FutureBuilder<List<RotinaBackup>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -45,12 +44,13 @@ class ListaTarefaBackup extends StatelessWidget {
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
-                                DataColumn(label: Text("Nome")),
-                                DataColumn(label: Text("Destino")),
-                                DataColumn(label: Text("Tipo")),
-                                DataColumn(label: Text("Ações")),
+                                DataColumn(label: Text('Nome')),
+                                DataColumn(label: Text('Destino')),
+                                DataColumn(label: Text('Start')),
+                                DataColumn(label: Text('Servidor')),
+                                DataColumn(label: Text('Ações')),
                               ],
-                              rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
+                              rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
                         }
                       }
                       return Center(child: CircularProgressIndicator());
@@ -63,7 +63,7 @@ class ListaTarefaBackup extends StatelessWidget {
     );
   }
 
-  DataRow servidorDataRow(TarefaBackup tarefa, BuildContext ctx) {
+  DataRow createItem(RotinaBackup tarefa, BuildContext ctx) {
     return DataRow(
       cells: [
         DataCell(
@@ -83,6 +83,7 @@ class ListaTarefaBackup extends StatelessWidget {
         ),
         DataCell(Text('${tarefa.diretorioDestino}')),
         DataCell(Text('${tarefa.startBackup.text}')),
+        DataCell(Text('${tarefa.servidores?.isNotEmpty == true ? tarefa.servidores.first.nome : "Sem servidor"}')),
         DataCell(Row(
           children: [
             IconButton(
@@ -90,7 +91,7 @@ class ListaTarefaBackup extends StatelessWidget {
                 onPressed: () {
                   showDialog(
                     context: ctx,
-                    builder: (_) => EditaTarefa(tarefa: tarefa),
+                    builder: (_) => EditaRotinaBackup(tarefa: tarefa),
                   );
                 }),
             SizedBox(width: defaultPadding + 5),
@@ -107,7 +108,7 @@ class ListaTarefaBackup extends StatelessWidget {
                           TextButton(
                               onPressed: () async {
                                 Navigator.of(context).pop(true);
-                                await locator<TarefaProvider>().delete(tarefa.id);
+                                await locator<RotinaBackupProvider>().delete(tarefa.id);
                               },
                               child: Text("DELETE")),
                           TextButton(

@@ -1,9 +1,9 @@
-import 'package:fsbackup/models/tarefa_backup.dart';
+import 'package:fsbackup/models/rotina_backup.dart';
 import 'package:fsbackup/db/local_database.dart';
 
-class TarefaRepository {
+class RotinaBackupRepository {
   final LocalDatabase db = LocalDatabase();
-  TarefaRepository() {
+  RotinaBackupRepository() {
     db.collection = 'tarefas';
   }
 
@@ -11,27 +11,27 @@ class TarefaRepository {
     return db.initDB();
   }
 
-  Future<List<TarefaBackup>> all() async {
+  Future<List<RotinaBackup>> all() async {
     var result = await db.find();
-    return result.map((m) => TarefaBackup.fromMap(m)).toList();
+    return result.map((m) => RotinaBackup.fromMap(m)).toList();
   }
 
-  Future<TarefaBackup> getById(String id) async {
+  Future<RotinaBackup> getById(String id) async {
     var result = await db.first({'id': id});
-    return TarefaBackup.fromMap(Map<String, dynamic>.from(result));
+    return RotinaBackup.fromMap(Map<String, dynamic>.from(result));
   }
 
-  Future<TarefaBackup> insert(TarefaBackup server) async {
+  Future<RotinaBackup> insert(RotinaBackup server) async {
     await db.insert(server.toMap());
     return server;
   }
 
-  Future<TarefaBackup> update(TarefaBackup server) async {
+  Future<RotinaBackup> update(RotinaBackup server) async {
     await db.update({'id': server.id}, server.toMap());
     return server;
   }
 
-  Future<void> remove(TarefaBackup server) async {
+  Future<void> remove(RotinaBackup server) async {
     await db.remove({'id': server.id});
   }
 

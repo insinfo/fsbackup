@@ -1,3 +1,5 @@
+import 'package:fsbackup/app_injector.dart';
+import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup/responsive.dart';
 
 import 'package:flutter/material.dart';
@@ -6,7 +8,7 @@ import '../../constants.dart';
 
 import '../../shared/components/header.dart';
 
-import 'components/recent_files.dart';
+import 'components/fila_backups.dart';
 import 'components/storage_details.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -29,6 +31,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Header(
               title: 'Dashboard',
+              actions: [
+                ElevatedButton.icon(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: defaultPadding * 1.5, vertical: defaultPadding),
+                  ),
+                  onPressed: () {
+                    locator<FilaProvider>().start();
+                  },
+                  icon: Icon(Icons.sync),
+                  label: Text('Iniciar'),
+                ),
+              ],
             ),
             SizedBox(height: defaultPadding),
             Row(
@@ -40,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       //MyFiles(),
                       SizedBox(height: defaultPadding),
-                      RecentFiles(),
+                      FilaBackupWidget(),
                       if (Responsive.isMobile(context)) SizedBox(height: defaultPadding),
                       if (Responsive.isMobile(context)) StarageDetails(),
                     ],

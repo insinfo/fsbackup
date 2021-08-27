@@ -37,11 +37,11 @@ class SideMenu extends StatelessWidget {
             },
           ),
           DrawerListTile(
-            title: 'Tarefas',
+            title: 'Rotinas',
             svgSrc: 'assets/icons/menu_task.svg',
             press: () {
-              if (currentRoute != '/tarefas') {
-                navigatorKey.currentState.pushReplacementNamed('/tarefas');
+              if (currentRoute != '/rotinas') {
+                navigatorKey.currentState.pushReplacementNamed('/rotinas');
               }
             },
           ),

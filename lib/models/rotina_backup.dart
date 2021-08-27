@@ -8,19 +8,23 @@ extension StartBackupToString on StartBackup {
   }
 }
 
-class TarefaBackup {
+class RotinaBackup {
   String id;
   //lista de servidoes a serem feito backup
   List<Servidor> servidores;
   String nome;
   String diretorioDestino;
   StartBackup startBackup;
-  String icon = 'assets/icons/menu_task.svg';
+  String icon = 'assets/icons/media_file.svg';
 
-  TarefaBackup({this.id, this.servidores, this.nome, this.diretorioDestino, this.startBackup});
+  //extras
+  dynamic status = '';
+  double percent = 0;
 
-  factory TarefaBackup.fromMap(Map<String, dynamic> map) {
-    var s = TarefaBackup(
+  RotinaBackup({this.id, this.servidores, this.nome, this.diretorioDestino, this.startBackup});
+
+  factory RotinaBackup.fromMap(Map<String, dynamic> map) {
+    var s = RotinaBackup(
       id: map['id'] as String,
       nome: map['nome'],
       diretorioDestino: map['diretorioDestino'],

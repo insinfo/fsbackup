@@ -1,0 +1,288 @@
+<svg version="1.1" x="0" y="0" id="ilemwsnn1" diagram-revision="2" width="1465" height="1015" xmlns="http://www.w3.org/2000/svg" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xlink="http://www.w3.org/1999/xlink" style="background-color: transparent;"><g>
+  <g id="ilemwsnn-ko16" transform="translate(5,5)">
+    <desc>root/abstractShapes/square?version=4&amp;author=Cinergix</desc>
+    <g id="image" transform="scale(16.1664981842041,11.166434288024902)">
+      <rect vector-effect="non-scaling-stroke" x="0" y="0" fill="#004a80" stroke="#004a80" width="90" height="90" style="stroke-width:1.5;stroke:#004a80;fill:#004a80;" stroke-width="1.5"></rect>
+    </g>
+  </g>
+  <g id="ilemwsnn-ko1" transform="translate(325,475)">
+    <desc>root/umlClass/class?version=4&amp;author=Cinergix</desc>
+    <g id="image">
+      <g id="graphics">
+        
+        <rect x="1" y="1" width="208.00067591667175" height="31" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="32" width="208.00067591667175" height="75" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="107" width="208.00067591667175" height="85.50034976005554" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="1" width="208.00067591667175" height="191.50034976005554" fill="#ffffff" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <path d="M 1 32 L 209.00067591667175 32 M 1 107 L 209.00067591667175 107 " fill="none" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      </g>
+      <text x="0" y="0" width="78.6" height="16.75" transform="translate(64.7,4)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;font-weight:bold;">Storage Unit</tspan>
+      </text>
+      <text x="0" y="0" width="60.25" height="16.75" transform="translate(6,35)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Id: String</tspan>
+      </text>
+      <text x="0" y="0" width="85.05" height="16.75" transform="translate(6,51.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Name: String</tspan>
+      </text>
+      <text x="0" y="0" width="126.8" height="16.75" transform="translate(6,68.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-MediaServer: String</tspan>
+      </text>
+      <text x="0" y="0" width="118.85" height="16.75" transform="translate(6,85.25)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-storagePath:String</tspan>
+      </text>
+      <text x="0" y="0" width="51" height="16.75" transform="translate(6,110)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+Write()</tspan>
+      </text>
+      <text x="0" y="0" width="46.6" height="16.75" transform="translate(6,126.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+Read()</tspan>
+      </text>
+      <text x="0" y="0" width="37.25" height="16.75" transform="translate(6,143.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+List()</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="ilemwsnn-ko6" transform="translate(669.95,320)">
+    <desc>root/umlClass/class?version=4&amp;author=Cinergix</desc>
+    <g id="image">
+      <g id="graphics">
+        
+        <rect x="1" y="1" width="208" height="31" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="32" width="208" height="58.25" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="90.25" width="208" height="75" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="1" width="208" height="164.25" fill="#ffffff" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <path d="M 1 32 L 209 32 M 1 90.25 L 209 90.25 " fill="none" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      </g>
+      <text x="0" y="0" width="92.1" height="16.75" transform="translate(57.95,4)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;font-weight:bold;">Backup Engine</tspan>
+      </text>
+      <text x="0" y="0" width="53.3" height="16.75" transform="translate(6,35)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Id: Char</tspan>
+      </text>
+      <text x="0" y="0" width="85.05" height="16.75" transform="translate(6,51.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Name: String</tspan>
+      </text>
+      <text x="0" y="0" width="116.75" height="16.75" transform="translate(6,68.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">PolicyName: String</tspan>
+      </text>
+      <text x="0" y="0" width="91.3" height="16.75" transform="translate(6,93.25)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+QueryAgent()</tspan>
+      </text>
+      <text x="0" y="0" width="111.45" height="16.75" transform="translate(6,110)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+PerformBackup()</tspan>
+      </text>
+      <text x="0" y="0" width="117.45" height="16.75" transform="translate(6,126.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+DoQualityCheck()</tspan>
+      </text>
+      <text x="0" y="0" width="116.05" height="16.75" transform="translate(6,143.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ReportToLogger()</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="ilemwsnn-ko4" transform="translate(-10,-120)">
+    <g id="graphics">
+      
+      <path d="M 440 595 L 440 575 L 612.475 575 L 612.475 525 L 679.95 525 " fill="none" stroke="#ffffff" stroke-width="1.5" mask="url(#TextboxMask-ilemwsnn-ko4)"></path>
+    </g>
+    <text x="0" y="0" width="26.85" height="23.35" transform="translate(433.25,563.3)">
+      <tspan x="4.95" y="15.91015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">+ 1</tspan>
+    </text>
+    <text x="0" y="0" width="26.85" height="23.35" transform="translate(638.1,513.3)">
+      <tspan x="4.95" y="15.91015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">+ 1</tspan>
+    </text>
+    <mask id="TextboxMask-ilemwsnn-ko4">
+      <rect x="0" y="0" width="1500" height="1500" style="fill:white;"></rect>
+      <rect x="0" y="0" width="26.85" height="23.35" transform="translate(433.25,563.3)"></rect>
+      <rect x="0" y="0" width="26.85" height="23.35" transform="translate(638.1,513.3)"></rect>
+    </mask>
+  </g>
+  <g id="ilemwsnn-ko8" transform="translate(385,405)">
+    <desc>root/textControl?version=&amp;author=</desc>
+    <g id="image"></g>
+    <text x="0" y="0" width="37.7" height="25.75" transform="translate(56.15,5.6)">
+      <tspan x="7" y="17.92001953125" style="font-family:Lato;font-size:14px;fill:#ffffff;">Has</tspan>
+    </text>
+  </g>
+  <g id="Class-ilemwsnn-ko28" transform="translate(1085,465)">
+    <desc>root/umlClass/class?version=4&amp;author=Cinergix</desc>
+    <g id="image">
+      <g id="graphics">
+        
+        <rect x="1" y="1" width="208" height="31" fill="none" stroke="#35a6e2" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="32" width="208" height="52" fill="none" stroke="#35a6e2" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="84" width="208" height="109" fill="none" stroke="#35a6e2" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="1" width="208" height="192" fill="#ffffff" stroke="#35a6e2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <path d="M 1 32 L 209 32 M 1 84 L 209 84 " fill="none" stroke="#35a6e2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      </g>
+      <text x="0" y="0" width="139.45" height="16.75" transform="translate(34.25,4)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;font-weight:bold;">Hyper-V Agent(Client)</tspan>
+      </text>
+      <text x="0" y="0" width="95.1" height="16.75" transform="translate(6,35)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;" xml:space="preserve">+ Name:  String</tspan>
+      </text>
+      <text x="0" y="0" width="161.55" height="16.75" transform="translate(6,51.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ Vm_list : Vector&lt;String&gt;</tspan>
+      </text>
+      <text x="0" y="0" width="187.7" height="16.75" transform="translate(6,87)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;" xml:space="preserve">+  getVMList(): Vector&lt;String&gt;</tspan>
+      </text>
+      <text x="0" y="0" width="160.5" height="16.75" transform="translate(6,103.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ getReadStream():Stream</tspan>
+      </text>
+      <text x="0" y="0" width="168.5" height="16.75" transform="translate(6,120.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ getWriteStream(): Stream</tspan>
+      </text>
+      <text x="0" y="0" width="140.55" height="16.75" transform="translate(6,137.25)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+VirtualizeDisk():String</tspan>
+      </text>
+      <text x="0" y="0" width="96.85" height="16.75" transform="translate(6,154)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+Mount():String</tspan>
+      </text>
+      <text x="0" y="0" width="3.6" height="16.75" transform="translate(6,170.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;"></tspan>
+      </text>
+    </g>
+  </g>
+  <g id="Connector-ilemwsnn-ko29" transform="translate(-10,-120)">
+    <g id="graphics">
+      
+      <path d="M 889.95 575 L 995.4749999999999 575 L 995.4749999999999 568 L 1200 568 L 1200 585 " fill="none" stroke="#f6902a" stroke-width="1.5" mask="url(#TextboxMask-Connector-ilemwsnn-ko29)"></path>
+    </g>
+    <text x="0" y="0" width="29.6" height="21" transform="translate(904.95,564.5)">
+      <tspan x="4.95" y="13.56015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">0..1</tspan>
+    </text>
+    <text x="0" y="0" width="27.75" height="21" transform="translate(1177.6,557.5)">
+      <tspan x="4.95" y="13.56015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">1..*</tspan>
+    </text>
+    <mask id="TextboxMask-Connector-ilemwsnn-ko29">
+      <rect x="0" y="0" width="1500" height="1500" style="fill:white;"></rect>
+      <rect x="0" y="0" width="29.6" height="21" transform="translate(904.95,564.5)"></rect>
+      <rect x="0" y="0" width="27.75" height="21" transform="translate(1177.6,557.5)"></rect>
+    </mask>
+  </g>
+  <g id="ilemwsnn-ko30" transform="translate(810,775)">
+    <desc>root/umlClass/class?version=4&amp;author=Cinergix</desc>
+    <g id="image">
+      <g id="graphics">
+        
+        <rect x="1" y="1" width="208" height="31" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="32" width="208" height="58.25" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="90.25" width="208" height="75" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="1" width="208" height="164.25" fill="#ffffff" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <path d="M 1 32 L 209 32 M 1 90.25 L 209 90.25 " fill="none" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      </g>
+      <text x="0" y="0" width="94.25" height="16.75" transform="translate(56.85,4)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;font-weight:bold;">Restore Engine</tspan>
+      </text>
+      <text x="0" y="0" width="53.3" height="16.75" transform="translate(6,35)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Id: Char</tspan>
+      </text>
+      <text x="0" y="0" width="85.05" height="16.75" transform="translate(6,51.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Name: String</tspan>
+      </text>
+      <text x="0" y="0" width="116.75" height="16.75" transform="translate(6,68.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">PolicyName: String</tspan>
+      </text>
+      <text x="0" y="0" width="91.3" height="16.75" transform="translate(6,93.25)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+QueryAgent()</tspan>
+      </text>
+      <text x="0" y="0" width="113.65" height="16.75" transform="translate(6,110)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+PerformRestore()</tspan>
+      </text>
+      <text x="0" y="0" width="117.45" height="16.75" transform="translate(6,126.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+DoQualityCheck()</tspan>
+      </text>
+      <text x="0" y="0" width="116.05" height="16.75" transform="translate(6,143.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ReportToLogger()</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="ilemwsnn-ko32" transform="translate(370,745)">
+    <desc>root/umlClass/class?version=4&amp;author=Cinergix</desc>
+    <g id="image">
+      <g id="graphics">
+        
+        <rect x="1" y="1" width="208" height="31" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="32" width="208" height="75" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="107" width="208" height="58.25" fill="none" stroke="#959595" stroke-width="2" stroke-opacity="0" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <rect x="1" y="1" width="208" height="164.25" fill="#ffffff" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></rect>
+        <path d="M 1 32 L 209 32 M 1 107 L 209 107 " fill="none" stroke="#959595" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      </g>
+      <text x="0" y="0" width="140.9" height="16.75" transform="translate(33.55,4)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;font-weight:bold;">nbfsd on Media Server</tspan>
+      </text>
+      <text x="0" y="0" width="53.3" height="16.75" transform="translate(6,35)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Id: Char</tspan>
+      </text>
+      <text x="0" y="0" width="85.05" height="16.75" transform="translate(6,51.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-Name: String</tspan>
+      </text>
+      <text x="0" y="0" width="112.05" height="16.75" transform="translate(6,68.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-MountPoint:Char</tspan>
+      </text>
+      <text x="0" y="0" width="100.35" height="16.75" transform="translate(6,85.25)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">-backupid:String</tspan>
+      </text>
+      <text x="0" y="0" width="114.95" height="16.75" transform="translate(6,110)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ExportNFS:String</tspan>
+      </text>
+      <text x="0" y="0" width="57.2" height="16.75" transform="translate(6,126.75)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+Mount()</tspan>
+      </text>
+      <text x="0" y="0" width="116.05" height="16.75" transform="translate(6,143.5)">
+        <tspan x="0" y="13.920019531249999" style="font-family:Lato;font-size:14px;fill:#4b4b4b;">+ReportToLogger()</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="Connector-ilemwsnn-ko34" transform="translate(-10,-120)">
+    <g id="graphics">
+      
+      <path d="M 550 865 L 550 826.75 L 565 826.75 L 565 690 L 545 690 " fill="none" stroke="#f6902a" stroke-width="1.5" mask="url(#TextboxMask-Connector-ilemwsnn-ko34)"></path>
+    </g>
+    <text x="0" y="0" width="29.6" height="23.35" transform="translate(535.2,826.65)">
+      <tspan x="4.95" y="15.91015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">0..1</tspan>
+    </text>
+    <text x="0" y="0" width="27.75" height="21" transform="translate(551.1,688.35)">
+      <tspan x="4.95" y="13.56015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">1..*</tspan>
+    </text>
+    <mask id="TextboxMask-Connector-ilemwsnn-ko34">
+      <rect x="0" y="0" width="1500" height="1500" style="fill:white;"></rect>
+      <rect x="0" y="0" width="29.6" height="23.35" transform="translate(535.2,826.65)"></rect>
+      <rect x="0" y="0" width="27.75" height="21" transform="translate(551.1,688.35)"></rect>
+    </mask>
+  </g>
+  <g id="Connector-ilemwsnn-ko35" transform="translate(-10,-120)">
+    <g id="graphics">
+      
+      <path d="M 820 980 L 705 980 L 705 1000 L 590 1000 " fill="none" stroke="#f6902a" stroke-width="1.5" mask="url(#TextboxMask-Connector-ilemwsnn-ko35)"></path>
+    </g>
+    <text x="0" y="0" width="21.95" height="23.35" transform="translate(783.55,968.3)">
+      <tspan x="4" y="15.91015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">+1</tspan>
+    </text>
+    <text x="0" y="0" width="27.5" height="23.35" transform="translate(604.85,988.3)">
+      <tspan x="4.85" y="15.91015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">1..*</tspan>
+    </text>
+    <mask id="TextboxMask-Connector-ilemwsnn-ko35">
+      <rect x="0" y="0" width="1500" height="1500" style="fill:white;"></rect>
+      <rect x="0" y="0" width="21.95" height="23.35" transform="translate(783.55,968.3)"></rect>
+      <rect x="0" y="0" width="27.5" height="23.35" transform="translate(604.85,988.3)"></rect>
+    </mask>
+  </g>
+  <g id="Connector-ilemwsnn-ko36" transform="translate(-10,-120)">
+    <g id="graphics">
+      
+      <path d="M 1030 930 L 1200 930 L 1200 780 " fill="none" stroke="#f6902a" stroke-width="1.5" mask="url(#TextboxMask-Connector-ilemwsnn-ko36)"></path>
+    </g>
+    <text x="0" y="0" width="23.9" height="23.35" transform="translate(1045,918.3)">
+      <tspan x="4.95" y="15.91015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">+1</tspan>
+    </text>
+    <text x="0" y="0" width="27.75" height="21" transform="translate(1186.1,795)">
+      <tspan x="4.95" y="13.56015625" style="font-family:Lato;font-size:12px;fill:#000000;font-weight:bold;">1..*</tspan>
+    </text>
+    <mask id="TextboxMask-Connector-ilemwsnn-ko36">
+      <rect x="0" y="0" width="1500" height="1500" style="fill:white;"></rect>
+      <rect x="0" y="0" width="23.9" height="23.35" transform="translate(1045,918.3)"></rect>
+      <rect x="0" y="0" width="27.75" height="21" transform="translate(1186.1,795)"></rect>
+    </mask>
+  </g>
+<defs></defs></g></svg>

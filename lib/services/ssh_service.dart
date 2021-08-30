@@ -57,14 +57,17 @@ class SshService {
       client.sendChannelData(utf8.encode(cmd));
       var isEnd = false;
       var result = '';
-      outStream.stream.listen((data) {
+      outStream.stream.listen((line) {
         //isaque.neves@laravel:/var/www/dart$
-        result += data;
-        if (data.trim().endsWith('\$')) {
-          //print('stream.listen $data');
-          if (isEnd == false) {
-            isEnd = true;
-            completer.complete(result);
+        result += line;
+        var l = line.trim();
+        if (l.startsWith('$user@')) {
+          if (l.endsWith('\$') || l.endsWith('#')) {
+            //print('stream.listen $data');
+            if (isEnd == false) {
+              isEnd = true;
+              completer.complete(result);
+            }
           }
         }
       });

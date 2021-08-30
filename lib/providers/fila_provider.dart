@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/models/rotina_backup.dart';
 import 'package:fsbackup/repositories/tarefa_repository.dart';
-import 'package:fsbackup/services/backup_task.dart';
+
 import 'package:fsbackup/services/ssh_service.dart';
-import 'package:fsbackup/worker/worker.dart';
 
 class FilaProvider extends ChangeNotifier {
   final RotinaBackupRepository repository;

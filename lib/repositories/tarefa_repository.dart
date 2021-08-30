@@ -1,41 +1,40 @@
 import 'package:fsbackup/models/rotina_backup.dart';
-import 'package:fsbackup/db/local_database.dart';
+
+import 'package:fsbackup/services/mongodb_service.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 class RotinaBackupRepository {
-  final LocalDatabase db = LocalDatabase();
-  RotinaBackupRepository() {
-    db.collection = 'tarefas';
-  }
-
-  Future<dynamic> initDB() {
-    return db.initDB();
+  final MongodbService mongo;
+  DbCollection collection;
+  RotinaBackupRepository(this.mongo) {
+    collection = mongo.db.collection('rotinas');
   }
 
   Future<List<RotinaBackup>> all() async {
-    var result = await db.find();
+    final result = await collection.find().toList();
     return result.map((m) => RotinaBackup.fromMap(m)).toList();
   }
 
   Future<RotinaBackup> getById(String id) async {
-    var result = await db.first({'id': id});
+    final result = await collection.findOne({'id': id});
     return RotinaBackup.fromMap(Map<String, dynamic>.from(result));
   }
 
   Future<RotinaBackup> insert(RotinaBackup server) async {
-    await db.insert(server.toMap());
+    await collection.insert(server.toMap());
     return server;
   }
 
   Future<RotinaBackup> update(RotinaBackup server) async {
-    await db.update({'id': server.id}, server.toMap());
+    await collection.update({'id': server.id}, server.toMap());
     return server;
   }
 
   Future<void> remove(RotinaBackup server) async {
-    await db.remove({'id': server.id});
+    await collection.remove({'id': server.id});
   }
 
   Future<void> removeById(String id) async {
-    await db.remove({'id': id});
+    await collection.remove({'id': id});
   }
 }

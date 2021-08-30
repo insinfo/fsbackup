@@ -1,41 +1,40 @@
 import 'package:fsbackup/models/servidor.dart';
-import 'package:fsbackup/db/local_database.dart';
+
+import 'package:fsbackup/services/mongodb_service.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 class ServidorRepository {
-  final LocalDatabase db = LocalDatabase();
-  ServidorRepository() {
-    db.collection = 'servidores';
-  }
-
-  Future<dynamic> initDB() {
-    return db.initDB();
+  final MongodbService mongo;
+  DbCollection collection;
+  ServidorRepository(this.mongo) {
+    collection = mongo.db.collection('servidores');
   }
 
   Future<List<Servidor>> all() async {
-    var result = await db.find();
+    final result = await collection.find().toList();
     return result.map((m) => Servidor.fromMap(m)).toList();
   }
 
   Future<Servidor> getById(String id) async {
-    var result = await db.first({'id': id});
+    final result = await collection.findOne({'id': id});
     return Servidor.fromMap(Map<String, dynamic>.from(result));
   }
 
   Future<Servidor> insert(Servidor server) async {
-    await db.insert(server.toMap());
+    await collection.insert(server.toMap());
     return server;
   }
 
   Future<Servidor> update(Servidor server) async {
-    await db.update({'id': server.id}, server.toMap());
+    await collection.update({'id': server.id}, server.toMap());
     return server;
   }
 
   Future<void> remove(Servidor server) async {
-    await db.remove({'id': server.id});
+    await collection.remove({'id': server.id});
   }
 
   Future<void> removeById(String id) async {
-    await db.remove({'id': id});
+    await collection.remove({'id': id});
   }
 }

@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return MainScreen();
             }
-            return Center(child: CircularProgressIndicator());
+            return Scaffold(backgroundColor: bgColor, body: Center(child: CircularProgressIndicator()));
           },
         ));
   }

@@ -1,0 +1,25 @@
+Package: libssh
+Version: 0.9.5
+Port-Version: 4
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 7235999680dfbe06d1bdc074414f9ce590cb7784070611917d2760d30c2fd80a
+Description: libssh is a multiplatform C library implementing the SSHv2 protocol on client and server side
+Type: Port
+Default-Features: crypto
+
+Package: libssh
+Feature: crypto
+Depends: libssh
+Architecture: x64-windows
+Multi-Arch: same
+Description: Default crypto backend
+Type: Port
+
+Package: libssh
+Feature: mbedtls
+Depends: mbedtls
+Architecture: x64-windows
+Multi-Arch: same
+Description: Crypto support (mbedTLS)
+Type: Port

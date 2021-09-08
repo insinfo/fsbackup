@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dartssh/client.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:fsbackup/models/rotina_backup.dart';
 
@@ -20,7 +19,6 @@ class BackupTask implements FileTask<Future<bool>> {
     return _doExecute();
   }
 
-  SSHClient client;
   Future<bool> _doExecute() async {
     cancelToken = dio.CancelToken();
     var completer = Completer<bool>();

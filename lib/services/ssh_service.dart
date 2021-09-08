@@ -1,6 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
+/*
 import 'package:dartssh/client.dart';
 
 class SshService {
@@ -10,6 +8,7 @@ class SshService {
   SSHClient client;
   bool isConnected = false;
   StreamController<String> outStream;
+  StreamSubscription _streamSubscription;
 
   SshService({
     this.uri,
@@ -51,26 +50,27 @@ class SshService {
     return completer.future;
   }
 
-  Future<String> sendCommand(String cmd) async {
-    var completer = Completer<String>();
+  Future<List<String>> sendCommand(String cmd) async {
+    var completer = Completer<List<String>>();
     try {
-      client.sendChannelData(utf8.encode(cmd));
       var isEnd = false;
-      var result = '';
-      outStream.stream.listen((line) {
+      var lines = <String>[];
+      _streamSubscription = outStream.stream.listen((line) {
         //isaque.neves@laravel:/var/www/dart$
-        result += line;
+        lines.add(line);
         var l = line.trim();
         if (l.startsWith('$user@')) {
           if (l.endsWith('\$') || l.endsWith('#')) {
             //print('stream.listen $data');
             if (isEnd == false) {
               isEnd = true;
-              completer.complete(result);
+              _streamSubscription.cancel();
+              completer.complete(lines);
             }
           }
         }
       });
+      client.sendChannelData(utf8.encode(cmd + ' \n'));
     } catch (e, s) {
       print('SshService@sendCommand $e $s');
       completer.completeError(e, s);
@@ -78,8 +78,24 @@ class SshService {
     return completer.future;
   }
 
-  void close() {
-    client?.disconnect('terminate');
-    outStream?.close();
+  Future<String> execCommand(String cmd, {bool ignoreFirstAndLastLine = true}) async {
+    var lines = await sendCommand(cmd);
+
+    if (ignoreFirstAndLastLine) {
+      if (lines.length < 3) {
+        return '';
+      } else {
+        lines.removeRange(0, 1);
+        lines.removeLast();
+      }
+    }
+
+    return lines.join();
+  }
+
+  Future<void> close() async {
+    client.disconnect('terminate');
+    await outStream.close();
   }
 }
+*/

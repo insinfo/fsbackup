@@ -7,8 +7,8 @@ environment:
   sdk: ">=2.10.0 <3.0.0"
 
 dependencies:
-  #flutter:
-    #sdk: flutter
+  flutter:
+    sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -22,47 +22,31 @@ dependencies:
   #dartssh:
     #path: 
       #../dartssh
-  #path_provider: ^2.0.2 
-  #dio: any
-  #http: any
-  #url_launcher: ^6.0.9
-  #objectdb: ^1.2.1+1 #database NoSQL não tem collections
-  #mongo_dart: ^0.7.1
-  #process_run: ^0.12.1+1    
-  #google_fonts: any
-  #flutter_svg: ^0.22.0
-  #fl_chart: ^0.36.4
-  #provider: ^6.0.0
-  #data_table_2: ^2.1.1
-  #get_it: ^7.2.0
-  #page_transition: ^2.0.2
-  #uuid: any
-  #win32: any
-  #ffi: any
-  #csv: any
+  path_provider: ^2.0.2 
+  dio: any
+  http: any
+  url_launcher: ^6.0.9
+  objectdb: ^1.2.1+1 #database NoSQL não tem collections
+  mongo_dart: ^0.7.1
+  process_run: ^0.12.1+1    
+  google_fonts: any
+  flutter_svg: ^0.22.0
+  fl_chart: ^0.36.4
+  provider: ^6.0.0
+  data_table_2: ^2.1.1
+  get_it: ^7.2.0
+  page_transition: ^2.0.2
+  uuid: any
+  win32: any
+  ffi: any
+  csv: any
   #dcli: any
 
 dev_dependencies:
   #flutter_test:
     #sdk: flutter
-  build_runner: any
-  ffigen: 1.2.0
-  
-ffigen:
-  name: 'Libssh'
-  description: 'Bindings to Libssh'
-  output: 'generated_bindings.dart'
-  llvm-path:     
-    - 'C:\Program Files\llvm'      
-  headers:
-    entry-points:
-      - 'libssh_compiled/include/libssh/**.h'      
-    #include-directives:
-      #- 'libssh/include/**'
-      #- 'libssh/include/libssh/**'
-      #- 'libssh/src/**'
-  
-
+  build_runner: any  
+    
 # The following section is specific to Flutter.
 flutter:
   # The following line ensures that the Material Icons font is

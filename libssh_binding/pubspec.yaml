@@ -14,17 +14,18 @@ dev_dependencies:
   ffigen: ^4.0.0
   
 ffigen:
-  name: 'Libssh'
-  description: 'Bindings to libssh'
-  output: 'libssh.dart'
+  name: 'Sftp'
+  description: 'Bindings to sftp'
+  output: 'sftp.dart'
   llvm-path:     
     - 'C:\Program Files\llvm'      
   headers:
     entry-points:
-      - 'libssh/include/libssh/libssh.h'      
+      - 'libssh/include/libssh/sftp.h'      
     include-directives:
-      - '**libssh.h'
+      - '**sftp.h'
       #- 'libssh/include/libssh/**'
       #- 'libssh/src/**'
-  
+  #compiler-opts:
+    #- '-Ilibssh/'
 

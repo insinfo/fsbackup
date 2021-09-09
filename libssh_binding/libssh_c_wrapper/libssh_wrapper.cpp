@@ -37,19 +37,25 @@ string exec_ssh_command(ssh_session
 	rc = ssh_channel_request_exec(channel, command);
 	if (rc != SSH_OK) {
 		ssh_channel_close(channel);
-		ssh_channel_free(channel);		
+		ssh_channel_free(channel);
 		return NULL;
 	}
+	//fprintf(stdout, " size %d --- \r\n", sizeof(buffer));
 	nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
+	int count = 0;
 	while (nbytes > 0)
 	{
-		if (fwrite(buffer, 1, nbytes, stdout) != nbytes)
+
+		auto fw = fwrite(buffer, 1, nbytes, stdout);
+		//fprintf(stdout, " ----- %d --- %d --- \r\n", count, fw);
+		if (fw != nbytes)
 		{
 			ssh_channel_close(channel);
 			ssh_channel_free(channel);
 			return NULL;
 		}
 		nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
+		count++;
 	}
 
 	if (nbytes < 0)
@@ -64,6 +70,31 @@ string exec_ssh_command(ssh_session
 	ssh_channel_free(channel);
 
 	return receive;
+}
+//The example below shows how to open a connection to read a single file:
+int scp_read(ssh_session session)
+{
+	ssh_scp scp;
+	int rc;
+	scp = ssh_scp_new(session, SSH_SCP_READ, "helloworld/helloworld.txt");
+	if (scp == NULL)
+	{
+		fprintf(stderr, "Error allocating scp session: %s\n",
+			ssh_get_error(session));
+		return SSH_ERROR;
+	}
+	rc = ssh_scp_init(scp);
+	if (rc != SSH_OK)
+	{
+		fprintf(stderr, "Error initializing scp session: %s\n",
+			ssh_get_error(session));
+		ssh_scp_free(scp);
+		return rc;
+	}
+
+	ssh_scp_close(scp);
+	ssh_scp_free(scp);
+	return SSH_OK;
 }
 
 int main()
@@ -105,7 +136,7 @@ int main()
 		exit(-1);
 	}
 
-	string  resp = exec_ssh_command(my_ssh_session,"ls -l");
+	string  resp = exec_ssh_command(my_ssh_session, "ls -l");
 	std::cout << resp << endl;
 
 	ssh_disconnect(my_ssh_session);

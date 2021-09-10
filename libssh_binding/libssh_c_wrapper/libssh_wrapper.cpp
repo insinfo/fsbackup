@@ -10,6 +10,9 @@
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
 #include "custom_exception.cpp"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 //using namespace std;
 using std::string;
@@ -99,6 +102,10 @@ int scp_read(ssh_session session)
 
 int main()
 {
+	int access_type = O_WRONLY | O_CREAT | O_TRUNC;
+	fprintf(stdout, "access_type: %d\n", access_type);
+
+	//auto teste = O_WRONLY;
 	ssh_session my_ssh_session;
 	int rc;
 	int port = 22;

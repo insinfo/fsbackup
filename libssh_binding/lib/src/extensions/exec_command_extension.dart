@@ -3,24 +3,29 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/src/libssh.dart';
-import 'package:libssh_binding/src/utils.dart';
 
 extension ExecSshCommandExtension on Libssh {
   String execCommand(ssh_session session, String command) {
-    Pointer<Int8> cmd = stringToNativeInt8(command);
+    var cmd = command.toNativeUtf8();
     ssh_channel channel = ssh_channel_new(session);
+    if (channel.address == nullptr.address) {
+      throw Exception(
+          'Error allocating ssh_channel session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+    }
     var receive = "";
     var rc = ssh_channel_open_session(channel);
     if (rc != SSH_OK) {
       this.ssh_channel_free(channel);
-      throw Exception('Error on ssh_channel_open_session');
+      throw Exception(
+          'Error on ssh_channel_open_session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
 
-    rc = ssh_channel_request_exec(channel, cmd);
+    rc = ssh_channel_request_exec(channel, cmd.cast<Int8>());
     if (rc != SSH_OK) {
       ssh_channel_close(channel);
       ssh_channel_free(channel);
-      throw Exception('Error on ssh_channel_request_exec');
+      throw Exception(
+          'Error on ssh_channel_request_exec: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
     var bufferLength = 256;
     final buffer = malloc<Int8>(bufferLength); //	char buffer[256];

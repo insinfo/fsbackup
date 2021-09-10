@@ -17,6 +17,23 @@ class Libssh {
   Libssh.fromLookup(ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) lookup) : _lookup = lookup;
 
   /*********************************** INICIO SFTP ***************************************/
+
+  /// abtraction for init SFTP
+  ffi.Pointer<sftp_session_struct> initSFTP(ssh_session session) {
+    var sftp = sftp_new(session);
+    if (sftp.address == ffi.nullptr.address) {
+      throw Exception('Error allocating SFTP session: ${sftp_get_error(sftp)}');
+    }
+    //initializing SFTP session
+    var rc = sftp_init(sftp);
+    if (rc != SSH_OK) {
+      sftp_free(sftp);
+      throw Exception('Error initializing SFTP session: ${sftp_get_error(sftp)}');
+    }
+
+    return sftp;
+  }
+
   /// @brief Creates a new sftp session.
   ///
   /// This function creates a new sftp session and allocates a new sftp channel
@@ -38,7 +55,8 @@ class Libssh {
   }
 
   late final _sftp_newPtr = _lookup<ffi.NativeFunction<sftp_session Function(ssh_session)>>('sftp_new');
-  late final _sftp_new = _sftp_newPtr.asFunction<sftp_session Function(ssh_session)>();
+  late final sftp_session Function(ssh_session) _sftp_new =
+      _sftp_newPtr.asFunction<sftp_session Function(ssh_session)>();
 
   /// @brief Start a new sftp session with an existing channel.
   ///

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:libssh_binding/libssh_binding.dart';
+import 'package:libssh_binding/src/extensions/sftp_extension.dart';
 import 'dart:ffi' as ffi;
 import 'package:path/path.dart' as path;
 
@@ -19,6 +20,8 @@ void main() async {
   var my_ssh_session = libssh.ssh_new();
   libssh.ssh_options_set(my_ssh_session, ssh_options_e.SSH_OPTIONS_HOST, stringToNativeVoid(host));
   libssh.ssh_options_set(my_ssh_session, ssh_options_e.SSH_OPTIONS_PORT, intToNativeVoid(port));
+  //libssh.ssh_options_set(my_ssh_session, ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY, intToNativeVoid(SSH_LOG_PROTOCOL));
+  libssh.ssh_options_set(my_ssh_session, ssh_options_e.SSH_OPTIONS_USER, stringToNativeVoid(username));
   // Conecte-se ao servidor
   var rc = libssh.ssh_connect(my_ssh_session);
   if (rc != SSH_OK) {
@@ -32,16 +35,31 @@ void main() async {
     //ssh_disconnect(my_ssh_session);
     //ssh_free(my_ssh_session);
   }
+  String resp = '';
+  // resp = libssh.execCommand(my_ssh_session, 'ls -l');
+  //print("$resp");
+  /*resp = libssh.execCommand(my_ssh_session, 'cd /var/www/dart && ls -l');
+  print("$resp");*/
 
-  var resp = libssh.execCommand(my_ssh_session, 'ls -l');
-  print("$resp");
+  /*resp = libssh.scpReadFileAsString(my_ssh_session, '/home/isaque.neves/teste.txt');
+  print('$resp');*/
 
-  /*var resp = libssh.scpReadFileAsString(my_ssh_session, '/home/isaque.neves/teste.txt');
-  print('resp $resp');
-
-  await libssh.scpDownloadFileTo(
+  /*await libssh.scpDownloadFileTo(
       my_ssh_session, '/home/isaque.neves/teste.txt', path.join(Directory.current.path, 'teste.txt'));*/
 
+  var start = DateTime.now();
+
+  /*await libssh.sftpCopyLocalFileToRemote(
+      my_ssh_session, path.join(Directory.current.path, 'teste.mp4'), '/home/isaque.neves/teste.mp4');*/
+  var sftp = libssh.initSFTP(my_ssh_session);
+  await libssh.sftpDownloadFileTo(
+      my_ssh_session, '/home/isaque.neves/teste.mp4', path.join(Directory.current.path, 'teste.mp4'),
+      inSftp: sftp);
+
+  print(DateTime.now().difference(start));
+
+  libssh.ssh_disconnect(my_ssh_session);
+  libssh.ssh_free(my_ssh_session);
   //sleep(Duration(minutes: 50));
 
   exit(0);

@@ -72,5 +72,11 @@ void main() async {
 
 ```
 
-<!-- dart run ffigen --config  ffigen.yaml-->
+<!-- 
+
+dart run ffigen --config  ffigen.yaml
+go1.11.4.linux-amd64.tar.gz 120MB file
+dart run --observe --pause-isolates-on-start .\example\main.dart
+Measure-Command {pscp -pw Ins257257 isaque.neves@192.168.133.13:/home/isaque.neves/go1.11.4.linux-amd64.tar.gz ./go1.11.4.linux-amd64.tar.gz }
+-->
 

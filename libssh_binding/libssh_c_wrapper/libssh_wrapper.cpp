@@ -1,4 +1,5 @@
-
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_DEPRECATE
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -13,6 +14,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <io.h>
+#include <time.h>
+#include <chrono>
+
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 //using namespace std;
 using std::string;
@@ -100,10 +109,84 @@ int scp_read(ssh_session session)
 	return SSH_OK;
 }
 
+
+// Good chunk size
+#define MAX_XFER_BUF_SIZE 16384
+int sftpDownloadFileTo(ssh_session session, const char* fullRemotePath, const char* fullLocalPath)
+{
+	 
+	int access_type;
+	sftp_file file;
+	char buffer[MAX_XFER_BUF_SIZE * 8];//128KB
+	ssize_t nbytes, nwritten, rc;
+	int fd;
+	access_type = O_RDONLY;
+
+	 sftp_session sftp = sftp_new(session);
+	if (sftp == NULL)
+	{
+		fprintf(stderr, "Error allocating SFTP session: %s\n",
+			ssh_get_error(session));
+		return SSH_ERROR;
+	}
+	rc = sftp_init(sftp);
+	if (rc != SSH_OK)
+	{
+		fprintf(stderr, "Error initializing SFTP session: %d.\n",
+			sftp_get_error(sftp));
+		sftp_free(sftp);
+		return rc;
+	}
+		
+
+	file = sftp_open(sftp, fullRemotePath, access_type, 0);
+
+	if (file == NULL) {
+		fprintf(stderr, "Can't open file for reading: %s\n", ssh_get_error(session));
+		return SSH_ERROR;
+	}
+
+	fd = open(fullLocalPath, O_CREAT | O_RDWR, 0777);
+	if (fd < 0) {
+		fprintf(stderr, "Can't open file for writing: %s\n",
+			strerror(errno));
+		return SSH_ERROR;
+	}
+
+	for (;;) {
+		nbytes = sftp_read(file, buffer, sizeof(buffer));
+		if (nbytes == 0) {
+			break; // EOF
+		}
+		else if (nbytes < 0) {
+			fprintf(stderr, "Error while reading file: %s\n",
+				ssh_get_error(session));
+			sftp_close(file);
+			return SSH_ERROR;
+		}
+		nwritten = write(fd, buffer, nbytes);
+		if (nwritten != nbytes) {
+			fprintf(stderr, "Error writing: %s\n",
+				strerror(errno));
+			sftp_close(file);
+			return SSH_ERROR;
+		}
+	}
+	rc = sftp_close(file);
+	if (rc != SSH_OK) {
+		fprintf(stderr, "Can't close the read file: %s\n",
+			ssh_get_error(session));
+		return rc;
+	}
+
+	sftp_free(sftp);
+	return SSH_OK;
+}
+
 int main()
 {
-	int access_type = O_WRONLY | O_CREAT | O_TRUNC;
-	fprintf(stdout, "access_type: %d\n", access_type);
+	//int access_type = O_WRONLY | O_CREAT | O_TRUNC;
+	//fprintf(stdout, "access_type: %d\n", access_type);
 
 	//auto teste = O_WRONLY;
 	ssh_session my_ssh_session;
@@ -143,13 +226,23 @@ int main()
 		exit(-1);
 	}
 
-	string  resp = exec_ssh_command(my_ssh_session, "ls -l");
-	std::cout << resp << endl;
+	//string  resp = exec_ssh_command(my_ssh_session, "ls -l");
+	//std::cout << resp << endl;
+	clock_t tic = clock();
+	auto t1 = high_resolution_clock::now();
+	sftpDownloadFileTo(my_ssh_session, "/home/isaque.neves/go1.11.4.linux-amd64.tar.gz", "D:/MyDartProjects/fsbackup/libssh_binding/go1.11.4.linux-amd64.tar.gz");
+	auto t2 = high_resolution_clock::now();
+	clock_t toc = clock();
+	
+	duration<double, std::milli> ms_double = t2 - t1;	
+	std::cout << ms_double.count() << " ms\r\n";
+
+	printf("Elapsed: %f seconds\n", (double)(toc - tic) / CLOCKS_PER_SEC);
 
 	ssh_disconnect(my_ssh_session);
 	ssh_free(my_ssh_session);
 
-	std::cout << "Fim\n";
+	std::cout << "End\n";
 
 	return 0;
 }

@@ -12,6 +12,8 @@ import 'package:libssh_binding/src/stat.dart';
 
 import '../constants.dart';
 
+import 'dart:developer';
+
 extension SftpExtension on Libssh {
   /// create Directory on the remote computer
   /// [fullPath] example => "/home/helloworld"
@@ -42,7 +44,7 @@ extension SftpExtension on Libssh {
   Future<void> sftpCopyLocalFileToRemote(
       ssh_session session, String localFilefullPath, String remoteFilefullPath) async {
     var remotePath = remoteFilefullPath.toNativeUtf8();
-    var sftp = initSFTP(session);
+    var sftp = initSftp(session);
     //get remote file for writing
     int access_type = O_WRONLY | O_CREAT | O_TRUNC;
     var remoteFile = sftp_open(sftp, remotePath.cast(), access_type, S_IRWXU);
@@ -105,7 +107,7 @@ extension SftpExtension on Libssh {
       {Pointer<sftp_session_struct>? inSftp}) async {
     var remotePath = fullRemotePath.toNativeUtf8();
 
-    var sftp = inSftp != null ? inSftp : initSFTP(session);
+    var sftp = inSftp != null ? inSftp : initSftp(session);
 
     var access_type = O_RDONLY;
 
@@ -120,9 +122,14 @@ extension SftpExtension on Libssh {
 
     var targetFile = await File(fullLocalPath).create(recursive: true);
     var sink = targetFile.openWrite(); // for appending at the end of file
+    var bfs = sizeOf<Int8>() * bufferSize;
+    var bfn = bufferNative.cast<Void>();
 
+    Timeline.startSync('sftpDownloadFileTo');
+    final stopwatch = Stopwatch()..start();
+    var start = DateTime.now();
     while (true) {
-      nbytes = sftp_read(remoteFile, bufferNative.cast(), sizeOf<Int8>() * bufferSize);
+      nbytes = sftp_read(remoteFile, bfn, bfs);
       nwritten += nbytes;
       if (nbytes == 0) {
         break; // EOF
@@ -137,9 +144,12 @@ extension SftpExtension on Libssh {
         throw Exception('Error while reading file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
       }
 
-      var data = bufferNative.asTypedList(nbytes);
-      sink.add(data);
+      sink.add(bufferNative.asTypedList(nbytes));
     }
+    stopwatch.stop();
+    print(DateTime.now().difference(start));
+    print("sftpDownloadFileTo: ${stopwatch.elapsedMilliseconds} elapsed milliseconds");
+    Timeline.finishSync();
 
     await sink.flush();
     await sink.close();

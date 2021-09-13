@@ -47,17 +47,21 @@ void main() async {
   /*await libssh.scpDownloadFileTo(
       my_ssh_session, '/home/isaque.neves/teste.txt', path.join(Directory.current.path, 'teste.txt'));*/
 
-  var start = DateTime.now();
-
   /*await libssh.sftpCopyLocalFileToRemote(
       my_ssh_session, path.join(Directory.current.path, 'teste.mp4'), '/home/isaque.neves/teste.mp4');*/
-  var sftp = libssh.initSFTP(my_ssh_session);
-  await libssh.sftpDownloadFileTo(
-      my_ssh_session, '/home/isaque.neves/teste.mp4', path.join(Directory.current.path, 'teste.mp4'),
-      inSftp: sftp);
+  //sleep(Duration(seconds: 20));
 
-  print(DateTime.now().difference(start));
+  print(path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'));
+  var sftp = libssh.initSftp(my_ssh_session);
+  for (var i = 0; i < 10; i++) {
+    //var start = DateTime.now();
+    await libssh.sftpDownloadFileTo(my_ssh_session, '/home/isaque.neves/go1.11.4.linux-amd64.tar.gz',
+        path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'),
+        inSftp: sftp);
+  }
 
+  //print(DateTime.now().difference(start));
+  sleep(Duration(minutes: 30));
   libssh.ssh_disconnect(my_ssh_session);
   libssh.ssh_free(my_ssh_session);
   //sleep(Duration(minutes: 50));

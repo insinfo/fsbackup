@@ -19,7 +19,7 @@ class Libssh {
   /*********************************** INICIO SFTP ***************************************/
 
   /// abtraction for init SFTP
-  ffi.Pointer<sftp_session_struct> initSFTP(ssh_session session) {
+  ffi.Pointer<sftp_session_struct> initSftp(ssh_session session) {
     var sftp = sftp_new(session);
     if (sftp.address == ffi.nullptr.address) {
       throw Exception('Error allocating SFTP session: ${sftp_get_error(sftp)}');

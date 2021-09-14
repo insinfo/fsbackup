@@ -17,6 +17,9 @@
 #include <io.h>
 #include <time.h>
 #include <chrono>
+#include <vector>
+
+#include <windows.h>
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
@@ -28,7 +31,7 @@ using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
-
+using std::vector;
 
 
 string exec_ssh_command(ssh_session
@@ -112,15 +115,21 @@ int scp_read(ssh_session session)
 
 // Good chunk size
 #define MAX_XFER_BUF_SIZE 16384
-int sftpDownloadFileTo(ssh_session session, const char* fullRemotePath, const char* fullLocalPath)
+int sftpDownloadFileTo(ssh_session session, const char* ftpfile, const char* localfile)
 {
 	 
-	int access_type;
-	sftp_file file;
-	char buffer[MAX_XFER_BUF_SIZE * 8];//128KB
-	ssize_t nbytes, nwritten, rc;
-	int fd;
-	access_type = O_RDONLY;
+	
+	ssize_t retcode = 0, rc;
+	int res = TRUE;
+	sftp_file sfile = NULL;
+	const int bufsize = 128 * 1024;
+	//std::vector<char> _buf(bufsize);
+	//char* buf = &_buf[0];
+	char buf[bufsize];
+	DWORD len = 0;
+	long totalReceived = 0;
+	long totalSize = -1;
+	
 
 	 sftp_session sftp = sftp_new(session);
 	if (sftp == NULL)
@@ -139,45 +148,76 @@ int sftpDownloadFileTo(ssh_session session, const char* fullRemotePath, const ch
 	}
 		
 
-	file = sftp_open(sftp, fullRemotePath, access_type, 0);
-
-	if (file == NULL) {
-		fprintf(stderr, "Can't open file for reading: %s\n", ssh_get_error(session));
+	sfile = sftp_open(sftp, ftpfile, O_RDONLY, 0664);	//default rw-rw-r-- permission
+	if (sfile == NULL) {
+		fprintf(stderr, "Can't open file for reading: %s %s\n", ftpfile, ssh_get_error(session));
 		return SSH_ERROR;
 	}
 
-	fd = open(fullLocalPath, O_CREAT | O_RDWR, 0777);
-	if (fd < 0) {
-		fprintf(stderr, "Can't open file for writing: %s\n",
-			strerror(errno));
-		return SSH_ERROR;
+	sftp_attributes fattr = sftp_stat(sftp, ftpfile);
+	if (fattr == NULL) {
+		totalSize = -1;
+	}
+	else {
+		totalSize = (long)fattr->size;
+		sftp_attributes_free(fattr);
+	}
+													// O_CREAT create and open file
+	//fd = open(localfile, O_CREAT | O_RDWR, 0777);// O_RDWR open for reading and writing
+	/*int fileHandle = 0;
+	 int r = _sopen_s(&fileHandle, localfile, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+	fprintf(stdout, "open file %d %s.\n", fileHandle, localfile);
+	if (r) {
+		printf("Bad open!");
+	}*/
+	HANDLE hFile = CreateFileA(
+		localfile,                // name of the write
+		GENERIC_READ | GENERIC_WRITE,          // open for writing
+		0,                      // do not share
+		NULL,                   // default security
+		CREATE_ALWAYS,             // create new file only
+		FILE_ATTRIBUTE_NORMAL,  // normal file
+		NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{		
+		fprintf(stderr, " Unable to open file \"%s\" for write.\n", ftpfile);
+	}
+	
+
+	retcode = sftp_read(sfile, buf, bufsize);
+	while (retcode > 0 ) {
+		/*res = _write(fileHandle, buf, retcode);
+		if (res == -1) {			
+			switch (errno)
+			{
+			case EBADF:
+				perror("Bad file descriptor!");
+				break;
+			case ENOSPC:
+				perror("No space left on device!");
+				break;
+			case EINVAL:
+				perror("Invalid parameter: buffer was NULL!");
+				break;
+			default:
+				// An unrelated error occurred
+				perror("Unexpected error!");
+			}			
+		}*/
+		res = WriteFile(hFile, buf, static_cast<DWORD>(retcode), &len, NULL);
+		if (res == FALSE)
+		{
+			break;
+			printf("Terminal failure: Unable to write to file.\n");
+		}
+
+		totalReceived += len;
+	
+		retcode = sftp_read(sfile, buf, bufsize);
 	}
 
-	for (;;) {
-		nbytes = sftp_read(file, buffer, sizeof(buffer));
-		if (nbytes == 0) {
-			break; // EOF
-		}
-		else if (nbytes < 0) {
-			fprintf(stderr, "Error while reading file: %s\n",
-				ssh_get_error(session));
-			sftp_close(file);
-			return SSH_ERROR;
-		}
-		nwritten = write(fd, buffer, nbytes);
-		if (nwritten != nbytes) {
-			fprintf(stderr, "Error writing: %s\n",
-				strerror(errno));
-			sftp_close(file);
-			return SSH_ERROR;
-		}
-	}
-	rc = sftp_close(file);
-	if (rc != SSH_OK) {
-		fprintf(stderr, "Can't close the read file: %s\n",
-			ssh_get_error(session));
-		return rc;
-	}
+	sftp_close(sfile);
 
 	sftp_free(sftp);
 	return SSH_OK;

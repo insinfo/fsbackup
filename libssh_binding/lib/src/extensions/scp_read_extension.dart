@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:ffi/ffi.dart';
+import 'package:libssh_binding/src/constants.dart';
 import 'package:libssh_binding/src/libssh.dart';
 
 extension ScpReadExtension on Libssh {
@@ -31,16 +32,15 @@ extension ScpReadExtension on Libssh {
     //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
     //var mode = ssh_scp_request_get_permissions(scp);
     //var controller = StreamController<List<int>>();
-    int bs = (4 * 1024);
-    int bufferSize = remoteFileLength > bs ? bs : remoteFileLength;
+
+    int bufferSize = MAX_XFER_BUF_SIZE; //remoteFileLength > bs ? bs : remoteFileLength;
 
     var nbytes = 0;
     final buffer = malloc<Int8>(bufferSize);
     var receive = '';
     //print('fileSize $fileSize');
     while (true) {
-      var size = sizeOf<Int8>() * bufferSize;
-      nbytes = ssh_scp_read(scp, buffer.cast(), size);
+      nbytes = ssh_scp_read(scp, buffer.cast(), sizeOf<Int8>() * bufferSize);
       //print('nbytes $nbytes');
 
       var data = buffer.asTypedList(nbytes);
@@ -59,9 +59,9 @@ extension ScpReadExtension on Libssh {
     return receive;
   }
 
-  Future<void> scpDownloadFileTo(ssh_session session, String fullPathSource, String fullPathTarget) async {
-    var source = fullPathSource.toNativeUtf8();
-    var scp = ssh_scp_new(session, SSH_SCP_READ, source.cast<Int8>());
+  Future<void> scpDownloadFileTo(ssh_session session, String fullRemotePathSource, String fullLocalPathTarget) async {
+    var source = fullRemotePathSource.toNativeUtf8().cast<Int8>();
+    var scp = ssh_scp_new(session, SSH_SCP_READ, source);
     if (scp.address == nullptr.address) {
       throw Exception('Error allocating scp session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
@@ -77,38 +77,64 @@ extension ScpReadExtension on Libssh {
           "Error receiving information about file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
     }
 
-    var remoteFileLength = ssh_scp_request_get_size64(scp);
+    var remoteFileLength = ssh_scp_request_get_size(scp);
+
     //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
     //var mode = ssh_scp_request_get_permissions(scp);
-    //var controller = StreamController<List<int>>();
 
-    int bs = (4 * 1024);
-    int bufferSize = remoteFileLength > bs ? bs : remoteFileLength;
-    var nbytes = 0;
+    var nbytes = 0, nwritten = 0;
+    var bufferSize = MAX_XFER_BUF_SIZE * 2; //MAX_XFER_BUF_SIZE = 16384 = 16KB
     final buffer = malloc<Int8>(bufferSize);
 
-    var targetFile = await File(fullPathTarget).create(recursive: true);
-    var sink = targetFile.openWrite(); // for appending at the end of file
-    while (true) {
-      var size = sizeOf<Int8>() * bufferSize;
-      nbytes = ssh_scp_read(scp, buffer.cast(), size);
-      //print('nbytes $nbytes');
+    if (buffer.address == nullptr.address) {
+      print("Memory allocation error\n");
+    }
 
-      var data = buffer.asTypedList(nbytes);
-      sink.add(data);
+    final stopwatch = Stopwatch()..start();
+    var targetFile = await File(fullLocalPathTarget).create(recursive: true);
+    var sink = targetFile.openWrite(mode: FileMode.write); // for appending at the end of file
+    int len_loop = remoteFileLength;
 
-      if (nbytes < 0 || nbytes == SSH_ERROR || nbytes == remoteFileLength) {
+    rc = ssh_scp_accept_request(scp);
+    if (rc == SSH_ERROR) {
+      throw Exception("Error ssh_scp_accept_request: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
+    }
+
+    do {
+      nbytes = ssh_scp_read(scp, buffer.cast(), sizeOf<Int8>() * bufferSize);
+      nwritten += nbytes;
+
+      if (nbytes == SSH_ERROR || nbytes < 0) {
+        await sink.flush();
+        await sink.close();
         ssh_scp_close(scp);
         ssh_scp_free(scp);
         malloc.free(buffer);
-        await sink.flush();
-        await sink.close();
+        throw Exception('Error receiving file data: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+      } else if (nbytes == 0) {
         break;
       }
-    }
+      print('nbytes $nbytes nwritten $nwritten');
+      sink.add(buffer.asTypedList(nbytes));
+      len_loop -= nbytes;
+    } while (len_loop != 0);
 
-    if (nbytes != remoteFileLength) {
+    await sink.flush();
+    await sink.close();
+    malloc.free(buffer);
+    var localFileLength = targetFile.lengthSync();
+
+    print('remoteFileLength $remoteFileLength localFileLength $localFileLength');
+    print("scpDownloadFileTo: ${stopwatch.elapsedMilliseconds} elapsed milliseconds ");
+
+    if (localFileLength < nwritten) {
+      ssh_scp_close(scp);
+      ssh_scp_free(scp);
+      malloc.free(buffer);
       throw Exception("Error Incomplete file");
     }
+
+    ssh_scp_close(scp);
+    ssh_scp_free(scp);
   }
 }

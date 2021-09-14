@@ -14,6 +14,8 @@ import '../constants.dart';
 
 import 'dart:developer';
 
+import 'package:win32/win32.dart';
+
 extension SftpExtension on Libssh {
   /// create Directory on the remote computer
   /// [fullPath] example => "/home/helloworld"
@@ -105,78 +107,91 @@ extension SftpExtension on Libssh {
 
   Future<void> sftpDownloadFileTo(ssh_session session, String fullRemotePath, String fullLocalPath,
       {Pointer<sftp_session_struct>? inSftp}) async {
-    var remotePath = fullRemotePath.toNativeUtf8();
+    var ftpfile = fullRemotePath.toNativeUtf8().cast<Int8>();
 
     var sftp = inSftp != null ? inSftp : initSftp(session);
 
-    var access_type = O_RDONLY;
+    int res = 0;
+    int totalReceived = 0;
+    int totalSize = -1;
+    int retcode = 0;
+    var bufsize = 128 * 1024; //MAX_XFER_BUF_SIZE = 16384 = 16KB
+    Pointer<Uint32> len = nullptr; //lpNumberOfBytesWritten
+    final buf = calloc<Int8>(bufsize);
 
-    var remoteFile = sftp_open(sftp, remotePath.cast(), access_type, 0);
-    if (remoteFile.address == nullptr.address) {
+    var sfile = sftp_open(sftp, ftpfile, O_RDONLY, 0664);
+    if (sfile.address == nullptr.address) {
       sftp_free(sftp);
       throw Exception('Can\'t open file for reading: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
-    var nbytes = 0, nwritten = 0;
-    var bufferSize = MAX_XFER_BUF_SIZE * 2; //MAX_XFER_BUF_SIZE = 16384 = 16KB
-    final bufferNative = malloc<Uint8>(bufferSize);
 
-    var targetFile = await File(fullLocalPath).create(recursive: true);
-    var sink = targetFile.openWrite(); // for appending at the end of file
-    var bfs = sizeOf<Int8>() * bufferSize;
-    var bfn = bufferNative.cast<Void>();
+    var fattr = sftp_stat(sftp, ftpfile);
+    if (fattr.address == nullptr.address) {
+      totalSize = -1;
+    } else {
+      totalSize = fattr.ref.size;
+      sftp_attributes_free(fattr);
+    }
+    print('remoteFileSize $totalSize');
 
     Timeline.startSync('sftpDownloadFileTo');
     final stopwatch = Stopwatch()..start();
     var start = DateTime.now();
-    while (true) {
-      nbytes = sftp_read(remoteFile, bfn, bfs);
-      nwritten += nbytes;
-      if (nbytes == 0) {
-        break; // EOF
-      } else if (nbytes < 0) {
-        await sink.flush();
-        await sink.close();
-        sftp_close(remoteFile);
-        if (inSftp == null) {
-          sftp_free(sftp);
-        }
-        malloc.free(bufferNative);
-        throw Exception('Error while reading file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
-      }
 
-      sink.add(bufferNative.asTypedList(nbytes));
+    /*var hFile = CreateFile(
+        fullLocalPath.toNativeUtf16(), // name of the write
+        GENERIC_READ | GENERIC_WRITE, // open for writing
+        0, // do not share
+        nullptr, // default security
+        CREATE_ALWAYS, // create new file only
+        FILE_ATTRIBUTE_NORMAL, // normal file
+        0);
+    if (hFile == INVALID_HANDLE_VALUE) {
+      throw Exception('Unable to open local file $ftpfile for write.');
+    }*/
+
+    var localFile = File(fullLocalPath);
+    var hFile = localFile.openWrite(mode: FileMode.write);
+    retcode = sftp_read(sfile, buf.cast<Void>(), bufsize);
+    while (retcode > 0) {
+      /*res = WriteFile(hFile, buf, retcode, len, nullptr);
+      if (res == FALSE) {
+        print("Terminal failure: Unable to write to file.\n");
+        break;
+      }*/
+      var data = buf.asTypedList(retcode);
+      print('retcode: $retcode data: ${data.length}');
+      hFile.add(data);
+      retcode = sftp_read(sfile, buf.cast<Void>(), bufsize);
     }
+    await hFile.flush();
+    await hFile.close();
     stopwatch.stop();
     print(DateTime.now().difference(start));
     print("sftpDownloadFileTo: ${stopwatch.elapsedMilliseconds} elapsed milliseconds");
     Timeline.finishSync();
 
-    await sink.flush();
-    await sink.close();
-
-    var localFileLength = targetFile.lengthSync();
-
-    if (localFileLength < nwritten) {
+    /*if (localFileLength < nwritten) {
       sftp_close(remoteFile);
       if (inSftp == null) {
         sftp_free(sftp);
       }
       malloc.free(bufferNative);
       throw Exception('Incomplete file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
-    }
+    }*/
 
-    var rc = sftp_close(remoteFile);
+    var rc = sftp_close(sfile);
     if (rc != SSH_OK) {
       if (inSftp == null) {
         sftp_free(sftp);
       }
-      malloc.free(bufferNative);
+      calloc.free(buf);
       throw Exception('Can\'t close the written file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
 
     if (inSftp == null) {
       sftp_free(sftp);
     }
-    malloc.free(bufferNative);
+    calloc.free(buf);
   }
 }

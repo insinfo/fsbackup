@@ -1,1 +1,13 @@
 go1.11.4.linux-amd64.tar.gz
+teste.mp4
+teste.txt
+teste.zip
+
+*.iobj
+libssh_c_wrapper/x64/Release/libssh_wrapper.ipdb
+libssh_c_wrapper/x64/Release/libssh_wrapper.obj
+libssh_c_wrapper/x64/Release/libssh_wrapper.pdb
+libssh_c_wrapper/x64/Release/libssh_wrapper.tlog/CL.read.1.tlog
+libssh_c_wrapper/x64/Release/libssh_wrapper.tlog/libssh_wrapper.write.1u.tlog
+libssh_c_wrapper/x64/Release/vc142.pdb
+pubspec.lock

@@ -162,15 +162,14 @@ int sftpDownloadFileTo(ssh_session session, const char* ftpfile, const char* loc
 		totalSize = (long)fattr->size;
 		sftp_attributes_free(fattr);
 	}
-													// O_CREAT create and open file
-	//fd = open(localfile, O_CREAT | O_RDWR, 0777);// O_RDWR open for reading and writing
-	/*int fileHandle = 0;
-	 int r = _sopen_s(&fileHandle, localfile, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE);
-	fprintf(stdout, "open file %d %s.\n", fileHandle, localfile);
-	if (r) {
-		printf("Bad open!");
-	}*/
-	HANDLE hFile = CreateFileA(
+	//for linux	O_CREAT | O_RDWR							// O_CREAT create and open file
+	//auto hFile = open(localfile, O_CREAT | O_RDWR, 0777);// O_RDWR open for reading and writing	
+	//for windows
+	auto hFile = open(localfile, O_CREAT | O_RDWR | O_BINARY, 0777);
+
+	fprintf(stdout, "open file %d %s.\n", hFile, localfile);
+	
+	/*HANDLE hFile = CreateFileA(
 		localfile,                // name of the write
 		GENERIC_READ | GENERIC_WRITE,          // open for writing
 		0,                      // do not share
@@ -182,12 +181,12 @@ int sftpDownloadFileTo(ssh_session session, const char* ftpfile, const char* loc
 	if (hFile == INVALID_HANDLE_VALUE)
 	{		
 		fprintf(stderr, " Unable to open file \"%s\" for write.\n", ftpfile);
-	}
+	}*/
 	
 
 	retcode = sftp_read(sfile, buf, bufsize);
 	while (retcode > 0 ) {
-		/*res = _write(fileHandle, buf, retcode);
+		res = write(hFile, buf, retcode);
 		if (res == -1) {			
 			switch (errno)
 			{
@@ -204,13 +203,13 @@ int sftpDownloadFileTo(ssh_session session, const char* ftpfile, const char* loc
 				// An unrelated error occurred
 				perror("Unexpected error!");
 			}			
-		}*/
-		res = WriteFile(hFile, buf, static_cast<DWORD>(retcode), &len, NULL);
+		}
+		/*res = WriteFile(hFile, buf, static_cast<DWORD>(retcode), &len, NULL);
 		if (res == FALSE)
 		{
 			break;
 			printf("Terminal failure: Unable to write to file.\n");
-		}
+		}*/
 
 		totalReceived += len;
 	

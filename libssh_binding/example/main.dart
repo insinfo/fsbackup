@@ -46,11 +46,11 @@ void main() async {
 
   var start = DateTime.now();
 
-  /*await libssh.scpDownloadFileTo(my_ssh_session, '/home/isaque.neves/go1.11.4.linux-amd64.tar.gz',
-      path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'));*/
+  await libssh.scpDownloadFileTo(my_ssh_session, '/var/www/html/portal2018_invadido.tar.gz',
+      path.join(Directory.current.path, 'portal2018_invadido.tar.gz'));
 
-  await libssh.sftpDownloadFileTo(
-      my_ssh_session, '/home/isaque.neves/teste.txt', path.join(Directory.current.path, 'teste.txt'));
+  /* await libssh.sftpDownloadFileTo(my_ssh_session, '/home/isaque.neves/go1.11.4.linux-amd64.tar.gz',
+      path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'));*/
 
   /*await libssh.sftpCopyLocalFileToRemote(
       my_ssh_session, path.join(Directory.current.path, 'teste.mp4'), '/home/isaque.neves/teste.mp4');*/

@@ -151,7 +151,7 @@ extension SftpExtension on Libssh {
     }*/
 
     var localFile = File(fullLocalPath);
-    var hFile = localFile.openWrite(mode: FileMode.write);
+    var hFile = localFile.openSync(mode: FileMode.write);
     retcode = sftp_read(sfile, buf.cast<Void>(), bufsize);
     while (retcode > 0) {
       /*res = WriteFile(hFile, buf, retcode, len, nullptr);
@@ -159,13 +159,13 @@ extension SftpExtension on Libssh {
         print("Terminal failure: Unable to write to file.\n");
         break;
       }*/
-      var data = buf.asTypedList(retcode);
-      print('retcode: $retcode data: ${data.length}');
-      hFile.add(data);
+
+      //print('retcode: $retcode data: ${data.length}');
+      hFile.writeFromSync(buf.asTypedList(retcode));
       retcode = sftp_read(sfile, buf.cast<Void>(), bufsize);
     }
-    await hFile.flush();
-    await hFile.close();
+    //await hFile.flush();
+    //await hFile.close();
     stopwatch.stop();
     print(DateTime.now().difference(start));
     print("sftpDownloadFileTo: ${stopwatch.elapsedMilliseconds} elapsed milliseconds");

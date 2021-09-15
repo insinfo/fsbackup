@@ -10,3 +10,5 @@ export 'src/fcntl.dart';
 export 'src/utils.dart';
 export 'src/extensions/exec_command_extension.dart';
 export 'src/extensions/scp_read_extension.dart';
+
+export 'src/pscp.dart';

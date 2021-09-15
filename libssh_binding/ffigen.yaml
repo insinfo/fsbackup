@@ -1,12 +1,12 @@
-name: 'fcntl'
-description: 'Bindings to fcntl'
-output: 'test.dart'
+name: 'Pscp'
+description: 'Bindings to Pscp'
+output: 'pscp.dart'
 llvm-path:     
   - 'C:\Program Files\llvm'      
 headers:
   entry-points:
     #- 'libssh/include/libssh/sftp.h'     
-    - 'extra/test.h' 
+    - 'extra/pscp.h' 
   #include-directives:
     #- '**sftp.h'
     #- 'libssh/include/libssh/**'

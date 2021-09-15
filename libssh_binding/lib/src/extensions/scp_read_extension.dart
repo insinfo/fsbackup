@@ -83,8 +83,8 @@ extension ScpReadExtension on Libssh {
     //var mode = ssh_scp_request_get_permissions(scp);
 
     var nbytes = 0, nwritten = 0;
-    var bufferSize = MAX_XFER_BUF_SIZE * 2; //MAX_XFER_BUF_SIZE = 16384 = 16KB
-    final buffer = malloc<Int8>(bufferSize);
+    var bufsize = 128 * 1024; //MAX_XFER_BUF_SIZE = 16384 = 16KB
+    final buffer = calloc<Int8>(bufsize);
 
     if (buffer.address == nullptr.address) {
       print("Memory allocation error\n");
@@ -92,7 +92,7 @@ extension ScpReadExtension on Libssh {
 
     final stopwatch = Stopwatch()..start();
     var targetFile = await File(fullLocalPathTarget).create(recursive: true);
-    var sink = targetFile.openWrite(mode: FileMode.write); // for appending at the end of file
+    var hFile = targetFile.openSync(mode: FileMode.write); // for appending at the end of file
     int len_loop = remoteFileLength;
 
     rc = ssh_scp_accept_request(scp);
@@ -101,27 +101,25 @@ extension ScpReadExtension on Libssh {
     }
 
     do {
-      nbytes = ssh_scp_read(scp, buffer.cast(), sizeOf<Int8>() * bufferSize);
+      nbytes = ssh_scp_read(scp, buffer.cast(), sizeOf<Int8>() * bufsize);
       nwritten += nbytes;
 
       if (nbytes == SSH_ERROR || nbytes < 0) {
-        await sink.flush();
-        await sink.close();
+        await hFile.close();
         ssh_scp_close(scp);
         ssh_scp_free(scp);
-        malloc.free(buffer);
+        calloc.free(buffer);
         throw Exception('Error receiving file data: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
       } else if (nbytes == 0) {
         break;
       }
-      print('nbytes $nbytes nwritten $nwritten');
-      sink.add(buffer.asTypedList(nbytes));
+      //print('nbytes $nbytes nwritten $nwritten');
+      hFile.writeFromSync(buffer.asTypedList(nbytes));
       len_loop -= nbytes;
     } while (len_loop != 0);
 
-    await sink.flush();
-    await sink.close();
-    malloc.free(buffer);
+    await hFile.close();
+    calloc.free(buffer);
     var localFileLength = targetFile.lengthSync();
 
     print('remoteFileLength $remoteFileLength localFileLength $localFileLength');

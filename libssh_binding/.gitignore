@@ -3,11 +3,62 @@ teste.mp4
 teste.txt
 teste.zip
 
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
 *.iobj
-libssh_c_wrapper/x64/Release/libssh_wrapper.ipdb
-libssh_c_wrapper/x64/Release/libssh_wrapper.obj
-libssh_c_wrapper/x64/Release/libssh_wrapper.pdb
-libssh_c_wrapper/x64/Release/libssh_wrapper.tlog/CL.read.1.tlog
-libssh_c_wrapper/x64/Release/libssh_wrapper.tlog/libssh_wrapper.write.1u.tlog
-libssh_c_wrapper/x64/Release/vc142.pdb
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
 pubspec.lock
+

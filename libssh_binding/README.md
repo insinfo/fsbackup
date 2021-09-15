@@ -56,19 +56,14 @@ void main() async {
   /*await libssh.sftpCopyLocalFileToRemote(
       my_ssh_session, path.join(Directory.current.path, 'teste.mp4'), '/home/isaque.neves/teste.mp4');*/
 
-  var sftp = libssh.initSFTP(my_ssh_session);
 
-  await libssh.sftpDownloadFileTo(
-      my_ssh_session, '/home/isaque.neves/teste.mp4', path.join(Directory.current.path, 'teste.mp4'),
-      inSftp: sftp);
-
+  await libssh.sftpDownloadFileTo(my_ssh_session, '/home/isaque.neves/teste.mp4', path.join(Directory.current.path, 'teste.mp4'));
 
   libssh.ssh_disconnect(my_ssh_session);
   libssh.ssh_free(my_ssh_session);
 
   exit(0);
 }
-
 
 ```
 
@@ -82,5 +77,9 @@ Measure-Command {pscp -pw Ins257257 isaque.neves@192.168.133.13:/home/isaque.nev
 git filter-branch --tree-filter 'rm -rf libssh_binding/libssh_c_wrapper/x64/Release/go1.11.4.linux-amd64.tar.gz' HEAD
 
 git filter-branch -f --tree-filter 'rm -f /path/to/file' HEAD --all
+
+ perf record -g dart --generate-perf-events-symbols main.dart
+
+ perf report --no-children -i perf.data
 -->
 

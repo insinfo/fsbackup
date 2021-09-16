@@ -1,10 +1,9 @@
 ### Dart Binding to libssh version 0.9.6
 
-##### example 
+##### example of low level
 
 ```dart
 import 'dart:io';
-
 import 'package:libssh_binding/libssh_binding.dart';
 import 'package:libssh_binding/src/extensions/sftp_extension.dart';
 import 'dart:ffi' as ffi;
@@ -66,7 +65,43 @@ void main() async {
 }
 
 ```
+##### example of high level
 
+```dart
+import 'package:libssh_binding/libssh_binding.dart';
+
+void main() {
+  final libssh = LibsshWrapper('192.168.133.13', username: 'isaque.neves', password: 'Ins257257', port: 22);
+  libssh.connect();
+  final start = DateTime.now();
+
+
+  //download file via SCP
+  /*await libssh.scpDownloadFileTo('/home/isaque.neves/go1.11.4.linux-amd64.tar.gz',
+      path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'), callbackStats: (total, loaded) {
+    var progress = ((loaded / total) * 100).round();
+    stdout.write('\r');
+    stdout.write('\r[${List.filled(((progress / 10) * 4).round(), '=').join()}] $progress%');
+  });*/
+
+  //execute command
+  var re = libssh.execCommandSync('cd /var/www; ls -l');
+  print(re);
+
+  //execute command in shell
+  //var re = libssh.execCommandsInShell(['cd /var/www', 'ls -l']);
+  //print(re.join(''));
+
+  //download file via SFTP
+  /* await libssh.sftpDownloadFileTo(my_ssh_session, '/home/isaque.neves/go1.11.4.linux-amd64.tar.gz',
+      path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'));*/
+
+ 
+  print('${DateTime.now().difference(start)}');
+  libssh.dispose();
+}
+
+```
 <!-- 
 
 dart run ffigen --config  ffigen.yaml

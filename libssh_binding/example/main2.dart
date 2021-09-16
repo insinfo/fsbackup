@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/libssh_binding.dart';
-import 'package:libssh_binding/src/extensions/sftp_extension.dart';
+
 import 'dart:ffi';
 import 'package:path/path.dart' as path;
 
@@ -13,7 +13,7 @@ void callback(Pointer<Utf8> ptr) {
 void main(List<String> args) {
   var libraryPath = path.join(Directory.current.path, 'libssh_compiled', 'pscp.dll');
   final dll = DynamicLibrary.open(libraryPath);
-  var pscp = Pscp(dll);
+  var pscp = PscpBinding(dll);
 
   //pscp -pw Ins257257 isaque.neves@192.168.133.13:/home/isaque.neves/go1.11.4.linux-amd64.tar.gz ./go1.11.4.linux-amd64.tar.gz
 

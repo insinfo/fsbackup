@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:ffi/ffi.dart';
 
 Pointer<Void> stringToNativeVoid(String str, {Allocator allocator = malloc}) {
@@ -39,4 +40,11 @@ Pointer<Void> intToNativeVoid(int number, {Allocator allocator = malloc}) {
   final ptr = malloc.allocate<Int32>(sizeOf<Int32>());
   ptr.value = number;
   return ptr.cast();
+}
+
+Future writeAndFlush(IOSink sink, object) {
+  return sink.addStream((StreamController<List<int>>(sync: true)
+        ..add(utf8.encode(object.toString()))
+        ..close())
+      .stream);
 }

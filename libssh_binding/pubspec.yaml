@@ -1,6 +1,6 @@
 name: libssh_binding
-description: libssh_binding
-publish_to: 'none' 
+description: binding and high-level wrapper on top of libssh - The SSH library! libssh is a multiplatform C library implementing the SSHv2 protocol on client and server side. With libssh, you can remotely execute programs, transfer files, use a secure and transparent tunnel https://www.libssh.org
+#publish_to: 'none' 
 version: 1.0.0+1
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
 dev_dependencies: 
   build_runner: any
   ffigen: any #^4.0.0
-  win32: ^2.2.9
+  #win32: ^2.2.9
 
 
 ffigen:

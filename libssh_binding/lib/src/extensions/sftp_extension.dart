@@ -5,6 +5,7 @@ import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/src/extensions/base_extension.dart';
 import 'package:libssh_binding/src/fcntl.dart';
 import 'package:libssh_binding/src/libssh_binding.dart';
+import 'package:libssh_binding/src/models/directory_item.dart';
 import 'package:libssh_binding/src/sftp_binding.dart';
 import 'package:libssh_binding/src/stat.dart';
 import '../constants.dart';
@@ -12,33 +13,73 @@ import '../constants.dart';
 extension SftpExtension on LibsshBinding {
   /// create Directory on the remote computer
   /// [fullPath] example => "/home/helloworld"
-  void sftpCreateDirectory(ssh_session session, String fullPath) {
-    var path = fullPath.toNativeUtf8();
-    var sftp = sftp_new(session);
-    if (sftp.address == nullptr.address) {
-      throw Exception('Error allocating SFTP session: ${sftp_get_error(sftp)}');
-    }
+  void sftpCreateDirectory(ssh_session session, String fullRemotePath, {Allocator allocator = malloc}) {
+    final path = fullRemotePath.toNativeUtf8();
+    final sftp = initSftp(session);
 
-    var rc = sftp_init(sftp);
-    if (rc != SSH_OK) {
-      sftp_free(sftp);
-      throw Exception('Error initializing SFTP session: ${sftp_get_error(sftp)}');
-    }
-
-    rc = sftp_mkdir(sftp, path.cast(), S_IRWXU);
+    var rc = sftp_mkdir(sftp, path.cast(), S_IRWXU);
     if (rc != SSH_OK) {
       if (sftp_get_error(sftp) != SSH_FX_FILE_ALREADY_EXISTS) {
         throw Exception('Can\'t create directory: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
       }
     }
-
+    allocator.free(path);
     sftp_free(sftp);
   }
 
+  /// Listing the contents of a directory
+  List<DirectoryItem> sftpListDir(ssh_session session, String fullRemotePath, {Allocator allocator = malloc}) {
+    final sftp = initSftp(session);
+    final results = <DirectoryItem>[];
+    final path = fullRemotePath.toNativeUtf8(allocator: allocator);
+    var dir = sftp_opendir(sftp, path.cast());
+    if (dir == nullptr) {
+      sftp_free(sftp);
+      throw Exception('Directory not opened: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+    }
+    //print("Name                       Size Perms    Owner\tGroup\n");
+    sftp_attributes attributes;
+
+    while ((attributes = sftp_readdir(sftp, dir)) != nullptr) {
+      if (sftp_dir_eof(dir) == 1) {
+        break;
+      }
+      //longname => drwxrwxrwx    2 www-data www-data     4096 Jun 25  2018 .ssh
+      var name = attributes.ref.name.cast<Utf8>().toDartString();
+      /* print(
+          '$name  | ${attributes.ref.size} | ${attributes.ref.permissions} | ${attributes.ref.owner.cast<Utf8>().toDartString()} |' +
+              '${attributes.ref.uid} |  ${attributes.ref.group.cast<Utf8>().toDartString()}  ${attributes.ref.gid}');
+        */
+      //var t = attributes.ref.type == 1 ? 'file' : 'directory';
+      results.add(DirectoryItem(
+          name: name,
+          type: attributes.ref.type == 1 ? DirectoryItemType.file : DirectoryItemType.directory,
+          size: attributes.ref.size));
+
+      sftp_attributes_free(attributes);
+    }
+
+    /*if (sftp_dir_eof(dir) == 1) {
+      sftp_closedir(dir);
+      sftp_free(sftp);
+      throw Exception('Can\'t list directory: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+    }*/
+
+    var rc = sftp_closedir(dir);
+    if (rc != SSH_OK) {
+      sftp_free(sftp);
+      throw Exception('Can\'t close directory: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+    }
+    allocator.free(path);
+    sftp_free(sftp);
+
+    return results;
+  }
+
   /// Copying a local file to the remote computer
-  Future<void> sftpCopyLocalFileToRemote(
-      ssh_session session, String localFilefullPath, String remoteFilefullPath) async {
-    var remotePath = remoteFilefullPath.toNativeUtf8();
+  Future<void> sftpCopyLocalFileToRemote(ssh_session session, String localFilefullPath, String remoteFilefullPath,
+      {Allocator allocator = malloc}) async {
+    var remotePath = remoteFilefullPath.toNativeUtf8(allocator: allocator);
     var sftp = initSftp(session);
     //get remote file for writing
     int access_type = O_WRONLY | O_CREAT | O_TRUNC;
@@ -63,23 +104,22 @@ extension SftpExtension on LibsshBinding {
     int bs = MAX_XFER_BUF_SIZE; //(4 * 1024);
     int bufferSize = localFileLength > bs ? bs : localFileLength;
 
-    final bufferNative = malloc<Uint8>(bufferSize);
+    final bufferNative = allocator<Uint8>(bufferSize);
     var nwritten = 0;
     //var builder = new BytesBuilder(copy: false);
     while (true) {
       var bufferDart = await lfile.read(bufferSize);
-
       //builder.add(bufferDart);
       if (bufferDart.length <= 0) {
         break;
       }
-
       bufferNative.asTypedList(bufferSize).setAll(0, bufferDart);
       nwritten += sftp_write(remoteFile, bufferNative.cast(), sizeOf<Int8>() * bufferSize);
     }
     await lfile.close();
-    malloc.free(bufferNative);
-    print('localFileLength: $localFileLength | nwritten: $nwritten');
+    allocator.free(bufferNative);
+    allocator.free(remoteFile);
+    // print('localFileLength: $localFileLength | nwritten: $nwritten');
     //print('localFile:  ${utf8.decode(builder.takeBytes())}');
 
     if (nwritten < localFileLength) {
@@ -95,6 +135,7 @@ extension SftpExtension on LibsshBinding {
       throw Exception('Can\'t close the written file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
 
+    sftp_close(remoteFile);
     sftp_free(sftp);
   }
 

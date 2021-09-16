@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:libssh_binding/src/extensions/exec_command_extension.dart';
 import 'package:libssh_binding/src/extensions/scp_extension.dart';
 import 'package:libssh_binding/src/extensions/sftp_extension.dart';
+import 'package:libssh_binding/src/models/directory_item.dart';
 import 'package:libssh_binding/src/utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:ffi/ffi.dart';
@@ -21,6 +22,7 @@ class LibsshWrapper {
   String? password;
   int port = 22;
   bool isConnected = false;
+  bool verbosity = false;
 
   /// if defaultDllPath == true get ddl from default sytem folder Exemple: in windows c:\windows\Sytem32
   /// else get dll from Directory.current.path
@@ -30,7 +32,8 @@ class LibsshWrapper {
       this.port = 22,
       bool defaultDllPath = true,
       DynamicLibrary? inDll,
-      String ddlname = 'ssh.dll'}) {
+      String ddlname = 'ssh.dll',
+      this.verbosity = false}) {
     var libraryPath = defaultDllPath ? ddlname : path.join(Directory.current.path, ddlname); //'libssh_compiled',
     final dll = inDll == null ? DynamicLibrary.open(libraryPath) : inDll;
     libsshBinding = LibsshBinding(dll);
@@ -43,7 +46,10 @@ class LibsshWrapper {
     var my_session = libsshBinding.ssh_new();
     libsshBinding.ssh_options_set(my_session, ssh_options_e.SSH_OPTIONS_HOST, stringToNativeVoid(host));
     libsshBinding.ssh_options_set(my_session, ssh_options_e.SSH_OPTIONS_PORT, intToNativeVoid(port));
-    //libssh.ssh_options_set(my_ssh_session, ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY, intToNativeVoid(SSH_LOG_PROTOCOL));
+    if (verbosity == true) {
+      libsshBinding.ssh_options_set(
+          my_session, ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY, intToNativeVoid(SSH_LOG_PROTOCOL));
+    }
     libsshBinding.ssh_options_set(my_session, ssh_options_e.SSH_OPTIONS_USER, stringToNativeVoid(username!));
     return my_session;
   }
@@ -108,6 +114,15 @@ class LibsshWrapper {
   /// and return a list with the response of each command in the order of execution
   List<String> execCommandsInShell(List<String> commands) {
     return libsshBinding.execCommandsInShell(my_ssh_session, commands);
+  }
+
+  /// Listing the contents of a directory
+  List<DirectoryItem> sftpListDir(String fullRemotePath) {
+    return libsshBinding.sftpListDir(my_ssh_session, fullRemotePath);
+  }
+
+  Future<void> scpDownloadDirectory(String remoteDirectoryPath, String fullLocalDirectoryPathTarget) async {
+    await libsshBinding.scpDownloadDirectory(my_ssh_session, remoteDirectoryPath, fullLocalDirectoryPathTarget);
   }
 
   void disconnect() {

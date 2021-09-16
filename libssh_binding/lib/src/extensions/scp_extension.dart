@@ -60,15 +60,32 @@ extension ScpExtension on LibsshBinding {
     return receive;
   }
 
-  Pointer<ssh_scp_struct> initScp(ssh_session session, Pointer<Int8> source) {
-    var scp = ssh_scp_new(session, SSH_SCP_READ, source);
+  Pointer<ssh_scp_struct> initFileScp(ssh_session session, Pointer<Int8> remoteFilePath) {
+    var scp = ssh_scp_new(session, SSH_SCP_READ, remoteFilePath);
     if (scp.address == nullptr.address) {
-      throw Exception('Error allocating scp session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+      throw Exception(
+          'Error allocating scp file session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
     var rc = ssh_scp_init(scp);
     if (rc != SSH_OK) {
       ssh_scp_free(scp);
-      throw Exception("Error initializing scp session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
+      throw Exception(
+          "Error initializing scp file session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
+    }
+    return scp;
+  }
+
+  Pointer<ssh_scp_struct> initDirectoryScp(ssh_session session, Pointer<Int8> remoteDirectoryPath) {
+    var scp = ssh_scp_new(session, SSH_SCP_READ | SSH_SCP_RECURSIVE, remoteDirectoryPath);
+    if (scp == nullptr) {
+      throw Exception(
+          'Error allocating scp directory session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+    }
+    var rc = ssh_scp_init(scp);
+    if (rc != SSH_OK) {
+      ssh_scp_free(scp);
+      throw Exception(
+          "Error initializing scp directory session: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
     }
     return scp;
   }
@@ -76,7 +93,7 @@ extension ScpExtension on LibsshBinding {
   Future<void> scpDownloadFileTo(ssh_session session, String fullRemotePathSource, String fullLocalPathTarget,
       {void Function(int total, int done)? callbackStats, Allocator allocator = malloc}) async {
     var source = fullRemotePathSource.toNativeUtf8(allocator: allocator).cast<Int8>();
-    var scp = initScp(session, source);
+    var scp = initFileScp(session, source);
     var rc = ssh_scp_pull_request(scp);
     if (rc != ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE) {
       ssh_scp_free(scp);
@@ -84,27 +101,36 @@ extension ScpExtension on LibsshBinding {
           "Error receiving information about file: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
     }
 
-    var remoteFileLength = ssh_scp_request_get_size(scp);
-    //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
-    //var mode = ssh_scp_request_get_permissions(scp);
-
-    var targetFile = await File(fullLocalPathTarget).create(recursive: true);
-    var hFile = targetFile.openSync(mode: FileMode.write); // for appending at the end of file
-    int len_loop = remoteFileLength;
-
     rc = ssh_scp_accept_request(scp);
     if (rc == SSH_ERROR) {
       ssh_scp_close(scp);
       ssh_scp_free(scp);
       throw Exception("Error ssh_scp_accept_request: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
     }
+    try {
+      await scpReadFileAndSave(session, scp, fullLocalPathTarget, allocator: allocator, callbackStats: callbackStats);
+    } catch (e) {
+      rethrow;
+    } finally {
+      allocator.free(source);
+      ssh_scp_close(scp);
+      ssh_scp_free(scp);
+    }
+  }
 
+  Future<void> scpReadFileAndSave(
+      Pointer<ssh_session_struct> session, Pointer<ssh_scp_struct> scp, String fullLocalPathTarget,
+      {void Function(int total, int done)? callbackStats, Allocator allocator = malloc}) async {
+    var remoteFileLength = ssh_scp_request_get_size(scp);
+    //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
+    //var mode = ssh_scp_request_get_permissions(scp);
+    var targetFile = await File(fullLocalPathTarget).create(recursive: true);
+    var hFile = targetFile.openSync(mode: FileMode.write); // for appending at the end of file
+    int len_loop = remoteFileLength;
     var nbytes = 0, nwritten = 0;
     var bufsize = 128 * 1024; //MAX_XFER_BUF_SIZE = 16384 = 16KB
     final buffer = allocator<Int8>(bufsize);
     if (buffer.address == nullptr.address) {
-      ssh_scp_close(scp);
-      ssh_scp_free(scp);
       throw Exception("buffer Memory allocation error\n");
     }
     do {
@@ -115,10 +141,7 @@ extension ScpExtension on LibsshBinding {
       }
       if (nbytes == SSH_ERROR || nbytes < 0) {
         await hFile.close();
-        ssh_scp_close(scp);
-        ssh_scp_free(scp);
         allocator.free(buffer);
-        allocator.free(source);
         throw Exception('Error receiving file data: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
       } else if (nbytes == 0) {
         break;
@@ -130,16 +153,67 @@ extension ScpExtension on LibsshBinding {
 
     await hFile.close();
     allocator.free(buffer);
-    allocator.free(source);
-
     var localFileLength = targetFile.lengthSync();
     if (localFileLength < nwritten) {
-      ssh_scp_close(scp);
-      ssh_scp_free(scp);
       throw Exception("Error Incomplete file");
     }
+  }
 
-    ssh_scp_close(scp);
-    ssh_scp_free(scp);
+  /// [fullLocalDirectoryPathTarget] example c:\downloads
+  Future<dynamic>? scpDownloadDirectory(
+      Pointer<ssh_session_struct> session, String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
+      {Allocator allocator = malloc}) async {
+    var source = remoteDirectoryPath.toNativeUtf8(allocator: allocator).cast<Int8>();
+    var scp = initDirectoryScp(session, source);
+    String currentDir = fullLocalDirectoryPathTarget;
+    int currentDirSize = 0, totalSize = 0, loaded = 0;
+
+    var rc = 0;
+    bool isFirstDirectory = false;
+    do {
+      rc = ssh_scp_pull_request(scp);
+
+      switch (rc) {
+        case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
+          var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
+          var fileSize = ssh_scp_request_get_size64(scp);
+          print("downloading file: $filename size: $fileSize");
+          ssh_scp_accept_request(scp);
+          await scpReadFileAndSave(session, scp, '$currentDir/$filename');
+          loaded += fileSize;
+          //var progress = ((loaded / totalSize) * 100).round();
+          print('totalSize: $totalSize | loaded: $loaded');
+          break;
+        case SSH_ERROR:
+          print('Error: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+          return null;
+        case ssh_scp_request_types.SSH_SCP_REQUEST_WARNING:
+          print('Warning: ${ssh_scp_request_get_warning(scp).cast<Utf8>().toDartString()}');
+          break;
+        case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
+          var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
+          currentDirSize = ssh_scp_request_get_size64(scp);
+          //var mode = ssh_scp_request_get_permissions(scp);
+          currentDir += '/$filename';
+          if (isFirstDirectory == false) {
+            totalSize = currentDirSize;
+            isFirstDirectory = true;
+          }
+          print("downloading directory: $filename | size: $currentDirSize");
+          ssh_scp_accept_request(scp);
+          break;
+        case ssh_scp_request_types.SSH_SCP_REQUEST_ENDDIR:
+          print("End of directories");
+          break;
+        case ssh_scp_request_types.SSH_SCP_REQUEST_EOF:
+          print("End of requests");
+          return null;
+        default:
+          break;
+      }
+    } while (true);
+
+    //allocator.free(source);
+    //return null;
   }
 }

@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/src/constants.dart';
+import 'package:libssh_binding/src/extensions/exec_command_extension.dart';
 import 'package:libssh_binding/src/libssh_binding.dart';
 
 extension ScpExtension on LibsshBinding {
@@ -118,6 +119,26 @@ extension ScpExtension on LibsshBinding {
     }
   }
 
+  ///return total size in bytes of each file inside folder ignoring linux directory metadata size
+  int getSizeOfDirectory(Pointer<ssh_session_struct> session, String remoteDirectoryPath,
+      {bool isThrowException = true}) {
+    //windows = 1041090242
+    //ls -lAR | grep -v '^d' | awk '{total += $5} END {print "Total:", total}'
+    //linux = 1041090469 -> find ./dart/  -type f -print | xargs -d '\n' du -bs | awk '{ sum+=$1} END {print sum}'
+    try {
+      var cmdToGetTotaSize =
+          "find $remoteDirectoryPath -type f -print0 | xargs -0 stat --format=%s | awk '{s+=\$1} END {print s}'";
+      var cmdRes = execCommandSync(session, cmdToGetTotaSize);
+      return int.parse(cmdRes);
+    } catch (e) {
+      print('getSizeOfDirectory: $e');
+      if (isThrowException) {
+        throw Exception('Unable to get the size of a directory in bytes');
+      }
+    }
+    return 0;
+  }
+
   Future<void> scpReadFileAndSave(
       Pointer<ssh_session_struct> session, Pointer<ssh_scp_struct> scp, String fullLocalPathTarget,
       {void Function(int total, int done)? callbackStats, Allocator allocator = malloc}) async {
@@ -160,14 +181,20 @@ extension ScpExtension on LibsshBinding {
   }
 
   /// [fullLocalDirectoryPathTarget] example c:\downloads
+  /// this function work only if remote is linux debian like sytem
   Future<dynamic>? scpDownloadDirectory(
       Pointer<ssh_session_struct> session, String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
-      {Allocator allocator = malloc}) async {
+      {Allocator allocator = malloc,
+      void Function(int total, int loaded, int countDirectory, int countFiles)? callbackStats}) async {
     var source = remoteDirectoryPath.toNativeUtf8(allocator: allocator).cast<Int8>();
-    var scp = initDirectoryScp(session, source);
+
     String currentPath = '${fullLocalDirectoryPathTarget.replaceAll('\\', '/')}';
     String rootDirName = '';
-    int currentDirSize = 0, totalSize = 0, loaded = 0;
+    int currentDirSize = 0, totalSize = 0, loaded = 0, totalSizeFilesIgnorado = 0, countDirectory = 0, countFiles = 0;
+    totalSize = getSizeOfDirectory(session, remoteDirectoryPath);
+    print('totalSize: $totalSize');
+    var scp = initDirectoryScp(session, source);
+
     String currentDirName = '';
     var rc = 0;
     bool isFirstDirectory = true;
@@ -183,14 +210,22 @@ extension ScpExtension on LibsshBinding {
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
           var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
           var fileSize = ssh_scp_request_get_size64(scp);
-          print("file: $filename size: $fileSize");
+          // print("file: $filename size: $fileSize");
           ssh_scp_accept_request(scp);
           await scpReadFileAndSave(session, scp, '$currentPath/$filename');
+          countFiles++;
           loaded += fileSize;
           //var progress = ((loaded / totalSize) * 100).round();
-          //print('totalSize: $totalSize | loaded: $loaded');
+          //print('\r totalSize: $totalSize | loaded: $loaded | $progress %');
+          //stdout.write('\r');
+          //stdout.write('\r[${List.filled(((progress / 10) * 4).round(), '=').join()}] $progress%');
+          if (callbackStats != null) {
+            //(int total, int loaded, int countDirectory, int countFiles)
+            callbackStats(totalSize, loaded, countDirectory, countFiles);
+          }
           break;
         case SSH_ERROR:
+          totalSizeFilesIgnorado += ssh_scp_request_get_size64(scp);
           print('Error: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
           exitLoop = true;
           break;
@@ -208,6 +243,7 @@ extension ScpExtension on LibsshBinding {
             isFirstDirectory = false;
           }
           Directory('$currentPath').createSync(recursive: true);
+          countDirectory++;
           //print("directory: $currentDirName | currentPath: $currentPath");
           ssh_scp_accept_request(scp);
           break;
@@ -226,7 +262,7 @@ extension ScpExtension on LibsshBinding {
           break;
       }
     } while (true);
-
+    print('TotalSize: $totalSize | loaded: $loaded ');
     allocator.free(source);
     ssh_scp_close(scp);
     ssh_scp_free(scp);

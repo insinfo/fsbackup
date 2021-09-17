@@ -18,7 +18,7 @@ void main() async {
     //stdout.write('\r[${List.filled(((progress / 10) * 4).round(), '=').join()}] $progress%');
   });*/
 
-  await libssh.scpDownloadDirectory('/var/www/teste/', Directory.current.path);
+  await libssh.scpDownloadDirectory('/var/www/teste/', path.join(Directory.current.path, 'download'));
 
   /*var re = libssh.execCommandSync('cd /var/www; ls -l');
   print(re);*/

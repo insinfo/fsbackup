@@ -165,55 +165,71 @@ extension ScpExtension on LibsshBinding {
       {Allocator allocator = malloc}) async {
     var source = remoteDirectoryPath.toNativeUtf8(allocator: allocator).cast<Int8>();
     var scp = initDirectoryScp(session, source);
-    String currentDir = fullLocalDirectoryPathTarget;
+    String currentPath = '${fullLocalDirectoryPathTarget.replaceAll('\\', '/')}';
+    String rootDirName = '';
     int currentDirSize = 0, totalSize = 0, loaded = 0;
-
+    String currentDirName = '';
     var rc = 0;
-    bool isFirstDirectory = false;
+    bool isFirstDirectory = true;
+    bool exitLoop = false;
     do {
       rc = ssh_scp_pull_request(scp);
+      if (exitLoop) {
+        break;
+      }
 
       switch (rc) {
+        //Um novo arquivo será obtido
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
           var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
           var fileSize = ssh_scp_request_get_size64(scp);
-          print("downloading file: $filename size: $fileSize");
+          print("file: $filename size: $fileSize");
           ssh_scp_accept_request(scp);
-          await scpReadFileAndSave(session, scp, '$currentDir/$filename');
+          await scpReadFileAndSave(session, scp, '$currentPath/$filename');
           loaded += fileSize;
           //var progress = ((loaded / totalSize) * 100).round();
-          print('totalSize: $totalSize | loaded: $loaded');
+          //print('totalSize: $totalSize | loaded: $loaded');
           break;
         case SSH_ERROR:
           print('Error: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
-          return null;
+          exitLoop = true;
+          break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_WARNING:
           print('Warning: ${ssh_scp_request_get_warning(scp).cast<Utf8>().toDartString()}');
           break;
+        //Um novo diretório será puxado
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
-          var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
-          currentDirSize = ssh_scp_request_get_size64(scp);
+          currentDirName = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
+          //currentDirSize = ssh_scp_request_get_size64(scp);
           //var mode = ssh_scp_request_get_permissions(scp);
-          currentDir += '/$filename';
-          if (isFirstDirectory == false) {
-            totalSize = currentDirSize;
-            isFirstDirectory = true;
+          currentPath += '/$currentDirName';
+          if (isFirstDirectory == true) {
+            rootDirName = '/$currentDirName';
+            isFirstDirectory = false;
           }
-          print("downloading directory: $filename | size: $currentDirSize");
+          Directory('$currentPath').createSync(recursive: true);
+          //print("directory: $currentDirName | currentPath: $currentPath");
           ssh_scp_accept_request(scp);
           break;
+        //End of directory
         case ssh_scp_request_types.SSH_SCP_REQUEST_ENDDIR:
-          print("End of directories");
+          var parts = currentPath.split('/');
+          parts.removeLast();
+          currentPath = parts.join('/');
+          //print("End of directory ");
           break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_EOF:
           print("End of requests");
-          return null;
+          exitLoop = true;
+          break;
         default:
           break;
       }
     } while (true);
 
-    //allocator.free(source);
-    //return null;
+    allocator.free(source);
+    ssh_scp_close(scp);
+    ssh_scp_free(scp);
+    return null;
   }
 }

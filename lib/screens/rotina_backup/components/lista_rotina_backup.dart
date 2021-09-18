@@ -91,7 +91,7 @@ class ListaRotinaBackup extends StatelessWidget {
                 onPressed: () {
                   showDialog(
                     context: ctx,
-                    builder: (_) => EditaRotinaBackup(tarefa: tarefa),
+                    builder: (_) => EditaRotinaBackup(rotina: tarefa),
                   );
                 }),
             SizedBox(width: defaultPadding + 5),

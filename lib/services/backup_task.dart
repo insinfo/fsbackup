@@ -25,6 +25,7 @@ class BackupTask implements FileTask<Future<bool>> {
 
     try {
       status = 'inicio';
+      //int total, int count, String status
       taskProgressCallback(1, 0, status);
 
       await Future.delayed(Duration(seconds: 30));

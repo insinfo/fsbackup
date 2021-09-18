@@ -6,6 +6,8 @@ import 'package:fsbackup/models/servidor.dart';
 import 'package:fsbackup/providers/servidor_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
+import 'package:fsbackup/shared/text_input_formatters/ip_address_input_formatter.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:uuid/uuid.dart';
 
@@ -93,7 +95,7 @@ class _EditaServidorState extends State<EditaServidor> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomTextField(nameControl: nameControl, label: 'Nome'),
-              CustomTextField(nameControl: hostControl, label: 'Host'),
+              CustomTextField(nameControl: hostControl, label: 'Host', inputFormatters: [IpAddressInputFormatter()]),
               CustomTextField(nameControl: portControl, label: 'Porta'),
               CustomTextField(nameControl: userControl, label: 'Login'),
               CustomTextField(nameControl: passControl, label: 'Senha'),

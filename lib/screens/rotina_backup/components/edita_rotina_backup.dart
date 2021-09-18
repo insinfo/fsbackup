@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
@@ -6,15 +10,17 @@ import 'package:fsbackup/models/rotina_backup.dart';
 import 'package:fsbackup/providers/servidor_provider.dart';
 import 'package:fsbackup/providers/rotina_backup_provider.dart';
 import 'package:fsbackup/responsive.dart';
-import 'package:fsbackup/shared/components/servidor_picker.dart';
+import 'package:fsbackup/shared/components/servidor_picker/servidor_picker.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class EditaRotinaBackup extends StatefulWidget {
-  final RotinaBackup tarefa;
-  EditaRotinaBackup({this.tarefa});
+  final RotinaBackup rotina;
+  EditaRotinaBackup({this.rotina});
 
   @override
   _EditaRotinaBackupState createState() => _EditaRotinaBackupState();
@@ -33,13 +39,13 @@ class _EditaRotinaBackupState extends State<EditaRotinaBackup> {
   }
 
   void fillControls() {
-    nomeControl.text = widget.tarefa == null ? '' : widget.tarefa.nome;
-    dirDestinoControl.text = widget.tarefa == null ? '' : widget.tarefa.diretorioDestino;
-    dropdownValue = widget.tarefa == null ? StartBackup.manual : widget.tarefa.startBackup;
-    servidor = widget.tarefa == null ? null : widget.tarefa.servidores.first;
-    /*if (widget.tarefa != null) {
-      if (widget.tarefa.servidores != null && widget.tarefa.servidores.isNotEmpty) {
-        servidor = widget.tarefa.servidores.first;
+    nomeControl.text = widget.rotina == null ? '' : widget.rotina.nome;
+    dirDestinoControl.text = widget.rotina == null ? '' : widget.rotina.diretorioDestino;
+    dropdownValue = widget.rotina == null ? StartBackup.manual : widget.rotina.startBackup;
+    servidor = widget.rotina == null ? null : widget.rotina.servidores.first;
+    /*if (widget.rotina != null) {
+      if (widget.rotina.servidores != null && widget.rotina.servidores.isNotEmpty) {
+        servidor = widget.rotina.servidores.first;
       }
     }*/
   }
@@ -56,15 +62,15 @@ class _EditaRotinaBackupState extends State<EditaRotinaBackup> {
   }
 
   void edit() async {
-    fillModel(widget.tarefa, false);
-    await locator<RotinaBackupProvider>().update(widget.tarefa);
+    fillModel(widget.rotina, false);
+    await locator<RotinaBackupProvider>().update(widget.rotina);
     Navigator.of(context).pop();
   }
 
   void add() async {
-    var newTarefa = RotinaBackup();
-    fillModel(newTarefa, true);
-    await locator<RotinaBackupProvider>().insert(newTarefa);
+    var newRotina = RotinaBackup();
+    fillModel(newRotina, true);
+    await locator<RotinaBackupProvider>().insert(newRotina);
     Navigator.of(context).pop();
   }
 
@@ -74,7 +80,7 @@ class _EditaRotinaBackupState extends State<EditaRotinaBackup> {
       scrollable: false,
       backgroundColor: secondaryColor,
       title: Text(
-        widget.tarefa == null ? 'Nova Tarefa' : 'Editar Tarefa',
+        widget.rotina == null ? 'Nova Rotina' : 'Editar Rotina',
       ),
       content: Builder(builder: (context) {
         var height = MediaQuery.of(context).size.height;
@@ -95,7 +101,25 @@ class _EditaRotinaBackupState extends State<EditaRotinaBackup> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomTextField(nameControl: nomeControl, label: 'Nome'),
-              CustomTextField(nameControl: dirDestinoControl, label: 'Diretorio destino do backup'),
+              CustomTextField(
+                nameControl: dirDestinoControl,
+                label: 'Diretorio destino do backup',
+                onTap: () async {
+                  /*var pathDocuments = Platform.isWindows ? Directory('c:\\') : await getApplicationDocumentsDirectory();
+                  String path = await FilesystemPicker.open(
+                      title: pathDocuments.path, //'Selecione diretorio destino',
+                      context: context,
+                      rootDirectory: pathDocuments,
+                      fsType: FilesystemType.folder,
+                      pickText: 'Selecione',
+                      folderIconColor: Colors.teal);*/
+
+                  var path = await FilePicker.platform.getDirectoryPath();
+                  if (path != null) {
+                    setState(() => dirDestinoControl.text = path);
+                  }
+                },
+              ),
               Row(
                 children: [
                   Padding(
@@ -163,10 +187,10 @@ class _EditaRotinaBackupState extends State<EditaRotinaBackup> {
         ),
         TextButton(
           child: Text(
-            widget.tarefa == null ? 'Add' : 'Atualizar',
+            widget.rotina == null ? 'Add' : 'Atualizar',
             style: TextStyle(color: Colors.white),
           ),
-          onPressed: widget.tarefa == null ? add : edit,
+          onPressed: widget.rotina == null ? add : edit,
         )
       ],
     );

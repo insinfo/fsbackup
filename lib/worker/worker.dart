@@ -114,7 +114,7 @@ abstract class Task<T> {
   T execute();
 }
 
-typedef ProgressCallback = void Function(int count, int total, String status);
+typedef ProgressCallback = void Function(int total, int count, String status);
 
 abstract class FileTask<T> extends Task<T> {
   ProgressCallback taskProgressCallback;

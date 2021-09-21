@@ -64,11 +64,7 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
             ),
           ),
 
-          Expanded(
-            child: Flexible(
-              child: Text("LOGs"),
-            ),
-          ),
+          //Text("LOGs"),
         ],
       ),
     );

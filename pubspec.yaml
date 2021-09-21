@@ -43,7 +43,7 @@ dependencies:
 
   file_picker: ^4.0.3
   #mask_text_input_formatter: ^2.0.0
-  
+  #docking: ^0.6.0 #https://pub.dev/packages/docking
 
   #filesystem_picker:
     #path: packages/filesystem_picker

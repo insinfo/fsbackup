@@ -33,7 +33,6 @@ class _MyAppState extends State<MyApp> {
       title: 'FileSystem Picker Demo',
       theme: ThemeData(
         primarySwatch: Colors.teal,
-        accentColor: Colors.white,
         buttonTheme: ButtonThemeData(
           buttonColor: Colors.teal,
           textTheme: ButtonTextTheme.accent,
@@ -94,9 +93,7 @@ class _DemoPageState extends State<DemoPage> {
       folderIconColor: Colors.teal,
       allowedExtensions: ['.txt'],
       fileTileSelectMode: filePickerSelectMode,
-      requestPermission: !isDesktop
-          ? () async => await Permission.storage.request().isGranted
-          : null,
+      requestPermission: !isDesktop ? () async => await Permission.storage.request().isGranted : null,
     );
 
     if (path != null) {
@@ -123,9 +120,7 @@ class _DemoPageState extends State<DemoPage> {
       fsType: FilesystemType.folder,
       pickText: 'Save file to this folder',
       folderIconColor: Colors.teal,
-      requestPermission: !isDesktop
-          ? () async => await Permission.storage.request().isGranted
-          : null,
+      requestPermission: !isDesktop ? () async => await Permission.storage.request().isGranted : null,
     );
 
     setState(() {
@@ -147,14 +142,11 @@ class _DemoPageState extends State<DemoPage> {
               children: <Widget>[
                 // Theme Brightness Switch Button
                 ElevatedButton(
-                  child: Text((appState!.brightness == Brightness.light)
-                      ? 'Switch to Dark theme'
-                      : 'Switch to Light theme'),
+                  child: Text(
+                      (appState!.brightness == Brightness.light) ? 'Switch to Dark theme' : 'Switch to Light theme'),
                   onPressed: () {
                     appState.setThemeBrightness(
-                        appState.brightness == Brightness.light
-                            ? Brightness.dark
-                            : Brightness.light);
+                        appState.brightness == Brightness.light ? Brightness.dark : Brightness.light);
                   },
                 ),
 
@@ -178,8 +170,7 @@ class _DemoPageState extends State<DemoPage> {
 
                 ElevatedButton(
                   child: Text('Save File'),
-                  onPressed:
-                      (rootPath != null) ? () => _pickDir(context) : null,
+                  onPressed: (rootPath != null) ? () => _pickDir(context) : null,
                 ),
 
                 Divider(height: 60),
@@ -202,8 +193,7 @@ class _DemoPageState extends State<DemoPage> {
 
                 ElevatedButton(
                   child: Text('Open File'),
-                  onPressed:
-                      (rootPath != null) ? () => _openFile(context) : null,
+                  onPressed: (rootPath != null) ? () => _openFile(context) : null,
                 ),
 
                 Padding(
@@ -214,9 +204,8 @@ class _DemoPageState extends State<DemoPage> {
                     value: filePickerSelectMode == FileTileSelectMode.wholeTile,
                     onChanged: (bool? newValue) => {
                       setState(() {
-                        filePickerSelectMode = newValue!
-                            ? FileTileSelectMode.wholeTile
-                            : FileTileSelectMode.checkButton;
+                        filePickerSelectMode =
+                            newValue! ? FileTileSelectMode.wholeTile : FileTileSelectMode.checkButton;
                       })
                     },
                   ),

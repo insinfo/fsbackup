@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
@@ -12,8 +10,6 @@ import 'package:fsbackup/providers/rotina_backup_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:fsbackup/shared/components/servidor_picker/servidor_picker.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';

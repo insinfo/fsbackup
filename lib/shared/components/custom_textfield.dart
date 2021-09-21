@@ -7,14 +7,37 @@ class CustomTextField extends StatefulWidget {
   final void Function(bool hasFocus) onFocusChange;
   final void Function() onTap;
   final List<TextInputFormatter> inputFormatters;
+  final TextInputType keyboardType;
 
-  const CustomTextField({
+  final String Function(String) validator;
+
+  final void Function(String) onSaved;
+  final void Function(String) onChanged;
+  final bool obscureText;
+  final bool enableSuggestions;
+  final bool autocorrect;
+  final String initialValue;
+  final String hintText;
+  //custom
+  final bool isPassword;
+
+  CustomTextField({
     Key key,
-    @required this.nameControl,
-    @required this.label,
+    this.nameControl,
+    this.label = '',
     this.onFocusChange,
     this.onTap,
     this.inputFormatters,
+    this.keyboardType,
+    this.obscureText = false,
+    this.enableSuggestions = false,
+    this.autocorrect = false,
+    this.isPassword = false,
+    this.validator,
+    this.onSaved,
+    this.onChanged,
+    this.initialValue,
+    this.hintText,
   }) : super(key: key);
 
   @override
@@ -23,7 +46,7 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   FocusNode _focus = FocusNode();
-
+  bool _isObscure = true;
   @override
   void initState() {
     super.initState();
@@ -46,8 +69,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      obscureText: widget.isPassword == false ? widget.obscureText : _isObscure,
+      enableSuggestions: widget.enableSuggestions,
+      autocorrect: widget.autocorrect,
+      keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
+      validator: widget.validator,
+      onSaved: widget.onSaved,
+      onChanged: widget.onChanged,
+      initialValue: widget.initialValue,
+
       onTap: () {
         if (widget.onTap != null) {
           widget.onTap();
@@ -59,8 +91,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
       // cursorColor: Colors.blue[400],
       // textCapitalization: TextCapitalization.words,
       decoration: InputDecoration(
-        label: Text(widget.label),
-        /*border: UnderlineInputBorder(
+          hintText: widget.hintText,
+          label: Text(widget.label),
+          suffixIcon: widget.isPassword
+              ? IconButton(
+                  icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  })
+              : null
+          /*border: UnderlineInputBorder(
           borderSide: BorderSide(
             color: Colors.blue[400],
           ),
@@ -70,8 +112,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
             borderSide: BorderSide(
           color: Colors.blue[400],
         )),*/
-        //hintText: label,
-      ),
+          //hintText: label,
+          ),
     );
   }
 }

@@ -42,7 +42,8 @@ dependencies:
   csv: any
 
   file_picker: ^4.0.3
-  mask_text_input_formatter: ^2.0.0
+  #mask_text_input_formatter: ^2.0.0
+  
 
   #filesystem_picker:
     #path: packages/filesystem_picker

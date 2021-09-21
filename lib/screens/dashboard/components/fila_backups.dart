@@ -31,9 +31,10 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Fila de babkups em andamento',
+            'Fila de backups em andamento',
             style: Theme.of(context).textTheme.subtitle1,
           ),
+          //SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: ChangeNotifierProvider.value(
@@ -60,6 +61,12 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
                       return Center(child: CircularProgressIndicator());
                     });
               }),
+            ),
+          ),
+
+          Expanded(
+            child: Flexible(
+              child: Text("LOGs"),
             ),
           ),
         ],

@@ -1,7 +1,5 @@
 class Diretorio {
-  Diretorio({
-    this.path,
-  });
+  Diretorio({this.path});
 
   String path;
 

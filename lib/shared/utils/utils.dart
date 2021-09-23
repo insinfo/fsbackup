@@ -1,9 +1,24 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Utils {
+  static List<Widget> rowGap(double gap, Iterable<Widget> children) {
+    return children.expand<Widget>((child) sync* {
+      yield SizedBox(width: gap);
+      yield child;
+    }).toList();
+  }
+
+  static List<Widget> columnGap(double gap, Iterable<Widget> children) {
+    return children.expand<Widget>((child) sync* {
+      yield SizedBox(height: gap);
+      yield child;
+    }).toList();
+  }
+
   static Future<Directory> getDownloadDirectory(String path) async {
     final dir = await getApplicationDocumentsDirectory();
 

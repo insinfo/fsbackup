@@ -1,4 +1,5 @@
 import 'package:fsbackup/providers/fila_provider.dart';
+import 'package:fsbackup/providers/log_provider.dart';
 import 'package:fsbackup/providers/menu_provider.dart';
 import 'package:fsbackup/providers/servidor_provider.dart';
 import 'package:fsbackup/providers/rotina_backup_provider.dart';
@@ -23,6 +24,8 @@ Future appInjector() async {
     locator.registerSingleton<RotinaBackupProvider>(RotinaBackupProvider(locator<RotinaBackupRepository>()));
 
     locator.registerSingleton<FilaProvider>(FilaProvider(locator<RotinaBackupRepository>()));
+
+    locator.registerSingleton<LogProvider>(LogProvider());
 
     isLoadedDb = true;
   }

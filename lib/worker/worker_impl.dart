@@ -74,16 +74,17 @@ class _WorkerImpl implements Worker {
 //  }
 
   @override
-  Future handle(Task task, {Function(TransferProgress progress) callback}) {
+  Future handle(Task task,
+      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback}) {
     if (isClosed) throw Exception('Worker is closed!');
 
     if (task is FileTask &&
         (task.actionType == ActionType.cancelUpload || task.actionType == ActionType.cancelDownload)) {
       var taskId = task.taskId;
       for (var workerIsolate in workingIsolates) {
-        print('Worker: handle: CancelFileTask: $workerIsolate');
+        //  print('Worker: handle: CancelFileTask: $workerIsolate');
         if (workerIsolate.taskId == taskId) {
-          workerIsolate.performTask(task, callback: callback);
+          workerIsolate.performTask(task, progressCallback: progressCallback, logCallback: logCallback);
         }
       }
 
@@ -93,7 +94,7 @@ class _WorkerImpl implements Worker {
     var isolate = _selectIsolate();
 
     if (isolate != null) {
-      return isolate.performTask(task, callback: callback);
+      return isolate.performTask(task, progressCallback: progressCallback, logCallback: logCallback);
     } else {
       throw Exception('No isolate available');
     }
@@ -145,7 +146,8 @@ class _WorkerImpl implements Worker {
 }
 
 class _WorkerIsolateImpl implements WorkerIsolate {
-  Map<String, Function(TransferProgress progress)> mapTaskCallback = {};
+  Map<String, Function(TransferProgress progress)> mapTaskProgressCallback = {};
+  Map<String, Function(TaskLog taskLog)> mapTaskLogCallback = {};
   bool _isClosed = false;
 
   @override
@@ -205,30 +207,39 @@ class _WorkerIsolateImpl implements WorkerIsolate {
 
   Future<WorkerIsolate> _spawnIsolate() {
     var completer = Completer<WorkerIsolate>();
-    Isolate.spawn(_workerMain, _receivePort.sendPort).then((isolate) {}, onError: print);
+    Isolate.spawn(_workerMain, _receivePort.sendPort).then((isolate) {}, onError: (e) {
+      //print(e);
+    });
 
     _receivePort.listen((dynamic message) {
 //      print('Worker: receivePort: $message');
-      if (message is _WorkerProgress) {
-        Function callback = mapTaskCallback[message.taskId];
-        if (callback != null) {
-          callback(TransferProgress(
-            count: message.count,
+      if (message is _WorkerLog) {
+        Function callbackLog = mapTaskLogCallback[message.taskId];
+        if (callbackLog != null) {
+          callbackLog(TaskLog(log: message.log));
+        } else {
+//          print('... but not callback for taskId=${message.taskId}');
+        }
+        return;
+      } else if (message is _WorkerProgress) {
+        Function callbackProgress = mapTaskProgressCallback[message.taskId];
+        if (callbackProgress != null) {
+          callbackProgress(TransferProgress(
+            loaded: message.loaded,
             total: message.total,
             status: message.status,
           ));
         } else {
 //          print('... but not callback for taskId=${message.taskId}');
         }
-
         return;
       } else if (message is FileTask &&
           (message.actionType == ActionType.cancelUpload || message.actionType == ActionType.cancelDownload)) {
-        print('... CancelFileTask this=$this');
+        //print('... CancelFileTask this=$this');
 
         return;
       } else if (message is SendPort) {
-        print('... SendPort this=$this');
+        // print('... SendPort this=$this');
         completer.complete(this);
         _spawnEventController.add(IsolateSpawnedEvent(this));
         _sendPort = message;
@@ -237,7 +248,7 @@ class _WorkerIsolateImpl implements WorkerIsolate {
 
         return;
       } else if (message is String) {
-        print('... SendPort this String=$message');
+        //print('... SendPort this String=$message');
 //        completer.complete(this);
 //        this._spawnEventController.add(new IsolateSpawnedEvent(this));
         taskId = message;
@@ -248,7 +259,6 @@ class _WorkerIsolateImpl implements WorkerIsolate {
       } else if (message is _WorkerException) {
         _taskFailedEventController
             .add(TaskFailedEvent(this, _runningScheduledTask.task, message.exception, message.stackTrace));
-
         _runningScheduledTask.completer.completeError(message.exception, message.stackTrace);
       } else if (message is _WorkerSignal) {
         if (message.id == closeSignal.id) {
@@ -275,13 +285,14 @@ class _WorkerIsolateImpl implements WorkerIsolate {
   }
 
   @override
-  Future performTask(Task task, {Function(TransferProgress progress) callback}) {
-    print('Worker: performTask $task');
+  Future performTask(Task task,
+      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback}) {
+    // print('Worker: performTask $task');
     if (isClosed) throw StateError('This WorkerIsolate is closed.');
 
     if (task is FileTask &&
         (task.actionType == ActionType.cancelUpload || task.actionType == ActionType.cancelDownload)) {
-      print('Worker: performTask _sendPort.send of CancelFileTask');
+      //  print('Worker: performTask _sendPort.send of CancelFileTask');
       _sendPort.send(task);
       return Future<void>.value(null);
     }
@@ -289,7 +300,8 @@ class _WorkerIsolateImpl implements WorkerIsolate {
     var completer = Completer<void>();
 
     if (task is FileTask && (task.actionType == ActionType.upload || task.actionType == ActionType.download)) {
-      mapTaskCallback[task.taskId] = callback;
+      mapTaskProgressCallback[task.taskId] = progressCallback;
+      mapTaskLogCallback[task.taskId] = logCallback;
     }
 
     _scheduledTasks.add(_ScheduledTask(task, completer));
@@ -436,16 +448,29 @@ void mergeStream(EventSink sink, Stream stream) {
 
 // An add code
 class _WorkerProgress {
-  int count;
+  int loaded;
   int total;
-
-  String taskId;
   String status;
 
-  _WorkerProgress({this.count, this.total, this.taskId, this.status});
+  String taskId;
+
+  _WorkerProgress({this.loaded, this.total, this.taskId, this.status});
 
   @override
   String toString() {
-    return '_WorkerProgress{count=$count, total=$total}, status=$status';
+    return '_WorkerProgress{loaded=$loaded, total=$total}, status=$status';
+  }
+}
+
+class _WorkerLog {
+  String log;
+
+  String taskId;
+
+  _WorkerLog({this.taskId, this.log});
+
+  @override
+  String toString() {
+    return '_WorkerLog{taskId=$taskId, log=$log}';
   }
 }

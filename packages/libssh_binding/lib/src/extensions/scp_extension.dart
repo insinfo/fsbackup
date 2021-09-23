@@ -183,20 +183,27 @@ extension ScpExtension on LibsshBinding {
   /// [fullLocalDirectoryPathTarget] example c:\downloads
   /// this function work only if remote is linux debian like sytem
   /// [callbackStats] function to show stattistcs callbackStats(totalSize, loaded, countDirectory, countFiles)
+  /// [printLog] callback for print log messagens
+  /// [updateStatsOnFileEnd] if true call callbackStats on file download end , if false call callbackStats on directory end
   Future<dynamic>? scpDownloadDirectory(
       Pointer<ssh_session_struct> session, String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
       {Allocator allocator = malloc,
-      void Function(int total, int loaded, int countDirectory, int countFiles)? callbackStats}) async {
+      void Function(int totalBytes, int loaded, int countDirectory, int countFiles)? callbackStats,
+      void Function(Object? obj)? printLog,
+      bool updateStatsOnFileEnd = true}) async {
     var source = remoteDirectoryPath.toNativeUtf8(allocator: allocator).cast<Int8>();
+
+    var printFunc = printLog != null ? printLog : print;
 
     String currentPath = '${fullLocalDirectoryPathTarget.replaceAll('\\', '/')}';
     String rootDirName = '';
     int currentDirSize = 0, totalSize = 0, loaded = 0, totalSizeFilesIgnorado = 0, countDirectory = 0, countFiles = 0;
+    String currentDirName = '';
+
     totalSize = getSizeOfDirectory(session, remoteDirectoryPath);
-    print('totalSize: $totalSize');
+    printFunc('Tamanho total: $totalSize do diretorio $remoteDirectoryPath');
     var scp = initDirectoryScp(session, source);
 
-    String currentDirName = '';
     var rc = 0;
     bool isFirstDirectory = true;
     bool exitLoop = false;
@@ -211,7 +218,7 @@ extension ScpExtension on LibsshBinding {
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
           var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
           var fileSize = ssh_scp_request_get_size64(scp);
-          // print("file: $filename size: $fileSize");
+          printFunc("file: $filename size: $fileSize");
           ssh_scp_accept_request(scp);
           await scpReadFileAndSave(session, scp, '$currentPath/$filename');
           countFiles++;
@@ -220,18 +227,18 @@ extension ScpExtension on LibsshBinding {
           //print('\r totalSize: $totalSize | loaded: $loaded | $progress %');
           //stdout.write('\r');
           //stdout.write('\r[${List.filled(((progress / 10) * 4).round(), '=').join()}] $progress%');
-          if (callbackStats != null) {
+          if (callbackStats != null && updateStatsOnFileEnd == true) {
             //(int total, int loaded, int countDirectory, int countFiles)
             callbackStats(totalSize, loaded, countDirectory, countFiles);
           }
           break;
         case SSH_ERROR:
           totalSizeFilesIgnorado += ssh_scp_request_get_size64(scp);
-          print('Error: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+          printFunc('Error: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
           exitLoop = true;
           break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_WARNING:
-          print('Warning: ${ssh_scp_request_get_warning(scp).cast<Utf8>().toDartString()}');
+          printFunc('Warning: ${ssh_scp_request_get_warning(scp).cast<Utf8>().toDartString()}');
           break;
         //Um novo diretório será puxado
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
@@ -246,6 +253,10 @@ extension ScpExtension on LibsshBinding {
           Directory('$currentPath').createSync(recursive: true);
           countDirectory++;
           //print("directory: $currentDirName | currentPath: $currentPath");
+          if (callbackStats != null && updateStatsOnFileEnd == false) {
+            //(int total, int loaded, int countDirectory, int countFiles)
+            callbackStats(totalSize, loaded, countDirectory, countFiles);
+          }
           ssh_scp_accept_request(scp);
           break;
         //End of directory
@@ -256,14 +267,14 @@ extension ScpExtension on LibsshBinding {
           //print("End of directory ");
           break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_EOF:
-          print("End of requests");
+          printFunc("Fim dos diretorios");
           exitLoop = true;
           break;
         default:
           break;
       }
     } while (true);
-    print('TotalSize: $totalSize | loaded: $loaded ');
+    printFunc('Tamanho total: $totalSize | Copiado: $loaded ');
     allocator.free(source);
     ssh_scp_close(scp);
     ssh_scp_free(scp);

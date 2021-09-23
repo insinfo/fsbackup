@@ -31,7 +31,7 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Fila de backups em andamento',
+            'Fila de backups em andamento:',
             style: Theme.of(context).textTheme.subtitle1,
           ),
           //SizedBox(height: 10),
@@ -45,7 +45,7 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(child: Text('Não ha Tarefas em execução'));
+                          return Center(child: Text('Não ha Tarefas em execução!'));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
@@ -63,8 +63,6 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
               }),
             ),
           ),
-
-          //Text("LOGs"),
         ],
       ),
     );
@@ -90,7 +88,7 @@ DataRow createItem(RotinaBackup rotina, BuildContext ctx) {
         ),
       ),
       DataCell(Text(rotina.diretorioDestino)),
-      DataCell(Text('${rotina.status?.toString()?.toUpperCase()}  ${rotina.percent * 100}%')),
+      DataCell(Text('${rotina.percent.toStringAsFixed(4)}%')),
     ],
   );
 }

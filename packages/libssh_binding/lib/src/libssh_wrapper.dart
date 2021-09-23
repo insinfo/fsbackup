@@ -121,11 +121,20 @@ class LibsshWrapper {
     return libsshBinding.sftpListDir(my_ssh_session, fullRemotePath);
   }
 
+  ///return total size in bytes of each file inside folder ignoring linux directory metadata size
+  int getSizeOfDirectory(String remoteDirectoryPath, {bool isThrowException = true}) {
+    return libsshBinding.getSizeOfDirectory(my_ssh_session, remoteDirectoryPath, isThrowException: isThrowException);
+  }
+
   /// [fullLocalDirectoryPathTarget] example c:\downloads
   /// [remoteDirectoryPath] example /var/www
   /// this function work only if remote is linux debian like sytem
-  Future<void> scpDownloadDirectory(String remoteDirectoryPath, String fullLocalDirectoryPathTarget) async {
-    await libsshBinding.scpDownloadDirectory(my_ssh_session, remoteDirectoryPath, fullLocalDirectoryPathTarget);
+  Future<void> scpDownloadDirectory(String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
+      {Allocator allocator = malloc,
+      void Function(int totalBytes, int loaded, int countDirectory, int countFiles)? callbackStats,
+      void Function(Object? obj)? printLog}) async {
+    await libsshBinding.scpDownloadDirectory(my_ssh_session, remoteDirectoryPath, fullLocalDirectoryPathTarget,
+        allocator: allocator, callbackStats: callbackStats, printLog: printLog);
   }
 
   void disconnect() {

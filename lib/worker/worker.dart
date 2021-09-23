@@ -56,7 +56,8 @@ abstract class Worker {
   }
 
   /// Returns a [Future] with the result of the execution of the [Task].
-  Future handle(Task task, {Function(TransferProgress progress) callback});
+  Future handle(Task task,
+      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback});
 
   /// Closes the [ReceivePort] of the isolates.
   /// Waits until all scheduled tasks have completed if [afterDone] is `true`.
@@ -91,7 +92,8 @@ abstract class WorkerIsolate {
 
   factory WorkerIsolate() => _WorkerIsolateImpl();
 
-  Future performTask(Task task, {Function(TransferProgress progress) callback});
+  Future performTask(Task task,
+      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback});
 
   /// Closes the [ReceivePort] of the isolate.
   /// Waits until all scheduled tasks have completed if [afterDone] is `true`.
@@ -114,10 +116,14 @@ abstract class Task<T> {
   T execute();
 }
 
-typedef ProgressCallback = void Function(int total, int count, String status);
+/// void Function(int total , int loaded, String status);
+typedef ProgressCallback = void Function(int total, int loaded, String status);
+
+typedef LogCallback = void Function(String log);
 
 abstract class FileTask<T> extends Task<T> {
   ProgressCallback taskProgressCallback;
+  LogCallback tasklogCallback;
   String taskId;
   ActionType actionType;
 
@@ -126,10 +132,18 @@ abstract class FileTask<T> extends Task<T> {
 
 enum ActionType { upload, download, cancelUpload, cancelDownload }
 
+//enum CallbackType { pregress, log }
+
 class TransferProgress {
-  final int count;
+  final int loaded;
   final int total;
   final String status;
 
-  const TransferProgress({this.count, this.total, this.status});
+  const TransferProgress({this.total, this.loaded, this.status});
+}
+
+class TaskLog {
+  final String log;
+
+  const TaskLog({this.log});
 }

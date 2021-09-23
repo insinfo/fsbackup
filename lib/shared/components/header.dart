@@ -2,6 +2,7 @@ import 'package:fsbackup/providers/menu_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fsbackup/shared/utils/utils.dart';
 
 import 'package:get_it/get_it.dart';
 import '../../constants.dart';
@@ -35,7 +36,13 @@ class Header extends StatelessWidget {
         Expanded(child: SearchField()),
         ProfileCard()*/
         SizedBox(width: defaultPadding),
-        if (actions != null) ...actions
+        if (actions != null)
+          Expanded(
+              child: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: Utils.rowGap(10, [if (actions != null) ...actions]),
+          ))
       ],
     );
   }

@@ -8,7 +8,7 @@ void _workerMain(SendPort sendPort) {
 
   if (sendPort is SendPort) {
     sendPort = sendPort;
-    print('Worker: sendPort send=${receivePort.sendPort}');
+    // print('Worker: sendPort send=${receivePort.sendPort}');
     sendPort.send(receivePort.sendPort);
   }
 
@@ -18,7 +18,7 @@ void _workerMain(SendPort sendPort) {
     try {
       if (message is Task) {
         var taskId = '';
-        print('Worker: execute Task message=$message');
+        //  print('Worker: execute Task message=$message');
 
         if (message is FileTask) {
           if (message.actionType == ActionType.upload) {
@@ -26,28 +26,35 @@ void _workerMain(SendPort sendPort) {
             mapUploadTask[taskId] = message;
 
             sendPort.send(taskId);
-            message.taskProgressCallback = (count, total, status) {
+            message.taskProgressCallback = (total, loaded, status) {
               sendPort.send(_WorkerProgress(
-                count: count,
+                loaded: loaded,
                 total: total,
                 taskId: message.taskId,
                 status: status,
               ));
+            };
+
+            message.tasklogCallback = (log) {
+              sendPort.send(_WorkerLog(log: log, taskId: message.taskId));
             };
           } else if (message.actionType == ActionType.download) {
             taskId = message.taskId;
             mapDownloadTask[taskId] = message;
             sendPort.send(taskId);
-            message.taskProgressCallback = (count, total, status) {
+            message.taskProgressCallback = (total, loaded, status) {
               sendPort.send(_WorkerProgress(
-                count: count,
+                loaded: loaded,
                 total: total,
                 taskId: message.taskId,
                 status: status,
               ));
             };
+            message.tasklogCallback = (log) {
+              sendPort.send(_WorkerLog(log: log, taskId: message.taskId));
+            };
           } else if (message.actionType == ActionType.cancelUpload) {
-            print('... CancelUploadTask message=$message');
+            // print('... CancelUploadTask message=$message');
             mapUploadTask.forEach((taskId, uploadTask) {
               if (taskId == message.taskId) {
                 uploadTask.handleCancel(taskId);
@@ -56,7 +63,7 @@ void _workerMain(SendPort sendPort) {
 
             return;
           } else if (message.actionType == ActionType.cancelDownload) {
-            print('... CancelDownloadTask message=$message');
+            // print('... CancelDownloadTask message=$message');
             mapDownloadTask.forEach((taskId, downloadTask) {
               if (taskId == message.taskId) {
                 downloadTask.handleCancel(taskId);
@@ -74,28 +81,26 @@ void _workerMain(SendPort sendPort) {
         if (result is Future) {
           result.then(
             (dynamic futureResult) {
-              print('Worker: main: ------ WorkerResult: ${result.runtimeType}'
-                  ': result=$futureResult');
+              // print('Worker: main: ------ WorkerResult: ${result.runtimeType}' ': result=$futureResult');
+
               sendPort.send(_WorkerResult(futureResult, taskId: taskId));
             },
             onError: (dynamic exception, StackTrace stackTrace) {
-              print('Worker: execute main but FAIL: exception=$exception, '
-                  'stackTrace=$stackTrace');
+              //print('Worker: execute main but FAIL: exception=$exception, '   'stackTrace=$stackTrace');
               sendException(sendPort, exception, stackTrace);
             },
           );
         } else {
-          print('Worker: main2: WorkerResult: result2=$result');
+          // print('Worker: main2: WorkerResult: result2=$result');
           sendPort.send(_WorkerResult(result, taskId: taskId));
         }
       } else if (message is String) {
-        print('Worker: execute TaskId=$message');
+        // print('Worker: execute TaskId=$message');
       } else {
         throw Exception('Message is not a task');
       }
     } catch (exception, stackTrace) {
-      print('... Worker: execute Task message=$message but FAIL: '
-          'exception=$exception, stackTrace=$stackTrace');
+      //print('... Worker: execute Task message=$message but FAIL: ' 'exception=$exception, stackTrace=$stackTrace');
       sendException(sendPort, exception, stackTrace);
     }
   });

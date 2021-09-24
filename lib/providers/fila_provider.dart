@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
-import 'package:fsbackup/models/rotina_backup.dart';
+import 'package:fsbackup/models/backup_routine_model.dart';
 import 'package:fsbackup/providers/log_provider.dart';
-import 'package:fsbackup/repositories/tarefa_repository.dart';
+import 'package:fsbackup/repositories/backup_routine_repository.dart';
 import 'package:fsbackup/services/backup_task.dart';
 import 'package:fsbackup/worker/worker.dart';
 
 class FilaProvider extends ChangeNotifier {
-  final RotinaBackupRepository repository;
-  List<RotinaBackup> rotinas = <RotinaBackup>[];
+  final BackupRoutineRepository repository;
+  List<BackupRoutineModel> routines = <BackupRoutineModel>[];
   FilaProvider(this.repository);
 
   Future<void> start() async {
-    rotinas = await repository.all();
+    routines = await repository.all();
 
-    rotinas.forEach((rotina) async {
+    routines.forEach((rotina) async {
       //var servidor = rotina.servidores.first;
 
       var task = BackupTask(rotina, taskId: rotina.id);
@@ -32,7 +32,7 @@ class FilaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<RotinaBackup>> getAll() async {
-    return rotinas;
+  Future<List<BackupRoutineModel>> getAll() async {
+    return routines;
   }
 }

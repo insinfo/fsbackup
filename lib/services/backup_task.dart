@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart' as dio;
-import 'package:fsbackup/models/rotina_backup.dart';
+import 'package:fsbackup/models/backup_routine_model.dart';
 import 'package:fsbackup/worker/worker.dart';
 import 'package:libssh_binding/libssh_binding.dart';
 
@@ -9,7 +9,7 @@ import 'package:libssh_binding/libssh_binding.dart';
 class BackupTask implements FileTask<Future<bool>> {
   dio.CancelToken cancelToken;
 
-  final RotinaBackup rotinaBackup;
+  final BackupRoutineModel rotinaBackup;
   LibsshWrapper libssh;
   BackupTask(this.rotinaBackup, {this.taskId});
   @override
@@ -23,10 +23,8 @@ class BackupTask implements FileTask<Future<bool>> {
     var completer = Completer<bool>();
 
     try {
-      //int total, int count, String status
-      taskProgressCallback(0, 1, 'inicio');
       //var progress = ((loaded / total) * 100).round();
-      var server = rotinaBackup.servidores.first;
+      var server = rotinaBackup.servers.first;
       libssh = LibsshWrapper(
         server.host,
         username: server.user,
@@ -36,29 +34,30 @@ class BackupTask implements FileTask<Future<bool>> {
       );
       libssh.connect();
 
-      var dirretorios = server.directories;
+      var fileObjects = server.fileObjects;
       int totalSize = 0;
       int totalLoaded = 0;
 
-      totalSize = dirretorios
+      totalSize = fileObjects
           .map((d) => libssh.getSizeOfDirectory(d.path))
           .toList()
           .reduce((value, element) => value + element);
 
-      print('dirretorios ${dirretorios.map((e) => e.path).toList().join(", ")} totalSize: $totalSize');
+      print('dirretorios ${fileObjects.map((e) => e.path).toList().join(", ")} totalSize: $totalSize');
 
-      for (var dir in dirretorios) {
+      for (var dir in fileObjects) {
         // var loadCurrent = 0;
         //faz o download do diretorio
         await libssh.scpDownloadDirectory(
           dir.path,
-          rotinaBackup.diretorioDestino,
+          rotinaBackup.destinationDirectory,
           printLog: (v) {
             tasklogCallback(v);
+            print(v);
           },
-          callbackStats: (int total, int loaded, int countDirectory, int countFiles) {
-            totalLoaded += loaded;
-            taskProgressCallback(total, loaded, 'andamento');
+          callbackStats: (int total, int loaded, int currentFileSize, int countDirectory, int countFiles) {
+            totalLoaded += currentFileSize;
+            taskProgressCallback(totalSize, totalLoaded, 'andamento');
           },
         );
         //totalLoaded += loadCurrent;

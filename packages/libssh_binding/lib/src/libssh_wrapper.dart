@@ -10,14 +10,34 @@ import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/src/libssh_binding.dart';
 import 'package:libssh_binding/src/sftp_binding.dart';
 
+class LibssOptions {
+  late String host;
+  String? username;
+  String? password;
+  int port = 22;
+  bool verbosity = false;
+  DynamicLibrary? inDll;
+  String ddlname = 'ssh.dll';
+  bool defaultDllPath = true;
+
+  LibssOptions(this.host,
+      {this.username,
+      this.password,
+      this.port = 22,
+      this.verbosity = false,
+      this.ddlname = 'ssh.dll',
+      this.inDll,
+      this.defaultDllPath = true});
+}
+
 /// high-level wrapper on top of libssh binding - The SSH library!
 /// libssh is a multiplatform C library implementing the SSHv2 protocol on client and server side.
 /// With libssh, you can remotely execute programs, transfer files, use a secure and transparent tunnel
 /// https://www.libssh.org/
 class LibsshWrapper {
-  late ssh_session my_ssh_session;
+  late ssh_session mySshSession;
   late LibsshBinding libsshBinding;
-  String host;
+  late String host;
   String? username;
   String? password;
   int port = 22;
@@ -37,43 +57,58 @@ class LibsshWrapper {
     var libraryPath = defaultDllPath ? ddlname : path.join(Directory.current.path, ddlname); //'libssh_compiled',
     final dll = inDll == null ? DynamicLibrary.open(libraryPath) : inDll;
     libsshBinding = LibsshBinding(dll);
-    my_ssh_session = initSsh();
+    mySshSession = initSsh();
+  }
+
+  LibsshWrapper.fromOptions(LibssOptions options) {
+    var libraryPath = options.defaultDllPath
+        ? options.ddlname
+        : path.join(Directory.current.path, options.ddlname); //'libssh_compiled',
+    host = options.host;
+    username = options.username;
+    password = options.password;
+    port = options.port;
+    verbosity = options.verbosity;
+
+    final dll = options.inDll == null ? DynamicLibrary.open(libraryPath) : options.inDll;
+    libsshBinding = LibsshBinding(dll!);
+    mySshSession = initSsh();
   }
 
   /// initialize ssh - Open the session and set the options
   ssh_session initSsh() {
     // Open the session and set the options
-    var my_session = libsshBinding.ssh_new();
-    libsshBinding.ssh_options_set(my_session, ssh_options_e.SSH_OPTIONS_HOST, stringToNativeVoid(host));
-    libsshBinding.ssh_options_set(my_session, ssh_options_e.SSH_OPTIONS_PORT, intToNativeVoid(port));
+    var mySession = libsshBinding.ssh_new();
+    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_HOST, stringToNativeVoid(host));
+    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_PORT, intToNativeVoid(port));
     if (verbosity == true) {
       libsshBinding.ssh_options_set(
-          my_session, ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY, intToNativeVoid(SSH_LOG_PROTOCOL));
+          mySession, ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY, intToNativeVoid(SSH_LOG_PROTOCOL));
     }
-    libsshBinding.ssh_options_set(my_session, ssh_options_e.SSH_OPTIONS_USER, stringToNativeVoid(username!));
-    return my_session;
+    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_USER, stringToNativeVoid(username!));
+    return mySession;
   }
 
   /// Connect to SSH server
   void connect() {
-    var rc = libsshBinding.ssh_connect(my_ssh_session);
+    var rc = libsshBinding.ssh_connect(mySshSession);
     if (rc != SSH_OK) {
       isConnected = false;
       throw Exception('Error connecting to host: $host \n');
     }
-    rc = libsshBinding.ssh_userauth_password(
-        my_ssh_session, stringToNativeInt8(username!), stringToNativeInt8(password!));
+    rc =
+        libsshBinding.ssh_userauth_password(mySshSession, stringToNativeInt8(username!), stringToNativeInt8(password!));
     if (rc != ssh_auth_e.SSH_AUTH_SUCCESS) {
       isConnected = false;
       throw Exception(
-          "Error authenticating with password: ${libsshBinding.ssh_get_error(my_ssh_session.cast()).cast<Utf8>().toDartString()}\n");
+          "Error authenticating with password: ${libsshBinding.ssh_get_error(mySshSession.cast()).cast<Utf8>().toDartString()}\n");
     }
     isConnected = true;
   }
 
   /// check if session started and connection is open
   void isReady() {
-    if (my_ssh_session.address == nullptr) {
+    if (mySshSession == nullptr) {
       throw Exception('SSH session is not initialized');
     }
     if (isConnected == false) {
@@ -85,7 +120,7 @@ class LibsshWrapper {
   Future<void> scpDownloadFileTo(String fullRemotePathSource, String fullLocalPathTarget,
       {void Function(int, int)? callbackStats}) async {
     isReady();
-    await libsshBinding.scpDownloadFileTo(my_ssh_session, fullRemotePathSource, fullLocalPathTarget,
+    await libsshBinding.scpDownloadFileTo(mySshSession, fullRemotePathSource, fullLocalPathTarget,
         callbackStats: callbackStats);
   }
 
@@ -93,7 +128,7 @@ class LibsshWrapper {
   Future<void> sftpDownloadFileTo(String fullRemotePath, String fullLocalPath,
       {Pointer<sftp_session_struct>? inSftp}) async {
     isReady();
-    await libsshBinding.sftpDownloadFileTo(my_ssh_session, fullRemotePath, fullLocalPath, inSftp: inSftp);
+    await libsshBinding.sftpDownloadFileTo(mySshSession, fullRemotePath, fullLocalPath, inSftp: inSftp);
   }
 
   /// execute only one command
@@ -106,24 +141,24 @@ class LibsshWrapper {
     Allocator allocator = malloc,
   }) {
     isReady();
-    return libsshBinding.execCommandSync(my_ssh_session, command, allocator: allocator);
+    return libsshBinding.execCommandSync(mySshSession, command, allocator: allocator);
   }
 
   /// experimental as it may not be able to detect the prompt
   /// execute commands in the interactive shell the order of execution is based on the order of the command list
   /// and return a list with the response of each command in the order of execution
   List<String> execCommandsInShell(List<String> commands) {
-    return libsshBinding.execCommandsInShell(my_ssh_session, commands);
+    return libsshBinding.execCommandsInShell(mySshSession, commands);
   }
 
   /// Listing the contents of a directory
   List<DirectoryItem> sftpListDir(String fullRemotePath) {
-    return libsshBinding.sftpListDir(my_ssh_session, fullRemotePath);
+    return libsshBinding.sftpListDir(mySshSession, fullRemotePath);
   }
 
   ///return total size in bytes of each file inside folder ignoring linux directory metadata size
   int getSizeOfDirectory(String remoteDirectoryPath, {bool isThrowException = true}) {
-    return libsshBinding.getSizeOfDirectory(my_ssh_session, remoteDirectoryPath, isThrowException: isThrowException);
+    return libsshBinding.getSizeOfDirectory(mySshSession, remoteDirectoryPath, isThrowException: isThrowException);
   }
 
   /// [fullLocalDirectoryPathTarget] example c:\downloads
@@ -131,18 +166,21 @@ class LibsshWrapper {
   /// this function work only if remote is linux debian like sytem
   Future<void> scpDownloadDirectory(String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
       {Allocator allocator = malloc,
-      void Function(int totalBytes, int loaded, int countDirectory, int countFiles)? callbackStats,
-      void Function(Object? obj)? printLog}) async {
-    await libsshBinding.scpDownloadDirectory(my_ssh_session, remoteDirectoryPath, fullLocalDirectoryPathTarget,
-        allocator: allocator, callbackStats: callbackStats, printLog: printLog);
+      void Function(int totalBytes, int loaded, int currentFileSize, int countDirectory, int countFiles)? callbackStats,
+      void Function(Object? obj)? printLog,
+      bool isThrowException = false}) async {
+    await libsshBinding.scpDownloadDirectory(mySshSession, remoteDirectoryPath, fullLocalDirectoryPathTarget,
+        allocator: allocator, callbackStats: callbackStats, printLog: printLog, isThrowException: isThrowException);
   }
 
+  /// disconnect from server
   void disconnect() {
-    libsshBinding.ssh_disconnect(my_ssh_session);
+    libsshBinding.ssh_disconnect(mySshSession);
   }
 
+  /// free memory
   void dispose() {
     disconnect();
-    libsshBinding.ssh_free(my_ssh_session);
+    libsshBinding.ssh_free(mySshSession);
   }
 }

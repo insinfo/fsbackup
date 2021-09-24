@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fsbackup/screens/backup_routine_screen/backup_routine_screen.dart';
 import 'package:fsbackup/screens/dashboard/dashboard_screen.dart';
-import 'package:fsbackup/screens/rotina_backup/rotina_backup_screen.dart';
-import 'package:fsbackup/screens/servidor/servidor_screen.dart';
+
+import 'package:fsbackup/screens/server_screen/server_screen.dart';
 
 import 'package:page_transition/page_transition.dart';
 
 final Map<String, Widget> pageRoutes = {
   '/': DashboardScreen(),
   '/dashboard': DashboardScreen(),
-  '/servidores': ServidorScreen(),
-  '/rotinas': RotinaBackupScreen(),
+  '/servidores': ServerScreen(),
+  '/rotinas': BackupRoutineScreen(),
 };
 
 var currentRoute = '/dashboard';

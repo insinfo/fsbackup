@@ -1,0 +1,14 @@
+{
+  "hello": "Hello!!",
+  "btnShowLog":"Exibir Log",
+  "btnStart":"Iniciar",
+  "noItems":"Não há itens cadastrados",
+  "dashboardPageTitle":"Dashboard",
+  "dashboardPageSubTitle":"Fila de Backups em andamento", 
+  "serverPageTitle":"Servidores",
+  "serverPageSubTitle":"",
+  "backupRoutinesPageTitle":"Rotinas de Backup",
+  "backupRoutinesSubTitle":"",
+  "btnAdd":"Add",
+  "btnDelete":"Delete"
+}

@@ -88,6 +88,7 @@ extension ExecSshCommandExtension on LibsshBinding {
     var cmd = command.toNativeUtf8().cast<Int8>();
     var rc = ssh_channel_request_exec(channel, cmd);
     if (rc != SSH_OK) {
+      allocator.free(cmd);
       throw Exception(
           'Error on ssh_channel_request_exec: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }

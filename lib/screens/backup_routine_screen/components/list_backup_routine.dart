@@ -1,0 +1,128 @@
+import 'package:fsbackup/app_injector.dart';
+import 'package:fsbackup/constants.dart';
+
+import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
+import 'package:fsbackup/models/backup_routine_model.dart';
+
+import 'package:fsbackup/providers/backup_routine_provider.dart';
+import 'package:fsbackup/screens/backup_routine_screen/components/edit_backup_routine.dart';
+
+import 'package:provider/provider.dart';
+
+class ListBackupRoutine extends StatelessWidget {
+  ListBackupRoutine({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(defaultPadding),
+      decoration: BoxDecoration(
+        color: secondaryColor,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: ChangeNotifierProvider.value(
+              value: locator<BackupRoutineProvider>(),
+              builder: (context, w) => Consumer<BackupRoutineProvider>(builder: (ctx, data, child) {
+                return FutureBuilder<List<BackupRoutineModel>>(
+                    future: data.getAll(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data.length == 0) {
+                          return Center(child: Text("Não ha rotinas de Backup cadastradas"));
+                        } else if (snapshot.data.length > 0) {
+                          return DataTable2(
+                              columnSpacing: defaultPadding,
+                              minWidth: 600,
+                              columns: [
+                                DataColumn(label: Text('Nome')),
+                                DataColumn(label: Text('Destino')),
+                                DataColumn(label: Text('Start')),
+                                DataColumn(label: Text('Servidor')),
+                                DataColumn(label: Text('Ações')),
+                              ],
+                              rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
+                        }
+                      }
+                      return Center(child: CircularProgressIndicator());
+                    });
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  DataRow createItem(BackupRoutineModel routine, BuildContext ctx) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Row(
+            children: [
+              SvgPicture.asset(
+                routine.icon,
+                height: 30,
+                width: 30,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+                child: Text('${routine.name}'),
+              ),
+            ],
+          ),
+        ),
+        DataCell(Text('${routine.destinationDirectory}')),
+        DataCell(Text('${routine.startBackup.text}')),
+        DataCell(Text('${routine.servers?.isNotEmpty == true ? routine.servers.first.name : "Sem servidor"}')),
+        DataCell(Row(
+          children: [
+            IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  showDialog(
+                    context: ctx,
+                    builder: (_) => EditBackupRoutine(routine: routine),
+                  );
+                }),
+            SizedBox(width: defaultPadding + 5),
+            IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () async {
+                  await showDialog(
+                    context: ctx,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Confirmar"),
+                        content: Text("Tem certeza que deseja deletar este item?"),
+                        actions: <Widget>[
+                          TextButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop(true);
+                                await locator<BackupRoutineProvider>().delete(routine.id);
+                              },
+                              child: Text("DELETE")),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text("CANCEL"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                })
+          ],
+        )),
+      ],
+    );
+  }
+}

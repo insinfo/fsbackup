@@ -1,14 +1,12 @@
 import 'package:fsbackup/app_injector.dart';
+import 'package:fsbackup/constants.dart';
 import 'package:fsbackup/providers/fila_provider.dart';
-
 import 'package:flutter/material.dart';
+import 'package:fsbackup/screens/dashboard/components/fila_backups.dart';
 import 'package:fsbackup/screens/dashboard/components/log_view.dart';
+import 'package:fsbackup/shared/components/header.dart';
 
-import '../../constants.dart';
-
-import '../../shared/components/header.dart';
-
-import 'components/fila_backups.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -43,7 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   children: [
                     Header(
-                      title: 'Dashboard',
+                      title: AppLocalizations.of(context).dashboardPageTitle,
                       actions: [
                         //_showLog
                         ElevatedButton.icon(
@@ -56,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             });
                           },
                           icon: Icon(_showLog ? Icons.visibility : Icons.visibility_off),
-                          label: Text('Show Log'),
+                          label: Text(AppLocalizations.of(context).btnShowLog),
                         ),
                         ElevatedButton.icon(
                           style: TextButton.styleFrom(
@@ -66,7 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             locator<FilaProvider>().start();
                           },
                           icon: Icon(Icons.sync),
-                          label: Text('Iniciar'),
+                          label: Text(AppLocalizations.of(context).btnStart),
                         ),
                       ],
                     ),

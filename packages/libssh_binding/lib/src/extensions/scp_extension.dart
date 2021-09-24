@@ -147,7 +147,7 @@ extension ScpExtension on LibsshBinding {
     //var mode = ssh_scp_request_get_permissions(scp);
     var targetFile = await File(fullLocalPathTarget).create(recursive: true);
     var hFile = targetFile.openSync(mode: FileMode.write); // for appending at the end of file
-    int len_loop = remoteFileLength;
+    int lenLoop = remoteFileLength;
     var nbytes = 0, nwritten = 0;
     var bufsize = 128 * 1024; //MAX_XFER_BUF_SIZE = 16384 = 16KB
     final buffer = allocator<Int8>(bufsize);
@@ -169,8 +169,8 @@ extension ScpExtension on LibsshBinding {
       }
       //print('nbytes $nbytes nwritten $nwritten');
       hFile.writeFromSync(buffer.asTypedList(nbytes));
-      len_loop -= nbytes;
-    } while (len_loop != 0);
+      lenLoop -= nbytes;
+    } while (lenLoop != 0);
 
     await hFile.close();
     allocator.free(buffer);
@@ -188,24 +188,28 @@ extension ScpExtension on LibsshBinding {
   Future<dynamic>? scpDownloadDirectory(
       Pointer<ssh_session_struct> session, String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
       {Allocator allocator = malloc,
-      void Function(int totalBytes, int loaded, int countDirectory, int countFiles)? callbackStats,
+      void Function(int totalBytes, int loaded, int currentFileSize, int countDirectory, int countFiles)? callbackStats,
       void Function(Object? obj)? printLog,
-      bool updateStatsOnFileEnd = true}) async {
+      bool updateStatsOnFileEnd = true,
+      bool isThrowException = false}) async {
     var source = remoteDirectoryPath.toNativeUtf8(allocator: allocator).cast<Int8>();
-
+    //function used to print log info
     var printFunc = printLog != null ? printLog : print;
 
     String currentPath = '${fullLocalDirectoryPathTarget.replaceAll('\\', '/')}';
-    String rootDirName = '';
-    int currentDirSize = 0, totalSize = 0, loaded = 0, totalSizeFilesIgnorado = 0, countDirectory = 0, countFiles = 0;
+    /*String rootDirName = '';
+    int currentDirSize = 0;
+    bool isFirstDirectory = true;*/
+    int totalSize = 0, loaded = 0, countDirectory = 0, countFiles = 0;
+    int currentFileSize = 0;
     String currentDirName = '';
 
-    totalSize = getSizeOfDirectory(session, remoteDirectoryPath);
+    totalSize = getSizeOfDirectory(session, remoteDirectoryPath, isThrowException: isThrowException);
     printFunc('Tamanho total: $totalSize do diretorio $remoteDirectoryPath');
     var scp = initDirectoryScp(session, source);
 
     var rc = 0;
-    bool isFirstDirectory = true;
+
     bool exitLoop = false;
     do {
       rc = ssh_scp_pull_request(scp);
@@ -217,28 +221,34 @@ extension ScpExtension on LibsshBinding {
         //Um novo arquivo será obtido
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
           var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
-          var fileSize = ssh_scp_request_get_size64(scp);
-          printFunc("file: $filename size: $fileSize");
+          currentFileSize = ssh_scp_request_get_size64(scp);
+          //printFunc("file: $filename size: $fileSize");
           ssh_scp_accept_request(scp);
           await scpReadFileAndSave(session, scp, '$currentPath/$filename');
           countFiles++;
-          loaded += fileSize;
+          loaded += currentFileSize;
           //var progress = ((loaded / totalSize) * 100).round();
           //print('\r totalSize: $totalSize | loaded: $loaded | $progress %');
           //stdout.write('\r');
           //stdout.write('\r[${List.filled(((progress / 10) * 4).round(), '=').join()}] $progress%');
           if (callbackStats != null && updateStatsOnFileEnd == true) {
             //(int total, int loaded, int countDirectory, int countFiles)
-            callbackStats(totalSize, loaded, countDirectory, countFiles);
+            callbackStats(totalSize, loaded, currentFileSize, countDirectory, countFiles);
           }
           break;
         case SSH_ERROR:
-          totalSizeFilesIgnorado += ssh_scp_request_get_size64(scp);
-          printFunc('Error: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+          if (isThrowException) {
+            allocator.free(source);
+            ssh_scp_close(scp);
+            ssh_scp_free(scp);
+            throw Exception(
+                'scpDownloadDirectory: SSH_ERROR: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
+          }
+          printFunc('scpDownloadDirectory: SSH_ERROR: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
           exitLoop = true;
           break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_WARNING:
-          printFunc('Warning: ${ssh_scp_request_get_warning(scp).cast<Utf8>().toDartString()}');
+          printFunc('scpDownloadDirectory: Warning: ${ssh_scp_request_get_warning(scp).cast<Utf8>().toDartString()}');
           break;
         //Um novo diretório será puxado
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
@@ -246,16 +256,16 @@ extension ScpExtension on LibsshBinding {
           //currentDirSize = ssh_scp_request_get_size64(scp);
           //var mode = ssh_scp_request_get_permissions(scp);
           currentPath += '/$currentDirName';
-          if (isFirstDirectory == true) {
+          /*if (isFirstDirectory == true) {
             rootDirName = '/$currentDirName';
             isFirstDirectory = false;
-          }
+          }*/
           Directory('$currentPath').createSync(recursive: true);
           countDirectory++;
           //print("directory: $currentDirName | currentPath: $currentPath");
           if (callbackStats != null && updateStatsOnFileEnd == false) {
             //(int total, int loaded, int countDirectory, int countFiles)
-            callbackStats(totalSize, loaded, countDirectory, countFiles);
+            callbackStats(totalSize, loaded, currentFileSize, countDirectory, countFiles);
           }
           ssh_scp_accept_request(scp);
           break;
@@ -267,7 +277,7 @@ extension ScpExtension on LibsshBinding {
           //print("End of directory ");
           break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_EOF:
-          printFunc("Fim dos diretorios");
+          printFunc("scpDownloadDirectory: Fim dos diretorios");
           exitLoop = true;
           break;
         default:

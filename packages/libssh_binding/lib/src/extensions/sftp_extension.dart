@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
@@ -8,6 +9,7 @@ import 'package:libssh_binding/src/libssh_binding.dart';
 import 'package:libssh_binding/src/models/directory_item.dart';
 import 'package:libssh_binding/src/sftp_binding.dart';
 import 'package:libssh_binding/src/stat.dart';
+import 'package:libssh_binding/src/utils.dart';
 import '../constants.dart';
 
 extension SftpExtension on LibsshBinding {
@@ -34,6 +36,7 @@ extension SftpExtension on LibsshBinding {
     final path = fullRemotePath.toNativeUtf8(allocator: allocator);
     var dir = sftp_opendir(sftp, path.cast());
     if (dir == nullptr) {
+      allocator.free(path);
       sftp_free(sftp);
       throw Exception('Directory not opened: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
@@ -44,14 +47,28 @@ extension SftpExtension on LibsshBinding {
       if (sftp_dir_eof(dir) == 1) {
         break;
       }
+      if (attributes.ref.name == nullptr) {
+        break;
+      }
       //longname => drwxrwxrwx    2 www-data www-data     4096 Jun 25  2018 .ssh
-      var name = attributes.ref.name.cast<Utf8>().toDartString();
+
+      var name = nativeInt8ToString(attributes.ref.name);
+      //var name = ptrName.cast<Utf8>().toDartString();
+      //var longname = attributes.ref.longname.cast<Utf8>().toDartString();
+      var longname = nativeInt8ToString(attributes.ref.longname);
       /* print(
           '$name  | ${attributes.ref.size} | ${attributes.ref.permissions} | ${attributes.ref.owner.cast<Utf8>().toDartString()} |' +
               '${attributes.ref.uid} |  ${attributes.ref.group.cast<Utf8>().toDartString()}  ${attributes.ref.gid}');
         */
       //var t = attributes.ref.type == 1 ? 'file' : 'directory';
+
+      var path =
+          fullRemotePath.substring(fullRemotePath.length - 1) != '/' ? '$fullRemotePath/$name' : '$fullRemotePath$name';
+
       results.add(DirectoryItem(
+          nativePath: nativeInt8CodeUnits(attributes.ref.name),
+          longname: longname,
+          path: path,
           name: name,
           type: attributes.ref.type == 1 ? DirectoryItemType.file : DirectoryItemType.directory,
           size: attributes.ref.size));
@@ -67,6 +84,7 @@ extension SftpExtension on LibsshBinding {
 
     var rc = sftp_closedir(dir);
     if (rc != SSH_OK) {
+      allocator.free(path);
       sftp_free(sftp);
       throw Exception('Can\'t close directory: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
@@ -82,8 +100,8 @@ extension SftpExtension on LibsshBinding {
     var remotePath = remoteFilefullPath.toNativeUtf8(allocator: allocator);
     var sftp = initSftp(session);
     //get remote file for writing
-    int access_type = O_WRONLY | O_CREAT | O_TRUNC;
-    var remoteFile = sftp_open(sftp, remotePath.cast(), access_type, S_IRWXU);
+    int accessType = O_WRONLY | O_CREAT | O_TRUNC;
+    var remoteFile = sftp_open(sftp, remotePath.cast(), accessType, S_IRWXU);
     if (remoteFile.address == nullptr.address) {
       sftp_free(sftp);
       throw Exception(

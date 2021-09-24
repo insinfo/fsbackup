@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fsbackup/models/servidor.dart';
+import 'package:fsbackup/models/server_model.dart';
 import 'package:fsbackup/shared/components/servidor_picker/servidor_selection_dialog.dart';
 
 class ServidorPicker extends StatefulWidget {
-  final ValueChanged<Servidor> onChanged;
-  final ValueChanged<Servidor> onInit;
+  final ValueChanged<ServerModel> onChanged;
+  final ValueChanged<ServerModel> onInit;
   final String initialSelection;
 
   final TextStyle textStyle;
@@ -14,7 +14,7 @@ class ServidorPicker extends StatefulWidget {
   final TextStyle searchStyle;
   final TextStyle dialogTextStyle;
   final WidgetBuilder emptySearchBuilder;
-  final Function(Servidor) builder;
+  final Function(ServerModel) builder;
   final bool enabled;
   final TextOverflow textOverflow;
   final Icon closeIcon;
@@ -45,7 +45,7 @@ class ServidorPicker extends StatefulWidget {
   final bool alignLeft;
 
   /// Use this property to change the order of the options
-  final Comparator<Servidor> comparator;
+  final Comparator<ServerModel> comparator;
 
   /// Set to true if you want to hide the search part
   final bool hideSearch;
@@ -57,7 +57,7 @@ class ServidorPicker extends StatefulWidget {
   final Decoration flagDecoration;
 
   /// An  argument for injecting a list of items
-  final List<Servidor> items;
+  final List<ServerModel> items;
 
   ServidorPicker({
     this.onChanged,
@@ -98,7 +98,7 @@ class ServidorPicker extends StatefulWidget {
     if (countryFilter != null && countryFilter.isNotEmpty) {
       final uppercaseCustomList = countryFilter.map((c) => c.toUpperCase()).toList();
       elements =
-          elements.where((c) => uppercaseCustomList.contains(c.nome) || uppercaseCustomList.contains(c.host)).toList();
+          elements.where((c) => uppercaseCustomList.contains(c.name) || uppercaseCustomList.contains(c.host)).toList();
     }
 
     return _ServidorPickerState(elements);
@@ -106,8 +106,8 @@ class ServidorPicker extends StatefulWidget {
 }
 
 class _ServidorPickerState extends State<ServidorPicker> {
-  Servidor selectedItem;
-  List<Servidor> elements = [];
+  ServerModel selectedItem;
+  List<ServerModel> elements = [];
 
   _ServidorPickerState(this.elements);
 
@@ -131,7 +131,7 @@ class _ServidorPickerState extends State<ServidorPicker> {
               Flexible(
                 fit: widget.alignLeft ? FlexFit.tight : FlexFit.loose,
                 child: Text(
-                  selectedItem.nome,
+                  selectedItem.name,
                   style: widget.textStyle ?? Theme.of(context).textTheme.button,
                   overflow: widget.textOverflow,
                 ),
@@ -173,7 +173,7 @@ class _ServidorPickerState extends State<ServidorPicker> {
       if (widget.initialSelection != null) {
         selectedItem = elements.firstWhere(
             (e) =>
-                (e.nome.toUpperCase() == widget.initialSelection.toUpperCase()) || (e.host == widget.initialSelection),
+                (e.name.toUpperCase() == widget.initialSelection.toUpperCase()) || (e.host == widget.initialSelection),
             orElse: () => elements[0]);
       } else {
         selectedItem = elements[0];
@@ -188,7 +188,7 @@ class _ServidorPickerState extends State<ServidorPicker> {
 
     if (widget.initialSelection != null) {
       selectedItem = elements.firstWhere(
-          (e) => (e.nome.toUpperCase() == widget.initialSelection.toUpperCase()) || (e.host == widget.initialSelection),
+          (e) => (e.name.toUpperCase() == widget.initialSelection.toUpperCase()) || (e.host == widget.initialSelection),
           orElse: () => elements[0]);
     } else {
       selectedItem = elements[0];
@@ -231,13 +231,13 @@ class _ServidorPickerState extends State<ServidorPicker> {
     });
   }
 
-  void _publishSelection(Servidor e) {
+  void _publishSelection(ServerModel e) {
     if (widget.onChanged != null) {
       widget.onChanged(e);
     }
   }
 
-  void _onInit(Servidor e) {
+  void _onInit(ServerModel e) {
     if (widget.onInit != null) {
       widget.onInit(e);
     }

@@ -32,6 +32,20 @@ Pointer<Int8> stringToNativeInt8(String str, {Allocator allocator = malloc}) {
   return result.cast();
 }
 
+String nativeInt8ToString(Pointer<Int8> pointer, {allowMalformed: true}) {
+  var ptrName = pointer.cast<Utf8>();
+  final ptrNameCodeUnits = pointer.cast<Uint8>();
+  var list = ptrNameCodeUnits.asTypedList(ptrName.length);
+  return utf8.decode(list, allowMalformed: allowMalformed);
+}
+
+Uint8List  nativeInt8CodeUnits(Pointer<Int8> pointer) {
+  var ptrName = pointer.cast<Utf8>();
+  final ptrNameCodeUnits = pointer.cast<Uint8>();
+  var list = ptrNameCodeUnits.asTypedList(ptrName.length);
+  return list;
+}
+
 /*String nativeInt8ToString(Pointer<Int8> input){
 
 }*/

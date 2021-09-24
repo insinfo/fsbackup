@@ -4,7 +4,7 @@ import 'package:fsbackup/constants.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fsbackup/models/rotina_backup.dart';
+import 'package:fsbackup/models/backup_routine_model.dart';
 import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +40,7 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
             child: ChangeNotifierProvider.value(
               value: locator<FilaProvider>(),
               builder: (context, w) => Consumer<FilaProvider>(builder: (ctx, data, child) {
-                return FutureBuilder<List<RotinaBackup>>(
+                return FutureBuilder<List<BackupRoutineModel>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -69,7 +69,7 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
   }
 }
 
-DataRow createItem(RotinaBackup rotina, BuildContext ctx) {
+DataRow createItem(BackupRoutineModel rotina, BuildContext ctx) {
   return DataRow(
     cells: [
       DataCell(
@@ -82,12 +82,12 @@ DataRow createItem(RotinaBackup rotina, BuildContext ctx) {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-              child: Text(rotina.nome),
+              child: Text(rotina.name),
             ),
           ],
         ),
       ),
-      DataCell(Text(rotina.diretorioDestino)),
+      DataCell(Text(rotina.destinationDirectory)),
       DataCell(Text('${rotina.percent.toStringAsFixed(4)}%')),
     ],
   );

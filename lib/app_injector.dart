@@ -1,10 +1,10 @@
 import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup/providers/log_provider.dart';
 import 'package:fsbackup/providers/menu_provider.dart';
-import 'package:fsbackup/providers/servidor_provider.dart';
-import 'package:fsbackup/providers/rotina_backup_provider.dart';
-import 'package:fsbackup/repositories/servidor_repository.dart';
-import 'package:fsbackup/repositories/tarefa_repository.dart';
+import 'package:fsbackup/providers/server_provider.dart';
+import 'package:fsbackup/providers/backup_routine_provider.dart';
+import 'package:fsbackup/repositories/server_repository.dart';
+import 'package:fsbackup/repositories/backup_routine_repository.dart';
 import 'package:fsbackup/services/mongodb_service.dart';
 import 'package:get_it/get_it.dart';
 
@@ -17,13 +17,13 @@ Future appInjector() async {
 
     locator.registerSingleton<MenuProvider>(MenuProvider());
 
-    locator.registerSingleton<ServidorRepository>(ServidorRepository(locator<MongodbService>()));
-    locator.registerSingleton<ServidorProvider>(ServidorProvider(locator<ServidorRepository>()));
+    locator.registerSingleton<ServerRepository>(ServerRepository(locator<MongodbService>()));
+    locator.registerSingleton<ServerProvider>(ServerProvider(locator<ServerRepository>()));
 
-    locator.registerSingleton<RotinaBackupRepository>(RotinaBackupRepository(locator<MongodbService>()));
-    locator.registerSingleton<RotinaBackupProvider>(RotinaBackupProvider(locator<RotinaBackupRepository>()));
+    locator.registerSingleton<BackupRoutineRepository>(BackupRoutineRepository(locator<MongodbService>()));
+    locator.registerSingleton<BackupRoutineProvider>(BackupRoutineProvider(locator<BackupRoutineRepository>()));
 
-    locator.registerSingleton<FilaProvider>(FilaProvider(locator<RotinaBackupRepository>()));
+    locator.registerSingleton<FilaProvider>(FilaProvider(locator<BackupRoutineRepository>()));
 
     locator.registerSingleton<LogProvider>(LogProvider());
 

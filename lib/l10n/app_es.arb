@@ -1,0 +1,14 @@
+{
+  "hello": "Hello!!",
+  "btnShowLog":"Show Log",
+  "btnStart":"Start",
+  "noItems":"There are no registered items",
+  "dashboardPageTitle":"Dashboard",
+  "dashboardPageSubTitle":"Queue of backups in progress", 
+  "serverPageTitle":"Servers",
+  "serverPageSubTitle":"",
+  "backupRoutinesPageTitle":"Backup Routines",
+  "backupRoutinesSubTitle":"",
+  "btnAdd":"Add",
+  "btnDelete":"Delete"
+}

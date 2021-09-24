@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/constants.dart';
-import 'package:fsbackup/models/servidor.dart';
+import 'package:fsbackup/models/server_model.dart';
 
 /// selection dialog used for selection of the item
 class SelectionDialog extends StatefulWidget {
-  final List<Servidor> elements;
+  final List<ServerModel> elements;
 
   final InputDecoration searchDecoration;
   final TextStyle searchStyle;
@@ -43,7 +43,7 @@ class SelectionDialog extends StatefulWidget {
 
 class _SelectionDialogState extends State<SelectionDialog> {
   /// this is useful for filtering purpose
-  List<Servidor> filteredElements;
+  List<ServerModel> filteredElements;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -98,7 +98,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
         ),
       );
 
-  Widget _buildOption(Servidor e) {
+  Widget _buildOption(ServerModel e) {
     return Container(
       width: 400,
       child: Flex(
@@ -107,7 +107,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
           Expanded(
             flex: 4,
             child: Text(
-              e.nome,
+              e.name,
               overflow: TextOverflow.fade,
               style: widget.textStyle,
             ),
@@ -137,11 +137,11 @@ class _SelectionDialogState extends State<SelectionDialog> {
     s = s.toLowerCase();
     setState(() {
       filteredElements =
-          widget.elements.where((e) => e.nome.toLowerCase().contains(s) || e.host.toLowerCase().contains(s)).toList();
+          widget.elements.where((e) => e.name.toLowerCase().contains(s) || e.host.toLowerCase().contains(s)).toList();
     });
   }
 
-  void _selectItem(Servidor e) {
+  void _selectItem(ServerModel e) {
     Navigator.pop(context, e);
   }
 }

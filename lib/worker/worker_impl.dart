@@ -267,7 +267,7 @@ class _WorkerIsolateImpl implements WorkerIsolate {
           _receivePort.close();
         }
       } else if (message is _WorkerResult) {
-        print('... WorkerResult result=${message.result}, this=$this');
+        // print('... WorkerResult result=${message.result}, this=$this');
         _taskCompletedEventController.add(TaskCompletedEvent(this, _runningScheduledTask.task, message.result));
 
         _runningScheduledTask.completer.complete(message.result);

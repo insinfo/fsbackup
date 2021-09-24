@@ -14,4 +14,6 @@ export 'src/extensions/sftp_extension.dart';
 export 'src/extensions/base_extension.dart';
 export 'src/pscp_binding.dart';
 
+export 'src/models/directory_item.dart';
+
 export 'src/libssh_wrapper.dart';

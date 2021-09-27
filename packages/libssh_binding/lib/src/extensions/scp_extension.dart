@@ -10,7 +10,7 @@ import 'package:libssh_binding/src/libssh_binding.dart';
 
 extension ScpExtension on LibsshBinding {
   /// [fullPath] example => "helloworld/helloworld.txt"
-  String scpReadFileAsString(ssh_session session, String fullPath, {Allocator allocator = malloc}) {
+  String scpReadFileAsString(ssh_session session, String fullPath, {Allocator allocator = calloc}) {
     var path = fullPath.toNativeUtf8(allocator: allocator);
     var scp = ssh_scp_new(session, SSH_SCP_READ, path.cast<Int8>());
     if (scp.address == nullptr.address) {
@@ -92,8 +92,9 @@ extension ScpExtension on LibsshBinding {
   }
 
   Future<void> scpDownloadFileTo(ssh_session session, String fullRemotePathSource, String fullLocalPathTarget,
-      {void Function(int total, int done)? callbackStats, Allocator allocator = malloc}) async {
+      {void Function(int total, int done)? callbackStats, Allocator allocator = calloc, bool recursive = true}) async {
     var source = fullRemotePathSource.toNativeUtf8(allocator: allocator).cast<Int8>();
+
     var scp = initFileScp(session, source);
     var rc = ssh_scp_pull_request(scp);
     if (rc != ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE) {
@@ -109,7 +110,8 @@ extension ScpExtension on LibsshBinding {
       throw Exception("Error ssh_scp_accept_request: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
     }
     try {
-      await scpReadFileAndSave(session, scp, fullLocalPathTarget, allocator: allocator, callbackStats: callbackStats);
+      await scpReadFileAndSave(session, scp, fullLocalPathTarget,
+          allocator: allocator, callbackStats: callbackStats, recursive: recursive);
     } catch (e) {
       rethrow;
     } finally {
@@ -139,13 +141,31 @@ extension ScpExtension on LibsshBinding {
     return 0;
   }
 
+  ///return total size in bytes of file , work on  GNU/Linux systems, tested in debian 10
+  ///based on https://unix.stackexchange.com/questions/16640/how-can-i-get-the-size-of-a-file-in-a-bash-script/185039#185039
+  int getSizeOfFile(Pointer<ssh_session_struct> session, String remoteFilePath, {bool isThrowException = true}) {
+    //stat --format="%s" /var/www/html/'JUNHO 2021 - Controle de Dias Trabalhados.xlsx'
+    try {
+      var cmdToGetTotaSize = 'stat --format="%s" $remoteFilePath ';
+      var cmdRes = execCommandSync(session, cmdToGetTotaSize);
+      return int.parse(cmdRes);
+    } catch (e) {
+      print('getSizeOfFile: $e');
+      if (isThrowException) {
+        throw Exception('Unable to get the size of a file in bytes');
+      }
+    }
+    return 0;
+  }
+
   Future<void> scpReadFileAndSave(
       Pointer<ssh_session_struct> session, Pointer<ssh_scp_struct> scp, String fullLocalPathTarget,
-      {void Function(int total, int done)? callbackStats, Allocator allocator = malloc}) async {
+      {void Function(int total, int done)? callbackStats, Allocator allocator = calloc, bool recursive = false}) async {
     var remoteFileLength = ssh_scp_request_get_size(scp);
     //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
     //var mode = ssh_scp_request_get_permissions(scp);
-    var targetFile = await File(fullLocalPathTarget).create(recursive: true);
+
+    var targetFile = await File(fullLocalPathTarget).create(recursive: recursive);
     var hFile = targetFile.openSync(mode: FileMode.write); // for appending at the end of file
     int lenLoop = remoteFileLength;
     var nbytes = 0, nwritten = 0;
@@ -187,7 +207,7 @@ extension ScpExtension on LibsshBinding {
   /// [updateStatsOnFileEnd] if true call callbackStats on file download end , if false call callbackStats on directory end
   Future<dynamic>? scpDownloadDirectory(
       Pointer<ssh_session_struct> session, String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
-      {Allocator allocator = malloc,
+      {Allocator allocator = calloc,
       void Function(int totalBytes, int loaded, int currentFileSize, int countDirectory, int countFiles)? callbackStats,
       void Function(Object? obj)? printLog,
       bool updateStatsOnFileEnd = true,
@@ -224,7 +244,7 @@ extension ScpExtension on LibsshBinding {
           currentFileSize = ssh_scp_request_get_size64(scp);
           //printFunc("file: $filename size: $fileSize");
           ssh_scp_accept_request(scp);
-          await scpReadFileAndSave(session, scp, '$currentPath/$filename');
+          await scpReadFileAndSave(session, scp, '$currentPath/$filename', recursive: false);
           countFiles++;
           loaded += currentFileSize;
           //var progress = ((loaded / totalSize) * 100).round();

@@ -1,3 +1,5 @@
+import 'package:libssh_binding/libssh_binding.dart';
+
 /// Enumeration with options for display types of the file system.
 enum FilesystemType {
   all,
@@ -6,10 +8,7 @@ enum FilesystemType {
 }
 
 /// Value selection signature.
-typedef ValueSelected = void Function(String value);
-
-/// Access permission request signature.
-typedef RequestPermission = Future<bool> Function();
+typedef ValueSelected = void Function(DirectoryItem value);
 
 /// Mode for selecting files. Either only the button in the trailing
 /// of ListTile, or onTap of the whole ListTile.

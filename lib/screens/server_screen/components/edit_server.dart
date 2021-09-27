@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 
-import 'package:fsbackup/models/file_system_object.dart';
 import 'package:fsbackup/models/server_model.dart';
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/responsive.dart';
@@ -31,7 +30,7 @@ class _EditServerState extends State<EditServer> {
   var userControl = TextEditingController();
   var passControl = TextEditingController();
 
-  List<FileSystemObject> fileObjects = [];
+  List<DirectoryItem> fileObjects = [];
 
   LibsshWrapper libssh;
 
@@ -187,7 +186,7 @@ class _EditServerState extends State<EditServer> {
                     port: int.tryParse(portControl.text),
                   ));
                   libssh.connect();
-                  var path = await SftpFilePicker.open(
+                  var fileOrDir = await SftpFilePicker.open(
                     libsshWrapper: libssh,
                     title: 'Lista de arquivos: ${hostControl.text}',
                     context: context,
@@ -195,15 +194,18 @@ class _EditServerState extends State<EditServer> {
                     pickText: 'Selecione',
                     folderIconColor: Colors.yellow,
                   );
-                  print('EditServerWidget $path');
-                  setState(() {
-                    fileObjects.add(FileSystemObject(path: path));
-                  });
-                  libssh.dispose();
+                  //print('EditServerWidget $path');
+                  if (fileOrDir != null) {
+                    setState(() {
+                      fileObjects.add(fileOrDir);
+                    });
+                  }
                 } catch (e, s) {
                   print('EditServerWidget@ Add Diretorio onPressed $e $s');
                   ScaffoldMessenger.of(context)
                       .showSnackBar(SnackBar(content: Text('Erro ao se conectar com o servidor!')));
+                } finally {
+                  libssh.dispose();
                 }
               }
             }),
@@ -233,7 +235,7 @@ class _EditServerState extends State<EditServer> {
                 }
               } else {
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Selecione pelo menos um diretorio!')));
+                    .showSnackBar(SnackBar(content: Text('Selecione pelo menos um diretorio ou arquivo para backup!')));
               }
             } else {
               ScaffoldMessenger.of(context)
@@ -253,9 +255,9 @@ class _EditServerState extends State<EditServer> {
 }
 
 class DirWideget extends StatelessWidget {
-  const DirWideget(this.fileObjects, {Key key, this.onRemove, this.hintText}) : super(key: key);
+  const DirWideget(this.fileObject, {Key key, this.onRemove, this.hintText}) : super(key: key);
 
-  final FileSystemObject fileObjects;
+  final DirectoryItem fileObject;
   final String hintText;
   final void Function() onRemove;
 
@@ -273,8 +275,8 @@ class DirWideget extends StatelessWidget {
             child: CustomTextField(
               hintText: hintText,
               //label: 'Diretorio para backup',
-              initialValue: fileObjects.path,
-              onChanged: (v) => fileObjects.path = v,
+              initialValue: fileObject.path,
+              onChanged: (v) => fileObject.path = v,
             ),
           ),
         ),

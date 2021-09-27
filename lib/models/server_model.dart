@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:fsbackup/models/file_system_object.dart';
+import 'package:libssh_binding/libssh_binding.dart';
 
 ServerModel serverFromJson(String str) => ServerModel.fromMap(json.decode(str));
 String serverToJson(ServerModel data) => json.encode(data.toMap());
@@ -24,7 +24,7 @@ class ServerModel {
   String password;
 
   /// files or directories for backups
-  List<FileSystemObject> fileObjects;
+  List<DirectoryItem> fileObjects;
   String icon = 'assets/icons/Figma_file.svg';
 
   String privateKey;
@@ -35,7 +35,7 @@ class ServerModel {
       name: map['name'],
       host: map['host'],
       port: map['port'],
-      fileObjects: List<FileSystemObject>.from(map['fileObjects'].map((x) => FileSystemObject.fromMap(x))),
+      fileObjects: List<DirectoryItem>.from(map['fileObjects'].map((x) => DirectoryItem.fromMap(x))),
     );
 
     if (map.containsKey('user')) {

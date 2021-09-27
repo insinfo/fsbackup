@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:libssh_binding/libssh_binding.dart';
 import 'common.dart';
@@ -64,7 +63,7 @@ class FilesystemListTile extends StatelessWidget {
           Icons.check_circle,
           color: Theme.of(context).disabledColor,
         ),
-        onTap: () => onSelect(item.path),
+        onTap: () => onSelect(item),
       );
     } else {
       return null;
@@ -81,7 +80,7 @@ class FilesystemListTile extends StatelessWidget {
         onTap: (item.type == DirectoryItemType.directory)
             ? () => onChange(item)
             : ((fsType == FilesystemType.file && fileTileSelectMode == FileTileSelectMode.wholeTile)
-                ? () => onSelect(item.path)
+                ? () => onSelect(item)
                 : null));
   }
 }

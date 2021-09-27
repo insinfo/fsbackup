@@ -34,7 +34,7 @@ extension ExecSshCommandExtension on LibsshBinding {
   /// example:
   /// execCommandSync(session,"cd /tmp; mkdir mytest; cd mytest; touch mytest");
   String execCommandSync(ssh_session session, String command,
-      {Allocator allocator = malloc, bool returnStderr = false}) {
+      {Allocator allocator = calloc, bool returnStderr = false}) {
     var receive = "";
     final channel = initSshChannel(session);
     try {
@@ -84,7 +84,7 @@ extension ExecSshCommandExtension on LibsshBinding {
   }
 
   String execCommandOnChannel(ssh_session session, Pointer<ssh_channel_struct> channel, String command,
-      {Allocator allocator = malloc, bool returnStderr = false}) {
+      {Allocator allocator = calloc, bool returnStderr = false}) {
     var cmd = command.toNativeUtf8().cast<Int8>();
     var rc = ssh_channel_request_exec(channel, cmd);
     if (rc != SSH_OK) {
@@ -113,7 +113,7 @@ extension ExecSshCommandExtension on LibsshBinding {
   }
 
   void channelWrite(ssh_session session, Pointer<ssh_channel_struct> channel, String command,
-      {Allocator allocator = malloc}) {
+      {Allocator allocator = calloc}) {
     final units = utf8.encode(command);
     int size = units.length + 1;
     final Pointer<Uint8> result = allocator<Uint8>(size);
@@ -133,7 +133,7 @@ extension ExecSshCommandExtension on LibsshBinding {
   /// [isPty] verifica se existe um "#" or "$" prompts na string retornada pelo server e interronpe o loop
   String channelReadAsString(ssh_session session, Pointer<ssh_channel_struct> channel,
       {int? limitLoop,
-      Allocator allocator = malloc,
+      Allocator allocator = calloc,
       bool isStderr = false,
       bool isPty = false,
       int? timeout,
@@ -200,7 +200,7 @@ extension ExecSshCommandExtension on LibsshBinding {
 
 /*extension StringUtf8Pointer on String {
   
-  Pointer<Utf8> toNativeUtf8({Allocator allocator = malloc}) {
+  Pointer<Utf8> toNativeUtf8({Allocator allocator = calloc}) {
     final units = utf8.encode(this);
     final Pointer<Uint8> result = allocator<Uint8>(units.length + 1);
     final Uint8List nativeString = result.asTypedList(units.length + 1);

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/src/extensions/base_extension.dart';
 import 'package:libssh_binding/src/fcntl.dart';
@@ -15,7 +17,7 @@ import '../constants.dart';
 extension SftpExtension on LibsshBinding {
   /// create Directory on the remote computer
   /// [fullPath] example => "/home/helloworld"
-  void sftpCreateDirectory(ssh_session session, String fullRemotePath, {Allocator allocator = malloc}) {
+  void sftpCreateDirectory(ssh_session session, String fullRemotePath, {Allocator allocator = calloc}) {
     final path = fullRemotePath.toNativeUtf8();
     final sftp = initSftp(session);
 
@@ -30,13 +32,37 @@ extension SftpExtension on LibsshBinding {
   }
 
   /// Listing the contents of a directory
-  List<DirectoryItem> sftpListDir(ssh_session session, String fullRemotePath, {Allocator allocator = malloc}) {
+  /// [allowMalformed] allow Malformed utf8 file and directory name
+  List<DirectoryItem> sftpListDir(ssh_session session, String fullRemotePath,
+      {Allocator allocator = calloc, bool allowMalformed = false}) {
+    final path = fullRemotePath.toNativeUtf8(allocator: allocator).cast<Int8>();
+    return sftpListDirFromPointer(session, path, allocator: allocator, allowMalformed: allowMalformed);
+  }
+
+  /// Listing the contents of a directory
+  /// [allowMalformed] allow Malformed utf8 file and directory name
+  List<DirectoryItem> sftpListDirFromRawPath(ssh_session session, Uint8List fullRemotePath,
+      {Allocator allocator = calloc, bool allowMalformed = false}) {
+    //print('nativePath: ${rootDirectory.nativePath}');
+    /*print('nativePath Uint8List: ${fullRemotePath}');
+    print('nativePath String: ${uint8ListToString(fullRemotePath)}');
+    print('/var/www:${stringToUint8ListTo('/var/www')}');*/
+    var path = uint8ListToPointerInt8(fullRemotePath);
+    //print('nativePath pointer: ${nativeInt8ToString(path)}');
+
+    return sftpListDirFromPointer(session, path, allocator: allocator, allowMalformed: allowMalformed);
+  }
+
+  /// Listing the contents of a directory
+  /// [allowMalformed] allow Malformed utf8 file and directory name
+  List<DirectoryItem> sftpListDirFromPointer(ssh_session session, Pointer<Int8> fullRemotePath,
+      {Allocator allocator = calloc, bool allowMalformed = false}) {
     final sftp = initSftp(session);
     final results = <DirectoryItem>[];
-    final path = fullRemotePath.toNativeUtf8(allocator: allocator);
-    var dir = sftp_opendir(sftp, path.cast());
+
+    var dir = sftp_opendir(sftp, fullRemotePath);
     if (dir == nullptr) {
-      allocator.free(path);
+      allocator.free(fullRemotePath);
       sftp_free(sftp);
       throw Exception('Directory not opened: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
@@ -62,41 +88,53 @@ extension SftpExtension on LibsshBinding {
         */
       //var t = attributes.ref.type == 1 ? 'file' : 'directory';
 
-      var path =
-          fullRemotePath.substring(fullRemotePath.length - 1) != '/' ? '$fullRemotePath/$name' : '$fullRemotePath$name';
+      var uint8Name = nativeInt8ToUint8List(attributes.ref.name);
+      var uint8RemotePt = nativeInt8ToUint8List(fullRemotePath);
+      var stringRemotePt = uint8ListToString(uint8RemotePt);
 
-      results.add(DirectoryItem(
-          nativePath: nativeInt8CodeUnits(attributes.ref.name),
-          longname: longname,
-          path: path,
-          name: name,
-          type: attributes.ref.type == 1 ? DirectoryItemType.file : DirectoryItemType.directory,
-          size: attributes.ref.size));
+      var separator = stringRemotePt.contains('/') ? '/' : '\\';
+
+      var uint8Path = stringRemotePt.substring(stringRemotePt.length - 1) != separator
+          ? concatUint8List([
+              uint8RemotePt,
+              Uint8List.fromList([47]),
+              uint8Name
+            ])
+          : concatUint8List([uint8RemotePt, uint8Name]);
+
+      //var nPath = stringRemotePt.substring(stringRemotePt.length - 1) != '/' ? '$stringRemotePt/$name' : '$stringRemotePt$name';
+      //print('nPath $nPath');
+      var type = attributes.ref.type == 1 ? DirectoryItemType.file : DirectoryItemType.directory;
+      var size = attributes.ref.size;
+      var path = uint8ListToString(uint8Path);
+
+      if (allowMalformed == false) {
+        if (!isUft8MalformedStringPointer(attributes.ref.name)) {
+          results.add(
+              DirectoryItem(nativePath: uint8Path, longname: longname, path: path, name: name, type: type, size: size));
+        }
+      } else {
+        results.add(
+            DirectoryItem(nativePath: uint8Path, longname: longname, path: path, name: name, type: type, size: size));
+      }
 
       sftp_attributes_free(attributes);
     }
 
-    /*if (sftp_dir_eof(dir) == 1) {
-      sftp_closedir(dir);
-      sftp_free(sftp);
-      throw Exception('Can\'t list directory: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
-    }*/
-
     var rc = sftp_closedir(dir);
     if (rc != SSH_OK) {
-      allocator.free(path);
+      allocator.free(fullRemotePath);
       sftp_free(sftp);
       throw Exception('Can\'t close directory: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}');
     }
-    allocator.free(path);
+    allocator.free(fullRemotePath);
     sftp_free(sftp);
-
     return results;
   }
 
   /// Copying a local file to the remote computer
   Future<void> sftpCopyLocalFileToRemote(ssh_session session, String localFilefullPath, String remoteFilefullPath,
-      {Allocator allocator = malloc}) async {
+      {Allocator allocator = calloc}) async {
     var remotePath = remoteFilefullPath.toNativeUtf8(allocator: allocator);
     var sftp = initSftp(session);
     //get remote file for writing
@@ -157,12 +195,21 @@ extension SftpExtension on LibsshBinding {
     sftp_free(sftp);
   }
 
-  Future<void> sftpDownloadFileTo(ssh_session session, String fullRemotePath, String fullLocalPath,
+  Future<void> sftpDownloadFileToFromRawPath(ssh_session session, Uint8List fullRemotePath, String fullLocalPath,
       {void Function(int total, int done)? callbackStats,
       Pointer<sftp_session_struct>? inSftp,
-      Allocator allocator = malloc}) async {
-    var ftpfile = fullRemotePath.toNativeUtf8().cast<Int8>();
+      Allocator allocator = calloc}) async {
+    var ftpfile = uint8ListToPointerInt8(fullRemotePath, allocator: allocator);
+    await sftpDownloadFileTo(session, ftpfile, fullLocalPath, inSftp: inSftp, allocator: allocator);
+    allocator.free(ftpfile);
+  }
 
+//
+  Future<void> sftpDownloadFileTo(ssh_session session, Pointer<Int8> ftpfile, String fullLocalPath,
+      {void Function(int total, int done)? callbackStats,
+      Pointer<sftp_session_struct>? inSftp,
+      Allocator allocator = calloc,
+      bool recursive = true}) async {
     var sftp = inSftp != null ? inSftp : initSftp(session);
 
     //int res = 0;
@@ -245,6 +292,7 @@ extension SftpExtension on LibsshBinding {
     if (inSftp == null) {
       sftp_free(sftp);
     }
+    allocator.free(ftpfile);
     allocator.free(buf);
   }
 }

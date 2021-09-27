@@ -5,7 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 
-Pointer<Void> stringToNativeVoid(String str, {Allocator allocator = malloc}) {
+Pointer<Void> stringToNativeVoid(String str, {Allocator allocator = calloc}) {
   final units = utf8.encode(str);
   final Pointer<Uint8> result = allocator<Uint8>(units.length + 1);
   final Uint8List nativeString = result.asTypedList(units.length + 1);
@@ -14,7 +14,7 @@ Pointer<Void> stringToNativeVoid(String str, {Allocator allocator = malloc}) {
   return result.cast();
 }
 
-Pointer<Utf8> stringToNativeChar(String str, {Allocator allocator = malloc}) {
+Pointer<Utf8> stringToNativeChar(String str, {Allocator allocator = calloc}) {
   final units = utf8.encode(str);
   final Pointer<Uint8> result = allocator<Uint8>(units.length + 1);
   final Uint8List nativeString = result.asTypedList(units.length + 1);
@@ -23,7 +23,7 @@ Pointer<Utf8> stringToNativeChar(String str, {Allocator allocator = malloc}) {
   return result.cast();
 }
 
-Pointer<Int8> stringToNativeInt8(String str, {Allocator allocator = malloc}) {
+Pointer<Int8> stringToNativeInt8(String str, {Allocator allocator = calloc}) {
   final units = utf8.encode(str);
   final Pointer<Uint8> result = allocator<Uint8>(units.length + 1);
   final Uint8List nativeString = result.asTypedList(units.length + 1);
@@ -39,21 +39,73 @@ String nativeInt8ToString(Pointer<Int8> pointer, {allowMalformed: true}) {
   return utf8.decode(list, allowMalformed: allowMalformed);
 }
 
-Uint8List  nativeInt8CodeUnits(Pointer<Int8> pointer) {
+Uint8List nativeInt8ToCodeUnits(Pointer<Int8> pointer) {
   var ptrName = pointer.cast<Utf8>();
   final ptrNameCodeUnits = pointer.cast<Uint8>();
   var list = ptrNameCodeUnits.asTypedList(ptrName.length);
   return list;
 }
 
-/*String nativeInt8ToString(Pointer<Int8> input){
+Uint8List nativeInt8ToUint8List(Pointer<Int8> pointer) {
+  var ptrName = pointer.cast<Utf8>();
+  final ptrNameCodeUnits = pointer.cast<Uint8>();
+  var list = ptrNameCodeUnits.asTypedList(ptrName.length);
+  return list;
+}
 
-}*/
+bool isUft8MalformedStringPointer(Pointer<Int8> pointer) {
+  try {
+    var ptrName = pointer.cast<Utf8>();
+    final ptrNameCodeUnits = pointer.cast<Uint8>();
+    var list = ptrNameCodeUnits.asTypedList(ptrName.length);
+    utf8.decode(list);
+    return false;
+  } catch (e) {
+    return true;
+  }
+}
 
-Pointer<Void> intToNativeVoid(int number, {Allocator allocator = malloc}) {
-  final ptr = malloc.allocate<Int32>(sizeOf<Int32>());
+String uint8ListToString(Uint8List list, {allowMalformed: true}) {
+  return utf8.decode(list, allowMalformed: allowMalformed);
+}
+
+Uint8List stringToUint8ListTo(String str) {
+  return Uint8List.fromList(utf8.encode(str));
+}
+
+/// combine/concatenate two Uint8List
+Uint8List concatUint8List(List<Uint8List> lists) {
+  var bytesBuilder = BytesBuilder();
+  lists.forEach((l) {
+    bytesBuilder.add(l);
+  });
+  return bytesBuilder.toBytes();
+}
+
+Pointer<Void> intToNativeVoid(int number) {
+  final ptr = calloc.allocate<Int32>(sizeOf<Int32>());
   ptr.value = number;
   return ptr.cast();
+}
+
+Pointer<Int8> uint8ListToPointerInt8(Uint8List units, {Allocator allocator = calloc}) {
+  /*final pointer = allocator<Uint8>(list.length);
+  for (int i = 0; i < list.length; i++) {
+    pointer[i] = list[i];
+  }
+  return pointer.cast<Int8>();*/
+  /* final units = utf8.encode(this);
+    final Pointer<Uint8> result = allocator<Uint8>(units.length + 1);
+    final Uint8List nativeString = result.asTypedList(units.length + 1);
+    nativeString.setAll(0, units);
+    nativeString[units.length] = 0;
+    return result.cast();*/
+
+  final pointer = allocator<Uint8>(units.length + 1); //blob
+  final nativeString = pointer.asTypedList(units.length + 1); //blobBytes
+  nativeString.setAll(0, units);
+  nativeString[units.length] = 0;
+  return pointer.cast();
 }
 
 Future writeAndFlush(IOSink sink, object) {
@@ -61,4 +113,14 @@ Future writeAndFlush(IOSink sink, object) {
         ..add(utf8.encode(object.toString()))
         ..close())
       .stream);
+}
+
+extension Uint8ListBlobConversion on Uint8List {
+  /// Allocates a pointer filled with the Uint8List data.
+  Pointer<Uint8> allocatePointer() {
+    final blob = calloc<Uint8>(length);
+    final blobBytes = blob.asTypedList(length);
+    blobBytes.setAll(0, this);
+    return blob;
+  }
 }

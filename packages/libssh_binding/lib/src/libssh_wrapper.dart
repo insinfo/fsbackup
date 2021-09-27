@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:libssh_binding/src/extensions/exec_command_extension.dart';
 import 'package:libssh_binding/src/extensions/scp_extension.dart';
 import 'package:libssh_binding/src/extensions/sftp_extension.dart';
@@ -118,17 +119,26 @@ class LibsshWrapper {
 
   /// downloads a file from an SFTP/SCP server
   Future<void> scpDownloadFileTo(String fullRemotePathSource, String fullLocalPathTarget,
-      {void Function(int, int)? callbackStats}) async {
+      {void Function(int, int)? callbackStats, bool recursive = true}) async {
     isReady();
     await libsshBinding.scpDownloadFileTo(mySshSession, fullRemotePathSource, fullLocalPathTarget,
-        callbackStats: callbackStats);
+        callbackStats: callbackStats, recursive: recursive);
   }
 
   /// download one file via SFTP of remote server
   Future<void> sftpDownloadFileTo(String fullRemotePath, String fullLocalPath,
-      {Pointer<sftp_session_struct>? inSftp}) async {
+      {Pointer<sftp_session_struct>? inSftp, Allocator allocator = calloc, bool recursive = true}) async {
     isReady();
-    await libsshBinding.sftpDownloadFileTo(mySshSession, fullRemotePath, fullLocalPath, inSftp: inSftp);
+    var ftpfile = fullRemotePath.toNativeUtf8(allocator: allocator).cast<Int8>();
+    await libsshBinding.sftpDownloadFileTo(mySshSession, ftpfile, fullLocalPath, inSftp: inSftp, allocator: allocator);
+  }
+
+  Future<void> sftpDownloadFileToFromRawPath(Uint8List fullRemotePath, String fullLocalPath,
+      {Pointer<sftp_session_struct>? inSftp, Allocator allocator = calloc}) async {
+    isReady();
+
+    await libsshBinding.sftpDownloadFileToFromRawPath(mySshSession, fullRemotePath, fullLocalPath,
+        inSftp: inSftp, allocator: allocator);
   }
 
   /// execute only one command
@@ -138,7 +148,7 @@ class LibsshWrapper {
   /// execCommandSync(session,"cd /tmp; mkdir mytest; cd mytest; touch mytest");
   String execCommandSync(
     String command, {
-    Allocator allocator = malloc,
+    Allocator allocator = calloc,
   }) {
     isReady();
     return libsshBinding.execCommandSync(mySshSession, command, allocator: allocator);
@@ -152,8 +162,19 @@ class LibsshWrapper {
   }
 
   /// Listing the contents of a directory
-  List<DirectoryItem> sftpListDir(String fullRemotePath) {
-    return libsshBinding.sftpListDir(mySshSession, fullRemotePath);
+  /// [fullRemotePath] one String fullRemotePath
+  /// [allowMalformed] allow Malformed utf8 file and directory name
+  List<DirectoryItem> sftpListDir(String fullRemotePath, {Allocator allocator = calloc, bool allowMalformed = false}) {
+    return libsshBinding.sftpListDir(mySshSession, fullRemotePath, allowMalformed: allowMalformed);
+  }
+
+  /// Listing the contents of a directory
+  /// [fullRemotePath] one Uint8List fullRemotePath
+  /// [allowMalformed] allow Malformed utf8 file and directory name
+  List<DirectoryItem> sftpListDirFromRawPath(List<int> fullRemotePath,
+      {Allocator allocator = calloc, bool allowMalformed = false}) {
+    return libsshBinding.sftpListDirFromRawPath(mySshSession, Uint8List.fromList(fullRemotePath),
+        allowMalformed: allowMalformed);
   }
 
   ///return total size in bytes of each file inside folder ignoring linux directory metadata size
@@ -161,11 +182,26 @@ class LibsshWrapper {
     return libsshBinding.getSizeOfDirectory(mySshSession, remoteDirectoryPath, isThrowException: isThrowException);
   }
 
+  ///return total size in bytes of file or directory , work on  GNU/Linux systems, tested in debian 10
+  int getSizeOfFileSystemItem(DirectoryItem item, {bool isThrowException = true}) {
+    if (item.type == DirectoryItemType.directory) {
+      return getSizeOfDirectory(item.path, isThrowException: isThrowException);
+    } else {
+      return getSizeOfFile(item.path, isThrowException: isThrowException);
+    }
+  }
+
+  ///return total size in bytes of file , work on  GNU/Linux systems, tested in debian 10
+  ///based on https://unix.stackexchange.com/questions/16640/how-can-i-get-the-size-of-a-file-in-a-bash-script/185039#185039
+  int getSizeOfFile(String remoteFilePath, {bool isThrowException = true}) {
+    return libsshBinding.getSizeOfFile(mySshSession, remoteFilePath, isThrowException: isThrowException);
+  }
+
   /// [fullLocalDirectoryPathTarget] example c:\downloads
   /// [remoteDirectoryPath] example /var/www
   /// this function work only if remote is linux debian like sytem
   Future<void> scpDownloadDirectory(String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
-      {Allocator allocator = malloc,
+      {Allocator allocator = calloc,
       void Function(int totalBytes, int loaded, int currentFileSize, int countDirectory, int countFiles)? callbackStats,
       void Function(Object? obj)? printLog,
       bool isThrowException = false}) async {

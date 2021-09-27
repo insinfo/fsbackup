@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:libssh_binding/libssh_binding.dart';
 import 'common.dart';
 import 'filesystem_list.dart';
-import 'package:path/path.dart' as Path;
+//import 'package:path/path.dart' as Path;
 import 'breadcrumbs.dart';
 
 class _PathItem {
@@ -41,7 +41,7 @@ class SftpFilePicker extends StatefulWidget {
   /// * [allowedExtensions] specifies a list of file extensions that will be displayed for selection, if empty - files with any extension are displayed. Example: `['.jpg', '.jpeg']`
   /// * [fileTileSelectMode] specifies how to files can be selected (either tapping on the whole tile or only on trailing button). (default depends on [fsType])
 
-  static Future<String?> open({
+  static Future<DirectoryItem?> open({
     required BuildContext context,
     String rootName = 'Storage',
     FilesystemType fsType = FilesystemType.all,
@@ -54,7 +54,7 @@ class SftpFilePicker extends StatefulWidget {
     LibsshWrapper? libsshWrapper,
     LibssOptions? libssOptions,
   }) async {
-    return Navigator.of(context).push<String>(
+    return Navigator.of(context).push<DirectoryItem>(
       MaterialPageRoute(builder: (BuildContext context) {
         return SftpFilePicker(
           onClose: onClose,
@@ -64,8 +64,8 @@ class SftpFilePicker extends StatefulWidget {
           title: title,
           folderIconColor: folderIconColor,
           allowedExtensions: allowedExtensions,
-          onSelect: (String value) {
-            Navigator.of(context).pop<String>(value);
+          onSelect: (DirectoryItem value) {
+            Navigator.of(context).pop<DirectoryItem>(value);
           },
           fileTileSelectMode: fileTileSelectMode,
           libsshWrapper: libsshWrapper,
@@ -105,8 +105,8 @@ class SftpFilePicker extends StatefulWidget {
 
   final String rootDirectory;
 
-  LibsshWrapper? libsshWrapper;
-  LibssOptions? libssOptions;
+  final LibsshWrapper? libsshWrapper;
+  final LibssOptions? libssOptions;
 
   /// Creates a file system item selection widget.
   SftpFilePicker({
@@ -131,41 +131,23 @@ class SftpFilePicker extends StatefulWidget {
 
 class _SftpFilePickerState extends State<SftpFilePicker> {
   String currentSelectedPath = '';
-  String? directoryName;
-  late List<_PathItem> pathItems;
+  String? currentPath;
+  TextEditingController urlCtr = TextEditingController();
 
   late DirectoryItem directory;
   @override
   void initState() {
     super.initState();
-    var dir = DirectoryItem.fromName(widget.rootDirectory);
-    _setDirectory(dir);
+    currentPath = widget.rootDirectory;
+    _setDirectory(DirectoryItem.fromPath(widget.rootDirectory));
   }
 
   void _setDirectory(DirectoryItem value) {
     directory = value;
 
-    var pathSeparator = '/';
+    currentPath = directory.path; //directory.path;
 
-    pathItems = [];
-    var countSeparator = directory.path.split(pathSeparator).length - 1;
-    print('countSeparator $countSeparator ${directory.path}');
-
-    if (countSeparator < 2) {
-      pathItems.add(_PathItem(path: directory.path, text: directory.name));
-    } else {
-      final List<String> items = directory.path.split(pathSeparator);
-
-      String path = widget.rootDirectory;
-
-      for (var item in items) {
-        path += item.startsWith(pathSeparator) ? item : item + pathSeparator;
-        print(path);
-        pathItems.add(_PathItem(path: path, text: item));
-      }
-    }
-
-    directoryName = directory.path;
+    urlCtr.text = currentPath!;
   }
 
   void _changeDirectory(DirectoryItem value) {
@@ -174,14 +156,16 @@ class _SftpFilePickerState extends State<SftpFilePicker> {
         _setDirectory(value);
       });
     }
-    print('_SftpFilePickerState@_changeDirectory ${value.path}');
+    //print('_SftpFilePickerState@_changeDirectory ${value.path}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title ?? directoryName!),
+        elevation: 0,
+        backgroundColor: Color(0xFF2A2D3E),
+        title: Text(widget.title ?? currentPath!),
         leading: IconButton(
           icon: Icon(Icons.close),
           onPressed: () {
@@ -192,23 +176,51 @@ class _SftpFilePickerState extends State<SftpFilePicker> {
           },
         ),
         bottom: PreferredSize(
-          child: Theme(
-            data: ThemeData(
-              textTheme: TextTheme(
-                button: TextStyle(
-                    color: AppBarTheme.of(context).toolbarTextStyle?.color ??
-                        Theme.of(context).primaryTextTheme.headline6?.color),
-              ),
-            ),
-            child: Breadcrumbs<String>(
+          child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        if (currentPath != '/') {
+                          var p = currentPath!.substring(0, currentPath!.lastIndexOf('/'));
+                          p = p == '' ? '/' : p;
+                          var dir = DirectoryItem.fromPath(p);
+                          _changeDirectory(dir);
+                        }
+                      },
+                      icon: Icon(Icons.arrow_back)),
+                  Expanded(
+                    child: TextFormField(
+                      onFieldSubmitted: (value) {
+                        _changeDirectory(DirectoryItem.fromPath(value));
+                      },
+                      controller: urlCtr,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        //labelText: 'Path:',
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white, width: 2.0),
+                            borderRadius: BorderRadius.circular(25.0)),
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white, width: 2.0),
+                            borderRadius: BorderRadius.circular(25.0)),
+                      ),
+                    ),
+                  )
+                ],
+              )),
+          /*Breadcrumbs<String>(
               items: pathItems
                   .map((path) => BreadcrumbItem<String>(text: path.text, data: path.path))
                   .toList(growable: false),
               onSelect: (String? value) {
                 if (value != null) _changeDirectory(DirectoryItem.fromName(value));
               },
-            ),
-          ),
+            ),*/
+
           preferredSize: const Size.fromHeight(50),
         ),
       ),
@@ -241,7 +253,7 @@ class _SftpFilePickerState extends State<SftpFilePicker> {
                     icon: Icon(Icons.check_circle),
                     label: (widget.pickText != null) ? Text(widget.pickText!) : const SizedBox(),
                     onPressed: () {
-                      widget.onSelect(currentSelectedPath);
+                      //widget.onSelect(currentSelectedPath);
                       if (widget.onClose != null) {
                         widget.onClose!();
                       }

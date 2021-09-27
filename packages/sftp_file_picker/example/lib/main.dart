@@ -84,7 +84,7 @@ class _DemoPageState extends State<DemoPage> {
   }
 
   Future<void> _openFile(BuildContext context) async {
-    String? path = await SftpFilePicker.open(
+    var item = await SftpFilePicker.open(
       title: 'Open file',
       context: context,
       fsType: FilesystemType.file,
@@ -93,21 +93,21 @@ class _DemoPageState extends State<DemoPage> {
       fileTileSelectMode: filePickerSelectMode,
     );
 
-    if (path != null) {
+    if (item != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(path),
+          content: Text(item.path),
         ),
       );
     }
 
     setState(() {
-      filePath = path;
+      filePath = item!.path;
     });
   }
 
   Future<void> _pickDir(BuildContext context) async {
-    String? path = await SftpFilePicker.open(
+    var item = await SftpFilePicker.open(
       title: 'Save to folder',
       context: context,
       fsType: FilesystemType.folder,
@@ -116,7 +116,7 @@ class _DemoPageState extends State<DemoPage> {
     );
 
     setState(() {
-      dirPath = path;
+      dirPath = item!.path;
     });
   }
 

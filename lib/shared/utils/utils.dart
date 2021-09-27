@@ -45,8 +45,9 @@ class Utils {
     } else {
       await myDir.create(recursive: true);
     }
+    var p = myDir.path;
 
-    return myDir.path;
+    return p;
   }
 
   static Future<File> getImageFileFromAssets(String path) async {

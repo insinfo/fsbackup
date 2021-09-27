@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'package:dio/dio.dart' as dio;
+
 import 'package:fsbackup/models/backup_routine_model.dart';
+
 import 'package:fsbackup/worker/worker.dart';
 import 'package:libssh_binding/libssh_binding.dart';
 
 //enum BackupStatus { Iniciando, Copiando, Completo, Cancelado }
 
 class BackupTask implements FileTask<Future<bool>> {
-  dio.CancelToken cancelToken;
-
   final BackupRoutineModel rotinaBackup;
   LibsshWrapper libssh;
   BackupTask(this.rotinaBackup, {this.taskId});
@@ -19,7 +18,7 @@ class BackupTask implements FileTask<Future<bool>> {
 
   Future<bool> _doExecute() async {
     final start = DateTime.now();
-    cancelToken = dio.CancelToken();
+
     var completer = Completer<bool>();
 
     try {
@@ -34,45 +33,49 @@ class BackupTask implements FileTask<Future<bool>> {
       );
       libssh.connect();
 
-      var fileObjects = server.fileObjects;
+      List<DirectoryItem> fileObjects = server.fileObjects;
       int totalSize = 0;
       int totalLoaded = 0;
 
       totalSize = fileObjects
-          .map((d) => libssh.getSizeOfDirectory(d.path))
+          .map((d) => libssh.getSizeOfFileSystemItem(d))
           .toList()
           .reduce((value, element) => value + element);
 
       print('dirretorios ${fileObjects.map((e) => e.path).toList().join(", ")} totalSize: $totalSize');
 
-      for (var dir in fileObjects) {
-        // var loadCurrent = 0;
-        //faz o download do diretorio
-        await libssh.scpDownloadDirectory(
-          dir.path,
-          rotinaBackup.destinationDirectory,
-          printLog: (v) {
-            tasklogCallback(v);
-            print(v);
-          },
-          callbackStats: (int total, int loaded, int currentFileSize, int countDirectory, int countFiles) {
-            totalLoaded += currentFileSize;
-            taskProgressCallback(totalSize, totalLoaded, 'andamento');
-          },
-        );
-        //totalLoaded += loadCurrent;
+      for (var item in fileObjects) {
+        if (item.type == DirectoryItemType.directory) {
+          //faz o download do diretorio
+          print('faz backup dir');
+          await libssh.scpDownloadDirectory(
+            item.path,
+            rotinaBackup.destinationDirectory,
+            printLog: (v) {
+              tasklogCallback(v);
+              print(v);
+            },
+            callbackStats: (int total, int loaded, int currentFileSize, int countDirectory, int countFiles) {
+              totalLoaded += currentFileSize;
+              taskProgressCallback(totalSize, totalLoaded, 'andamento');
+            },
+          );
+        } else if (item.type == DirectoryItemType.file) {
+          print('faz backup file');
+          await libssh.scpDownloadFileTo(item.path, '${rotinaBackup.destinationDirectory}/${item.name}',
+              recursive: false);
+        }
       }
 
       print('\r\n${DateTime.now().difference(start)}');
-
-      libssh.dispose();
-
-      completer.complete(true);
     } catch (e, s) {
       print('BackupTask error: $e $s');
       tasklogCallback('BackupTask error: $e $s');
       //completer.complete(true);
-      completer.completeError(e);
+      //completer.completeError(e);
+    } finally {
+      completer.complete(true);
+      libssh.dispose();
     }
 
     return completer.future;

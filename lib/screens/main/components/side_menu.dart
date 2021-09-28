@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fsbackup/shared/routes.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
+
 class SideMenu extends StatelessWidget {
   final GlobalObjectKey<NavigatorState> navigatorKey;
   SideMenu({
@@ -18,7 +20,7 @@ class SideMenu extends StatelessWidget {
             child: Image.asset("assets/images/logo-backup-2.png"),
           ),
           DrawerListTile(
-            title: "Dashboard",
+            title: AppLocalizations.of(context).dashboardPageTitle,
             svgSrc: "assets/icons/menu_dashbord.svg",
             press: () {
               if (currentRoute != '/dashboard') {
@@ -27,7 +29,7 @@ class SideMenu extends StatelessWidget {
             },
           ),
           DrawerListTile(
-            title: "Servidores",
+            title: AppLocalizations.of(context).serverPageTitle,
             svgSrc: "assets/icons/menu_tran.svg",
             press: () {
               if (currentRoute != '/servidores') {
@@ -37,7 +39,7 @@ class SideMenu extends StatelessWidget {
             },
           ),
           DrawerListTile(
-            title: 'Rotinas',
+            title: AppLocalizations.of(context).backupRoutinesPageTitle,
             svgSrc: 'assets/icons/menu_task.svg',
             press: () {
               if (currentRoute != '/rotinas') {

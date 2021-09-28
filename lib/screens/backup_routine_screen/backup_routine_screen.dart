@@ -5,6 +5,8 @@ import 'package:fsbackup/screens/backup_routine_screen/components/list_backup_ro
 
 import 'package:fsbackup/shared/components/header.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
+
 class BackupRoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class BackupRoutineScreen extends StatelessWidget {
         child: Column(
           children: [
             Header(
-              title: 'Rotinas',
+              title: AppLocalizations.of(context).backupRoutinesPageTitle,
               actions: [
                 ElevatedButton.icon(
                   style: TextButton.styleFrom(

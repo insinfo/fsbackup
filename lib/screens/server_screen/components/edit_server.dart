@@ -173,7 +173,7 @@ class _EditServerState extends State<EditServer> {
       actions: <Widget>[
         TextButton(
             child: Text(
-              'Add Diretorio',
+              'Add Diretorio|Arquivo',
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () async {

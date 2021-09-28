@@ -42,7 +42,11 @@ dependencies:
   uuid: any
   win32: any
   ffi: any
-  csv: any
+  #csv: any
+  #os: ^0.1.2
+  
+  os:
+    path: packages/os
 
   file_picker: ^4.0.3
   #mask_text_input_formatter: ^2.0.0

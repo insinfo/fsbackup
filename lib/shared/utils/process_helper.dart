@@ -23,6 +23,16 @@ class ProcessHelper {
     return false;
   }
 
+  static int countProcessInstance(String name) {
+    var count = 0;
+    for (final pd in getProcesses()) {
+      if (pd.name == name) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   /// Returns a list of running processes.
   ///
   /// Currently this is only supported on Windows and Linux.

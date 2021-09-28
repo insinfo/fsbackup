@@ -1,5 +1,4 @@
 import 'package:file_picker/file_picker.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
@@ -10,9 +9,10 @@ import 'package:fsbackup/providers/backup_routine_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:fsbackup/shared/components/servidor_picker/servidor_picker.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
-
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
 
 class EditBackupRoutine extends StatefulWidget {
   final BackupRoutineModel routine;
@@ -96,7 +96,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomTextField(nameControl: nomeControl, label: 'Nome'),
+              CustomTextField(nameControl: nomeControl, label: AppLocalizations.of(context).columnName),
               CustomTextField(
                 nameControl: dirDestinoControl,
                 label: 'Diretorio destino do backup',

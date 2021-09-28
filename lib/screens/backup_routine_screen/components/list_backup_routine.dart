@@ -1,16 +1,15 @@
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import 'package:fsbackup/models/backup_routine_model.dart';
-
 import 'package:fsbackup/providers/backup_routine_provider.dart';
 import 'package:fsbackup/screens/backup_routine_screen/components/edit_backup_routine.dart';
-
+import 'package:fsbackup/shared/utils/utils.dart';
 import 'package:provider/provider.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
 
 class ListBackupRoutine extends StatelessWidget {
   ListBackupRoutine({
@@ -38,17 +37,17 @@ class ListBackupRoutine extends StatelessWidget {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(child: Text("Não ha rotinas de Backup cadastradas"));
+                          return Center(child: Text(AppLocalizations.of(context).noItems));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
-                                DataColumn(label: Text('Nome')),
-                                DataColumn(label: Text('Destino')),
-                                DataColumn(label: Text('Start')),
-                                DataColumn(label: Text('Servidor')),
-                                DataColumn(label: Text('Ações')),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnBackupDestination)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnStartHow)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnServer)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnActions)),
                               ],
                               rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
                         }
@@ -81,7 +80,7 @@ class ListBackupRoutine extends StatelessWidget {
             ],
           ),
         ),
-        DataCell(Text('${routine.destinationDirectory}')),
+        DataCell(Text('${Utils.truncateMidleString(routine.destinationDirectory, 20)}')),
         DataCell(Text('${routine.startBackup.text}')),
         DataCell(Text('${routine.servers?.isNotEmpty == true ? routine.servers.first.name : "Sem servidor"}')),
         DataCell(Row(
@@ -102,18 +101,18 @@ class ListBackupRoutine extends StatelessWidget {
                     context: ctx,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text("Confirmar"),
-                        content: Text("Tem certeza que deseja deletar este item?"),
+                        title: Text("Alert"),
+                        content: Text(AppLocalizations.of(context).confirmDeletionMessage),
                         actions: <Widget>[
                           TextButton(
                               onPressed: () async {
                                 Navigator.of(context).pop(true);
                                 await locator<BackupRoutineProvider>().delete(routine.id);
                               },
-                              child: Text("DELETE")),
+                              child: Text(AppLocalizations.of(context).btnDelete)),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child: Text("CANCEL"),
+                            child: Text(AppLocalizations.of(context).btnCancelar),
                           ),
                         ],
                       );

@@ -10,6 +10,8 @@ import 'package:fsbackup/screens/server_screen/components/edit_server.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
+
 class ListServer extends StatelessWidget {
   ListServer({
     Key key,
@@ -36,16 +38,16 @@ class ListServer extends StatelessWidget {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(child: Text("Não ha servidores cadastrados"));
+                          return Center(child: Text(AppLocalizations.of(context).noItems));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
-                                DataColumn(label: Text("Nome")),
-                                DataColumn(label: Text("Host")),
-                                DataColumn(label: Text("Porta")),
-                                DataColumn(label: Text("Ações")),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnHost)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnPort)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnActions)),
                               ],
                               rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
                         }
@@ -66,11 +68,7 @@ class ListServer extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              SvgPicture.asset(
-                server.icon,
-                height: 30,
-                width: 30,
-              ),
+              SvgPicture.asset(server.icon, height: 30, width: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: Text(server.name == null ? '' : server.name),
@@ -79,7 +77,7 @@ class ListServer extends StatelessWidget {
           ),
         ),
         DataCell(Text('${server.host}')),
-        DataCell(Text(server.port?.toString())),
+        DataCell(Text('${server.port}')),
         DataCell(Row(
           children: [
             IconButton(
@@ -98,18 +96,18 @@ class ListServer extends StatelessWidget {
                     context: ctx,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text("Confirmar"),
-                        content: Text("Tem certeza que deseja deletar este item?"),
+                        title: Text("Alert"),
+                        content: Text(AppLocalizations.of(context).confirmDeletionMessage),
                         actions: <Widget>[
                           TextButton(
                               onPressed: () async {
                                 Navigator.of(context).pop(true);
                                 await locator<ServerProvider>().delete(server.id);
                               },
-                              child: Text("DELETE")),
+                              child: Text(AppLocalizations.of(context).btnDelete)),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child: Text("CANCEL"),
+                            child: Text(AppLocalizations.of(context).btnCancelar),
                           ),
                         ],
                       );

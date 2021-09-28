@@ -17,8 +17,6 @@ class BackupTask implements FileTask<Future<bool>> {
   }
 
   Future<bool> _doExecute() async {
-    final start = DateTime.now();
-
     var completer = Completer<bool>();
 
     try {
@@ -43,11 +41,9 @@ class BackupTask implements FileTask<Future<bool>> {
           .reduce((value, element) => value + element);
 
       print('dirretorios ${fileObjects.map((e) => e.path).toList().join(", ")} totalSize: $totalSize');
-
+      final start = DateTime.now();
       for (var item in fileObjects) {
         if (item.type == DirectoryItemType.directory) {
-          //faz o download do diretorio
-          print('faz backup dir');
           await libssh.scpDownloadDirectory(
             item.path,
             rotinaBackup.destinationDirectory,
@@ -57,13 +53,23 @@ class BackupTask implements FileTask<Future<bool>> {
             },
             callbackStats: (int total, int loaded, int currentFileSize, int countDirectory, int countFiles) {
               totalLoaded += currentFileSize;
-              taskProgressCallback(totalSize, totalLoaded, 'andamento');
+              taskProgressCallback(totalSize, totalLoaded, 'a');
             },
           );
         } else if (item.type == DirectoryItemType.file) {
-          print('faz backup file');
-          await libssh.scpDownloadFileTo(item.path, '${rotinaBackup.destinationDirectory}/${item.name}',
-              recursive: false);
+          var currentFileSize = 0;
+          await libssh.scpDownloadFileTo(
+            item.path,
+            '${rotinaBackup.destinationDirectory}/${item.name}',
+            callbackStats: (int total, int loaded) {
+              currentFileSize = loaded;
+            },
+            recursive: false,
+          );
+
+          totalLoaded += currentFileSize;
+          print('totalSize: $totalSize | totalLoaded: $totalLoaded');
+          taskProgressCallback(totalSize, totalLoaded, 'a');
         }
       }
 

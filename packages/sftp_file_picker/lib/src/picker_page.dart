@@ -4,23 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:libssh_binding/libssh_binding.dart';
 import 'common.dart';
 import 'filesystem_list.dart';
-//import 'package:path/path.dart' as Path;
-import 'breadcrumbs.dart';
-
-class _PathItem {
-  final String text;
-  final String path;
-
-  _PathItem({
-    required this.path,
-    required this.text,
-  });
-
-  @override
-  String toString() {
-    return '$text: $path';
-  }
-}
 
 /// FileSystem file or folder picker dialog.
 ///

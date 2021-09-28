@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:libssh_binding/libssh_binding.dart';
-import 'package:sftp_file_picker/src/exceptions/unable_to_open_directory.dart';
-//import 'package:path/path.dart' as Path;
+
 import 'common.dart';
 import 'filesystem_list_tile.dart';
 

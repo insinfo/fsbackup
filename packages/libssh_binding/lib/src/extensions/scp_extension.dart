@@ -92,7 +92,7 @@ extension ScpExtension on LibsshBinding {
   }
 
   Future<void> scpDownloadFileTo(ssh_session session, String fullRemotePathSource, String fullLocalPathTarget,
-      {void Function(int total, int done)? callbackStats, Allocator allocator = calloc, bool recursive = true}) async {
+      {void Function(int totalBytes, int loaded)? callbackStats, Allocator allocator = calloc, bool recursive = true}) async {
     var source = fullRemotePathSource.toNativeUtf8(allocator: allocator).cast<Int8>();
 
     var scp = initFileScp(session, source);
@@ -160,7 +160,7 @@ extension ScpExtension on LibsshBinding {
 
   Future<void> scpReadFileAndSave(
       Pointer<ssh_session_struct> session, Pointer<ssh_scp_struct> scp, String fullLocalPathTarget,
-      {void Function(int total, int done)? callbackStats, Allocator allocator = calloc, bool recursive = false}) async {
+      {void Function(int totalBytes, int loaded)? callbackStats, Allocator allocator = calloc, bool recursive = false}) async {
     var remoteFileLength = ssh_scp_request_get_size(scp);
     //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
     //var mode = ssh_scp_request_get_permissions(scp);

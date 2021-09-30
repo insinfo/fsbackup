@@ -4,8 +4,9 @@ import 'package:fsbackup/constants.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fsbackup/models/backup_routine_model.dart';
+
 import 'package:fsbackup/providers/fila_provider.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
 
 class FilaBackupWidget extends StatefulWidget {

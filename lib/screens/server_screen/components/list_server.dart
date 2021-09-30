@@ -1,15 +1,12 @@
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fsbackup/models/server_model.dart';
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/screens/server_screen/components/edit_server.dart';
-
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
 
 class ListServer extends StatelessWidget {

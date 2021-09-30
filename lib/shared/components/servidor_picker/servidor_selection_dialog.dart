@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/constants.dart';
-import 'package:fsbackup/models/server_model.dart';
+
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 
 /// selection dialog used for selection of the item
 class SelectionDialog extends StatefulWidget {

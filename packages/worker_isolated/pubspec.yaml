@@ -1,0 +1,12 @@
+name: worker_isolated
+version: 1.0.0
+description: An easy to use utility to perform tasks concurrently By performing blocking CPU intensive tasks concurrently, you free your main isolate to do other stuff while you take advantage of the CPU capabilities
+publish_to: none
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+dependencies:  
+
+dev_dependencies:
+  pedantic: any
+  test: any

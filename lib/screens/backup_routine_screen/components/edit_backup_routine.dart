@@ -2,13 +2,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
-import 'package:fsbackup/models/server_model.dart';
-import 'package:fsbackup/models/backup_routine_model.dart';
+
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/providers/backup_routine_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:fsbackup/shared/components/servidor_picker/servidor_picker.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 

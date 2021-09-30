@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
-import 'package:fsbackup/models/backup_routine_model.dart';
+
 import 'package:fsbackup/providers/log_provider.dart';
 import 'package:fsbackup/repositories/backup_routine_repository.dart';
 import 'package:fsbackup/services/backup_task.dart';
-import 'package:fsbackup/worker/worker.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
+import 'package:worker_isolated/worker_isolated.dart';
 
 class FilaProvider extends ChangeNotifier {
   final BackupRoutineRepository repository;
@@ -15,8 +16,6 @@ class FilaProvider extends ChangeNotifier {
     routines = await repository.all();
 
     routines.forEach((rotina) async {
-      //var servidor = rotina.servidores.first;
-
       var task = BackupTask(rotina, taskId: rotina.id);
       final worker = Worker(poolSize: 1);
       await worker.handle(task, progressCallback: (TransferProgress progress) {

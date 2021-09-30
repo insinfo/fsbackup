@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 
-import 'package:fsbackup/models/server_model.dart';
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/responsive.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
-import 'package:fsbackup/shared/validator.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
+
 import 'package:libssh_binding/libssh_binding.dart';
 import 'package:sftp_file_picker/sftp_file_picker.dart';
 
@@ -124,7 +124,7 @@ class _EditServerState extends State<EditServer> {
                   CustomTextField(
                     nameControl: hostControl, label: 'Host',
                     validator: (val) {
-                      var isValid = validator.ip(val);
+                      var isValid = regexValidators.ip(val);
                       return !isValid ? 'Informe um IP valido' : null;
                     },
                     //inputFormatters: [IpAddressInputFormatter()]

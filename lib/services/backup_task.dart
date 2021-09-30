@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:fsbackup/models/backup_routine_model.dart';
-
-import 'package:fsbackup/worker/worker.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:libssh_binding/libssh_binding.dart';
+import 'package:worker_isolated/worker_isolated.dart';
 
 //enum BackupStatus { Iniciando, Copiando, Completo, Cancelado }
 

@@ -1,0 +1,19 @@
+name: fsbackup_shared
+version: 1.0.0
+description: shared code of fsbackup aplication
+publish_to: none
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+dependencies:
+  libssh_binding:
+    path: ../libssh_binding
+ 
+
+  ffi: ^1.1.2 #0.1.3
+  meta: ^1.7.0
+  win32: any
+
+dev_dependencies:
+  pedantic: any
+  test: any

@@ -1,6 +1,5 @@
-import 'package:fsbackup/models/server_model.dart';
-
 import 'package:fsbackup/services/mongodb_service.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class ServerRepository {

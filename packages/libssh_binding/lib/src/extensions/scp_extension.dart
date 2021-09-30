@@ -7,6 +7,7 @@ import 'package:ffi/ffi.dart';
 import 'package:libssh_binding/src/constants.dart';
 import 'package:libssh_binding/src/extensions/exec_command_extension.dart';
 import 'package:libssh_binding/src/libssh_binding.dart';
+import 'package:libssh_binding/src/utils.dart';
 
 extension ScpExtension on LibsshBinding {
   /// [fullPath] example => "helloworld/helloworld.txt"
@@ -92,7 +93,9 @@ extension ScpExtension on LibsshBinding {
   }
 
   Future<void> scpDownloadFileTo(ssh_session session, String fullRemotePathSource, String fullLocalPathTarget,
-      {void Function(int totalBytes, int loaded)? callbackStats, Allocator allocator = calloc, bool recursive = true}) async {
+      {void Function(int totalBytes, int loaded)? callbackStats,
+      Allocator allocator = calloc,
+      bool recursive = true}) async {
     var source = fullRemotePathSource.toNativeUtf8(allocator: allocator).cast<Int8>();
 
     var scp = initFileScp(session, source);
@@ -160,7 +163,9 @@ extension ScpExtension on LibsshBinding {
 
   Future<void> scpReadFileAndSave(
       Pointer<ssh_session_struct> session, Pointer<ssh_scp_struct> scp, String fullLocalPathTarget,
-      {void Function(int totalBytes, int loaded)? callbackStats, Allocator allocator = calloc, bool recursive = false}) async {
+      {void Function(int totalBytes, int loaded)? callbackStats,
+      Allocator allocator = calloc,
+      bool recursive = false}) async {
     var remoteFileLength = ssh_scp_request_get_size(scp);
     //var filename = ssh_scp_request_get_filename(scp).cast<Utf8>();
     //var mode = ssh_scp_request_get_permissions(scp);
@@ -240,7 +245,7 @@ extension ScpExtension on LibsshBinding {
       switch (rc) {
         //Um novo arquivo será obtido
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
-          var filename = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
+          var filename = nativeInt8ToString(ssh_scp_request_get_filename(scp), allowMalformed: true);
           currentFileSize = ssh_scp_request_get_size64(scp);
           //printFunc("file: $filename size: $fileSize");
           ssh_scp_accept_request(scp);
@@ -272,7 +277,7 @@ extension ScpExtension on LibsshBinding {
           break;
         //Um novo diretório será puxado
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
-          currentDirName = ssh_scp_request_get_filename(scp).cast<Utf8>().toDartString();
+          currentDirName = nativeInt8ToString(ssh_scp_request_get_filename(scp), allowMalformed: true);
           //currentDirSize = ssh_scp_request_get_size64(scp);
           //var mode = ssh_scp_request_get_permissions(scp);
           currentPath += '/$currentDirName';

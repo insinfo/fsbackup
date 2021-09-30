@@ -162,6 +162,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  cron:
+    dependency: "direct main"
+    description:
+      name: cron
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   crypto:
     dependency: transitive
     description:
@@ -289,6 +296,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  fsbackup_shared:
+    dependency: "direct main"
+    description:
+      path: "packages/fsbackup_shared"
+      relative: true
+    source: path
+    version: "1.0.0"
   get_it:
     dependency: "direct main"
     description:
@@ -439,7 +453,7 @@ packages:
   os:
     dependency: "direct main"
     description:
-      path: "packages/os"
+      path: "packages/os_utils"
       relative: true
     source: path
     version: "1.0.0"
@@ -778,7 +792,7 @@ packages:
     source: hosted
     version: "1.0.0"
   web_socket_channel:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: web_socket_channel
       url: "https://pub.dartlang.org"
@@ -791,6 +805,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.9"
+  worker_isolated:
+    dependency: "direct main"
+    description:
+      path: "packages/worker_isolated"
+      relative: true
+    source: path
+    version: "1.0.0"
   xdg_directories:
     dependency: transitive
     description:

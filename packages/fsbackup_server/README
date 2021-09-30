@@ -1,0 +1,474 @@
+Serviço do windows baseado em https://stackoverflow.com/questions/21056419/how-do-you-run-a-dart-application-as-a-windows-service?rq=1
+Executar a compilação
+
+in Visual Studio 2019 Developer Command Prompt
+cd fsbackup_native
+cmake -G "Visual Studio 15 2017 Win64"
+msbuild /p:Configuration=Release fsbackup_service.sln
+
+dart compile exe .\bin\server.dart
+#### para registar um serviço no windows
+sc.exe create fsbackup_service binPath=D:\MyDartProjects\fsbackup\packages\fsbackup_server\bin\server.exe
+
+#### para remover um serviço no windows
+SC DELETE fsbackup_service
+
+
+### how-do-you-run-a-dart-application-as-a-windows-service
+
+I am arriving really late to the game, but I figured a way around this problem without having to use 3rd party applications.
+
+My solution is kind of an hack, but hey, it works. I am compiling the dart application as an executable and then registering it as a Windows Service, using sc.exe create. The issue with sc.exe create is that the main function of the application needs to perform some extra steps to inform Windows that it is running. If this isn't done, Windows service gets stuck in a "Starting state".
+
+I don't think there is a pub package available to perform this duty. However, there are 2 things we can use: Dart:FFI, and the following article from Mohit Arora that explains how to create a Windows Service in C++. https://www.codeproject.com/Articles/499465/Simple-Windows-Service-in-Cplusplus
+
+I grabbed Mohit's code and made a ton of changes (including backporting it to C, because... C++)
+
+C
+Here's the full code of the Service.c file:
+
+```c
+
+// Provides an API for Dart console applications to
+// integrate themselves as Windows Services
+// The entry point to this API is the Init(...)
+// function at the bottom of this file.
+
+// The Init(...) function registers the ServiceMain(...)
+// function as the actual windows service function.
+// the ServiceMain function does the following:
+//
+// 1. Registers the ServiceCtrlHandler(...) function 
+// as the service control handler, which is essentially
+// tasked to handle control requests (in this case we 
+// are only handling the request to stop the service).
+//
+// 2. Creates an event object that and then waits indefinitely 
+// for the event to be set.
+//
+// The ServiceCtrlHandler(...) function responds to a
+// close request by setting the event created by the 
+// ServiceMain(...) function, essentially freeing 
+// the latter from the indefinite wait and terminating
+// it.
+
+// The functions in this file don't actually 
+// do any work, but keep the Windows Service
+// alive. The work be initiated by the calling 
+// application either before or after the call to Init(...).
+
+// Because this was developed for the purpose
+// of enabling Dart applications to run as 
+// Windows Services, it it the Dart Application 
+// that needs to call Init(...) using Dart FFI.
+// It must also be the Dart Application to 
+// spawn an isolate that does the actual work
+// before the call to Init(...)
+
+#include <Windows.h>
+#include <tchar.h>
+
+#include "service.h"
+
+
+SERVICE_STATUS        g_ServiceStatus = { 0 };
+SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
+HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
+
+
+LPWSTR w_service_name;
+
+
+void UpdateStatus(
+    DWORD newState,
+    DWORD checkPoint,
+    DWORD exitCode,
+    DWORD controlsAccepted)
+{
+    g_ServiceStatus.dwControlsAccepted = controlsAccepted;
+    g_ServiceStatus.dwCurrentState = newState;
+    g_ServiceStatus.dwWin32ExitCode = exitCode;
+    g_ServiceStatus.dwCheckPoint = checkPoint;
+
+    SetServiceStatus(g_StatusHandle, &g_ServiceStatus);
+}
+
+
+// Responds to control events. This implementation is
+// only responding to the SERVICE_CONTROL_STOP event
+// This method signals the ServiceMain function
+// that it can stop waiting before terminating.
+void WINAPI ServiceCtrlHandler(DWORD CtrlCode)
+{
+    if (CtrlCode != SERVICE_CONTROL_STOP || g_ServiceStatus.dwCurrentState != SERVICE_RUNNING)
+        return;
+
+    UpdateStatus(SERVICE_STOP_PENDING, 4, 0, 0);
+
+    SetEvent(g_ServiceStopEvent);
+
+}
+
+
+void InitServiceStatus()
+{
+    ZeroMemory(&g_ServiceStatus, sizeof(g_ServiceStatus));
+    g_ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
+    g_ServiceStatus.dwServiceSpecificExitCode = 0;
+    UpdateStatus(SERVICE_START_PENDING, 0, 0, 0);
+}
+
+
+// This function essentially creates an event object 
+// and enters a holding pattern until that event object 
+// is set by the ServiceCtrlHandler(...) in response
+// to a close request.
+
+// The function doesn't actually do any work,
+// except to keep the Windows Service alive.
+void WINAPI ServiceMain(DWORD argc, LPTSTR* argv)
+{
+    g_StatusHandle = RegisterServiceCtrlHandler(w_service_name, ServiceCtrlHandler);
+
+    if (g_StatusHandle == NULL)
+        return;
+
+    InitServiceStatus();
+
+    g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+    if (g_ServiceStopEvent == NULL)
+    {
+        UpdateStatus(SERVICE_STOPPED, 1, GetLastError(), 0);
+        return;
+    }
+
+    UpdateStatus(SERVICE_RUNNING, 0, 0, SERVICE_ACCEPT_STOP);
+
+    while (WaitForSingleObject(g_ServiceStopEvent, INFINITE) != WAIT_OBJECT_0)
+        ;
+
+    CloseHandle(g_ServiceStopEvent);
+    UpdateStatus(SERVICE_STOPPED, 3, 0, 0);
+}
+
+
+
+LPWSTR get_service_name(const char* service_name)
+{
+    int max_count = strlen(service_name);
+    int size = max_count + 1;
+    LPWSTR ret = malloc(sizeof(wchar_t) * size);
+    size_t outSize;
+    mbstowcs_s(&outSize, ret, size, service_name, max_count);
+    return ret;
+}
+
+
+
+/// This is the entry point that should be called
+/// by the Dart application (or any application 
+/// of a similar kind of platform) in order to 
+/// integrate itself as a Windows Service.
+/// It registers the ServiceMain(...) function
+/// as the service main function. Please consult
+/// the comments at that function to understand
+/// what it does.
+int init(const char* service_name)
+{
+    w_service_name = get_service_name(service_name);
+
+    SERVICE_TABLE_ENTRY ServiceTable[] =
+    {
+        {w_service_name, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
+        {NULL, NULL}
+    };
+
+    if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
+        return GetLastError();
+}
+```
+
+The Service.h header file is, naturally, a lot smaller:
+
+```c
+#pragma once
+
+#ifdef WINSERVICE_EXPORTS
+#define WINSERVICE_API __declspec(dllexport)
+#else
+#define WINSERVICE_API __declspec(dllimport)
+#endif
+
+
+WINSERVICE_API int init(const char* service_name);
+```
+
+=== Latest Update ===
+
+My original answer consisted of using C and Dart FFI to boostrap the Windows Service. However, none of this is really needed as a much, much, simpler solution can be had by using Docker with Windows Containers.
+
+Instead of actually running the application as a Windows Service, the alternative is to compile it to an executable Windows console application, create a Docker file and a Windows Docker image that will include that application. On the server you will need docker and you can simply run the image with a --restart option. To test this out, Windows 10 supports Docker with Windows containers.
+
+So, the simple solution is, we don't really need to run Dart code as a Windows Service, because we can run it as a docker container on the server.
+
+=== Original Answer ===
+
+I am arriving really late to the game, but I figured a way around this problem without having to use 3rd party applications.
+
+My solution is kind of an hack, but hey, it works. I am compiling the dart application as an executable and then registering it as a Windows Service, using sc.exe create. The issue with sc.exe create is that the main function of the application needs to perform some extra steps to inform Windows that it is running. If this isn't done, Windows service gets stuck in a "Starting state".
+
+I don't think there is a pub package available to perform this duty. However, there are 2 things we can use: Dart:FFI, and the following article from Mohit Arora that explains how to create a Windows Service in C++. https://www.codeproject.com/Articles/499465/Simple-Windows-Service-in-Cplusplus
+
+I grabbed Mohit's code and made a ton of changes (including backporting it to C, because... C++)
+
+C
+Here's the full code of the Service.c file:
+
+
+// Provides an API for Dart console applications to
+// integrate themselves as Windows Services
+// The entry point to this API is the Init(...)
+// function at the bottom of this file.
+
+// The Init(...) function registers the ServiceMain(...)
+// function as the actual windows service function.
+// the ServiceMain function does the following:
+//
+// 1. Registers the ServiceCtrlHandler(...) function 
+// as the service control handler, which is essentially
+// tasked to handle control requests (in this case we 
+// are only handling the request to stop the service).
+//
+// 2. Creates an event object that and then waits indefinitely 
+// for the event to be set.
+//
+// The ServiceCtrlHandler(...) function responds to a
+// close request by setting the event created by the 
+// ServiceMain(...) function, essentially freeing 
+// the latter from the indefinite wait and terminating
+// it.
+
+// The functions in this file don't actually 
+// do any work, but keep the Windows Service
+// alive. The work be initiated by the calling 
+// application either before or after the call to Init(...).
+
+// Because this was developed for the purpose
+// of enabling Dart applications to run as 
+// Windows Services, it it the Dart Application 
+// that needs to call Init(...) using Dart FFI.
+// It must also be the Dart Application to 
+// spawn an isolate that does the actual work
+// before the call to Init(...)
+
+#include <Windows.h>
+#include <tchar.h>
+
+#include "service.h"
+
+
+SERVICE_STATUS        g_ServiceStatus = { 0 };
+SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
+HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
+
+
+LPWSTR w_service_name;
+
+
+void UpdateStatus(
+    DWORD newState,
+    DWORD checkPoint,
+    DWORD exitCode,
+    DWORD controlsAccepted)
+{
+    g_ServiceStatus.dwControlsAccepted = controlsAccepted;
+    g_ServiceStatus.dwCurrentState = newState;
+    g_ServiceStatus.dwWin32ExitCode = exitCode;
+    g_ServiceStatus.dwCheckPoint = checkPoint;
+
+    SetServiceStatus(g_StatusHandle, &g_ServiceStatus);
+}
+
+
+// Responds to control events. This implementation is
+// only responding to the SERVICE_CONTROL_STOP event
+// This method signals the ServiceMain function
+// that it can stop waiting before terminating.
+void WINAPI ServiceCtrlHandler(DWORD CtrlCode)
+{
+    if (CtrlCode != SERVICE_CONTROL_STOP || g_ServiceStatus.dwCurrentState != SERVICE_RUNNING)
+        return;
+
+    UpdateStatus(SERVICE_STOP_PENDING, 4, 0, 0);
+
+    SetEvent(g_ServiceStopEvent);
+
+}
+
+
+void InitServiceStatus()
+{
+    ZeroMemory(&g_ServiceStatus, sizeof(g_ServiceStatus));
+    g_ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
+    g_ServiceStatus.dwServiceSpecificExitCode = 0;
+    UpdateStatus(SERVICE_START_PENDING, 0, 0, 0);
+}
+
+
+// This function essentially creates an event object 
+// and enters a holding pattern until that event object 
+// is set by the ServiceCtrlHandler(...) in response
+// to a close request.
+
+// The function doesn't actually do any work,
+// except to keep the Windows Service alive.
+void WINAPI ServiceMain(DWORD argc, LPTSTR* argv)
+{
+    g_StatusHandle = RegisterServiceCtrlHandler(w_service_name, ServiceCtrlHandler);
+
+    if (g_StatusHandle == NULL)
+        return;
+
+    InitServiceStatus();
+
+    g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+    if (g_ServiceStopEvent == NULL)
+    {
+        UpdateStatus(SERVICE_STOPPED, 1, GetLastError(), 0);
+        return;
+    }
+
+    UpdateStatus(SERVICE_RUNNING, 0, 0, SERVICE_ACCEPT_STOP);
+
+    while (WaitForSingleObject(g_ServiceStopEvent, INFINITE) != WAIT_OBJECT_0)
+        ;
+
+    CloseHandle(g_ServiceStopEvent);
+    UpdateStatus(SERVICE_STOPPED, 3, 0, 0);
+}
+
+
+
+LPWSTR get_service_name(const char* service_name)
+{
+    int max_count = strlen(service_name);
+    int size = max_count + 1;
+    LPWSTR ret = malloc(sizeof(wchar_t) * size);
+    size_t outSize;
+    mbstowcs_s(&outSize, ret, size, service_name, max_count);
+    return ret;
+}
+
+
+
+/// This is the entry point that should be called
+/// by the Dart application (or any application 
+/// of a similar kind of platform) in order to 
+/// integrate itself as a Windows Service.
+/// It registers the ServiceMain(...) function
+/// as the service main function. Please consult
+/// the comments at that function to understand
+/// what it does.
+int init(const char* service_name)
+{
+    w_service_name = get_service_name(service_name);
+
+    SERVICE_TABLE_ENTRY ServiceTable[] =
+    {
+        {w_service_name, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
+        {NULL, NULL}
+    };
+
+    if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
+        return GetLastError();
+}
+
+
+The Service.h header file is, naturally, a lot smaller:
+
+
+#pragma once
+
+#ifdef WINSERVICE_EXPORTS
+#define WINSERVICE_API __declspec(dllexport)
+#else
+#define WINSERVICE_API __declspec(dllimport)
+#endif
+
+
+WINSERVICE_API int init(const char* service_name);
+
+Just make sure you add WINSERVICE_EXPORTS to one of the definitions or replace it by the corresponding definition in your project.
+
+Dart
+I also needed to perform a few changes from the Dart side. Here's my prototype:
+
+```dart
+
+import 'dart:ffi' as ffi;
+import 'dart:io';
+import 'dart:isolate';
+import 'package:ffi/ffi.dart';
+import 'package:grpc/grpc.dart' as grpc;
+
+// These two types represent the
+// Init(...) function of the C API
+typedef init_func = ffi.Int32 Function(ffi.Pointer<Utf8>);
+typedef Init = int Function(ffi.Pointer<Utf8>);
+
+// Entry point to the Dart application.
+// When run as a Windows Service,
+// this is still the entry point.
+// This code is not embeded but is started
+// as a regular console application.
+void main() async {
+  final init = createInit();
+
+  // Starts the actual work in a separate Isolate
+  await Isolate.spawn(run, 'message');
+
+  final serviceName = Utf8.toUtf8('MProto_Server_from_Dart');
+  // calls the Init(...) function
+  var result = init(serviceName);
+  if (result != 0) return;
+
+  // blocks this Isolate indefinitely from continuing
+  while (true) {
+    sleep(Duration(days: 365));
+  }
+}
+
+// Creates the instance of the proxy to the Init(...)
+// function.
+Init createInit() {
+  final path =
+      r'[PATH to the C compiled DLL]';
+  final dylib = ffi.DynamicLibrary.open(path);
+
+  // ignore: omit_local_variable_types
+  final Init init =
+      dylib.lookup<ffi.NativeFunction<init_func>>('init').asFunction();
+  return init;
+}
+
+
+// Performs the actual work that needs to
+// be done, in this case, we are hosting
+// a gRPC service, but this should 
+// work with any other kind of 
+// payload, namely other types of
+// http services.
+void run(String message) async {
+  print('inside isolate');
+  var server = grpc.Server(
+    [
+// my service classes
+    ],
+  );
+  await server.serve(port: 5001);
+}
+
+
+```

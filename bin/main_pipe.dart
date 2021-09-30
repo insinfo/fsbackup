@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
-import 'package:fsbackup/shared/utils/process_helper.dart';
+
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:os/file_system.dart';
 
 var pipe = NamedPipeWindows('fsbackup2');
@@ -26,4 +28,6 @@ void startPipeServer() {
   pipe.start((val) {
     print('pipe server: $val');
   });
+
+  print('fim');
 }

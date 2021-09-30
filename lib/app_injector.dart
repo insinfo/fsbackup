@@ -7,6 +7,7 @@ import 'package:fsbackup/repositories/server_repository.dart';
 import 'package:fsbackup/repositories/backup_routine_repository.dart';
 import 'package:fsbackup/services/mongodb_service.dart';
 import 'package:get_it/get_it.dart';
+import 'package:cron/cron.dart';
 
 GetIt locator = GetIt.instance;
 bool isLoadedDb = false;
@@ -26,6 +27,8 @@ Future appInjector() async {
     locator.registerSingleton<FilaProvider>(FilaProvider(locator<BackupRoutineRepository>()));
 
     locator.registerSingleton<LogProvider>(LogProvider());
+
+    locator.registerSingleton<Cron>(Cron());
 
     isLoadedDb = true;
   }

@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fsbackup/models/server_model.dart';
+
 import 'package:fsbackup/repositories/server_repository.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 
 class ServerProvider with ChangeNotifier {
   final ServerRepository repository;

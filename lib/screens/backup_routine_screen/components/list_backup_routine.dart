@@ -3,10 +3,10 @@ import 'package:fsbackup/constants.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fsbackup/models/backup_routine_model.dart';
 import 'package:fsbackup/providers/backup_routine_provider.dart';
 import 'package:fsbackup/screens/backup_routine_screen/components/edit_backup_routine.dart';
-import 'package:fsbackup/shared/utils/utils.dart';
+
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
@@ -80,7 +80,7 @@ class ListBackupRoutine extends StatelessWidget {
             ],
           ),
         ),
-        DataCell(Text('${Utils.truncateMidleString(routine.destinationDirectory, 20)}')),
+        DataCell(Text('${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
         DataCell(Text('${routine.startBackup.text}')),
         DataCell(Text('${routine.servers?.isNotEmpty == true ? routine.servers.first.name : "Sem servidor"}')),
         DataCell(Row(

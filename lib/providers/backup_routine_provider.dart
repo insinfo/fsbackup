@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fsbackup/models/backup_routine_model.dart';
+
 import 'package:fsbackup/repositories/backup_routine_repository.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 
 class BackupRoutineProvider with ChangeNotifier {
   final BackupRoutineRepository repository;

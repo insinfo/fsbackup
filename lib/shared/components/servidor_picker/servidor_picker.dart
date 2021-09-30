@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fsbackup/models/server_model.dart';
+
 import 'package:fsbackup/shared/components/servidor_picker/servidor_selection_dialog.dart';
+import 'package:fsbackup_shared/fsbackup_shared.dart';
 
 class ServidorPicker extends StatefulWidget {
   final ValueChanged<ServerModel> onChanged;

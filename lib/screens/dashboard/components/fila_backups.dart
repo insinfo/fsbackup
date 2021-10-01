@@ -40,13 +40,15 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
             width: double.infinity,
             child: ChangeNotifierProvider.value(
               value: locator<FilaProvider>(),
-              builder: (context, w) => Consumer<FilaProvider>(builder: (ctx, data, child) {
+              builder: (context, w) =>
+                  Consumer<FilaProvider>(builder: (ctx, data, child) {
                 return FutureBuilder<List<BackupRoutineModel>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(child: Text('Não ha Tarefas em execução!'));
+                          return Center(
+                              child: Text('Não ha Tarefas em execução!'));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
@@ -54,9 +56,14 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
                               columns: [
                                 DataColumn(label: Text('Nome')),
                                 DataColumn(label: Text('Destino')),
+                                DataColumn(label: Text('%')),
                                 DataColumn(label: Text('Status')),
+                                DataColumn(label: Text('Ações')),
                               ],
-                              rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
+                              rows: snapshot.data
+                                  .map<DataRow>(
+                                      (server) => createItem(server, ctx))
+                                  .toList());
                         }
                       }
                       return Center(child: CircularProgressIndicator());
@@ -70,26 +77,31 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
   }
 }
 
-DataRow createItem(BackupRoutineModel rotina, BuildContext ctx) {
+DataRow createItem(BackupRoutineModel routine, BuildContext ctx) {
   return DataRow(
     cells: [
       DataCell(
         Row(
           children: [
             SvgPicture.asset(
-              rotina.icon,
+              routine.icon,
               height: 30,
               width: 30,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-              child: Text(rotina.name),
+              child: Text(routine.name),
             ),
           ],
         ),
       ),
-      DataCell(Text(rotina.destinationDirectory)),
-      DataCell(Text('${rotina.percent.toStringAsFixed(4)}%')),
+      DataCell(Text(
+          '${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
+      DataCell(Text('${routine.percent.toStringAsFixed(2)}%')),
+      DataCell(Text('${routine.status.text}')),
+      DataCell(Row(children: [
+        //
+      ])),
     ],
   );
 }

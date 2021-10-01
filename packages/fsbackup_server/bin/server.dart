@@ -2,9 +2,9 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:isolate';
 import 'package:ffi/ffi.dart';
-import 'package:fsbackup_server/fsbackup_server.dart';
+//import 'package:fsbackup_server/fsbackup_server.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
-import 'package:shelf/shelf_io.dart' as shelf_io;
+//import 'package:shelf/shelf_io.dart' as shelf_io;
 
 //serviço do windows baseado em https://stackoverflow.com/questions/21056419/how-do-you-run-a-dart-application-as-a-windows-service?rq=1
 //executar a compilação
@@ -52,11 +52,13 @@ void main() async {
 // function.
 Init createInit() {
   //PATH to the C compiled DLL
-  final path = r'D:\MyDartProjects\fsbackup\packages\fsbackup_server\fsbackup_native\Release\fsbackup_service.dll';
+  final path =
+      r'D:\MyDartProjects\fsbackup\packages\fsbackup_server\fsbackup_native\Release\fsbackup_service.dll';
   final dylib = ffi.DynamicLibrary.open(path);
 
   // ignore: omit_local_variable_types
-  final Init init = dylib.lookup<ffi.NativeFunction<init_func>>('init').asFunction();
+  final Init init =
+      dylib.lookup<ffi.NativeFunction<init_func>>('init').asFunction();
   return init;
 }
 
@@ -74,7 +76,7 @@ void run(String message) async {
     ],
   );
   await server.serve(port: 5001);*/
-  final home = HomeController();
+  //final home = HomeController();
   // Create server
   // final server = await shelf_io.serve(home.handler, '127.0.0.1', 5001);
   // Server on message

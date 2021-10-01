@@ -43,9 +43,12 @@ dependencies:
   win32: any
   ffi: any
   cron: any
+  cron_form_field: ^0.2.0
+  queue: ^3.1.0
   #csv: any
   #os: ^0.1.2
   web_socket_channel: any
+  teledart: ^0.2.1
   worker_isolated:
     path: packages/worker_isolated
   fsbackup_shared:

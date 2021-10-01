@@ -12,11 +12,11 @@ class BackupRoutineRepository {
 
   Future<List<BackupRoutineModel>> all() async {
     final result = await collection.find().toList();
-    var rotinas = result.map((m) => BackupRoutineModel.fromMap(m)).toList();
+    var routines = result.map((m) => BackupRoutineModel.fromMap(m)).toList();
 
     var idsServers = <String>[];
 
-    rotinas?.forEach((rotina) {
+    routines?.forEach((rotina) {
       if (rotina.servers is List) {
         rotina.servers.forEach((serv) {
           idsServers.add(serv.id);
@@ -27,10 +27,11 @@ class BackupRoutineRepository {
     if (idsServers.isNotEmpty) {
       var servers = await ServerRepository(mongo).findAllByIds(idsServers);
       if (servers is List) {
-        rotinas?.forEach((rotina) {
+        routines?.forEach((rotina) {
           var rotinaServersIds = rotina.servers?.map((e) => e.id)?.toList();
           if (rotinaServersIds is List) {
-            rotina.servers = servers.where((s) => rotinaServersIds.contains(s.id))?.toList();
+            rotina.servers =
+                servers.where((s) => rotinaServersIds.contains(s.id))?.toList();
           }
         });
       }
@@ -38,7 +39,7 @@ class BackupRoutineRepository {
 
     //print(idsServers);
 
-    return rotinas;
+    return routines;
   }
 
   Future<List<BackupRoutineModel>> findAllByIds(List<String> ids) async {
@@ -65,13 +66,13 @@ class BackupRoutineRepository {
     return server;
   }
 
-  Future<BackupRoutineModel> update(BackupRoutineModel server) async {
-    await collection.update({'id': server.id}, server.toMap());
-    return server;
+  Future<BackupRoutineModel> update(BackupRoutineModel routine) async {
+    await collection.update({'id': routine.id}, routine.toMap());
+    return routine;
   }
 
-  Future<void> remove(BackupRoutineModel server) async {
-    await collection.remove({'id': server.id});
+  Future<void> remove(BackupRoutineModel routine) async {
+    await collection.remove({'id': routine.id});
   }
 
   Future<void> removeById(String id) async {

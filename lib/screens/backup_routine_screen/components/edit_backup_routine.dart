@@ -25,6 +25,7 @@ class EditBackupRoutine extends StatefulWidget {
 class _EditBackupRoutineState extends State<EditBackupRoutine> {
   var nomeControl = TextEditingController();
   var dirDestinoControl = TextEditingController();
+  var whenToBackupControl = TextEditingController();
   var dropdownValue = StartBackup.manual;
   ServerModel server;
 
@@ -36,8 +37,13 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
 
   void fillControls() {
     nomeControl.text = widget.routine == null ? '' : widget.routine.name;
-    dirDestinoControl.text = widget.routine == null ? '' : widget.routine.destinationDirectory;
-    dropdownValue = widget.routine == null ? StartBackup.manual : widget.routine.startBackup;
+    dirDestinoControl.text =
+        widget.routine == null ? '' : widget.routine.destinationDirectory;
+    dropdownValue = widget.routine == null
+        ? StartBackup.manual
+        : widget.routine.startBackup;
+    whenToBackupControl.text =
+        widget.routine == null ? '' : widget.routine.whenToBackup;
     server = widget.routine == null ? null : widget.routine.servers.first;
     /*if (widget.rotina != null) {
       if (widget.rotina.servidores != null && widget.rotina.servidores.isNotEmpty) {
@@ -54,6 +60,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
     model.name = nomeControl.text;
     model.destinationDirectory = dirDestinoControl.text;
     model.startBackup = dropdownValue;
+    model.whenToBackup = whenToBackupControl.text;
     model.servers = [server];
   }
 
@@ -96,7 +103,9 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomTextField(nameControl: nomeControl, label: AppLocalizations.of(context).columnName),
+              CustomTextField(
+                  nameControl: nomeControl,
+                  label: AppLocalizations.of(context).columnName),
               CustomTextField(
                 nameControl: dirDestinoControl,
                 label: 'Diretorio destino do backup',
@@ -120,11 +129,13 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(right: 20),
-                    child: Text('Como iniciar:', style: TextStyle(color: Colors.white.withAlpha(150))),
+                    child: Text('Como iniciar:',
+                        style: TextStyle(color: Colors.white.withAlpha(150))),
                   ),
                   DropdownButton<StartBackup>(
                     value: dropdownValue,
-                    items: [StartBackup.manual, StartBackup.scheduled].map((opt) {
+                    items:
+                        [StartBackup.manual, StartBackup.scheduled].map((opt) {
                       return DropdownMenuItem<StartBackup>(
                         value: opt,
                         child: Text(opt.text.toUpperCase()),
@@ -139,34 +150,53 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Servidor:', style: TextStyle(color: Colors.white.withAlpha(150))),
+                    child: Text('Servidor:',
+                        style: TextStyle(color: Colors.white.withAlpha(150))),
                   ),
                   ChangeNotifierProvider.value(
-                      value: locator<ServerProvider>(),
-                      builder: (context, w) => Consumer<ServerProvider>(builder: (ctx, data, child) {
-                            return FutureBuilder<List<ServerModel>>(
-                                future: data.getAll(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    if (snapshot.data.length == 0) {
-                                      return Center(child: Text("Não ha Servidores"));
-                                    } else if (snapshot.data.length > 0) {
-                                      // servidor = snapshot.data.first;
-                                      return ServidorPicker(
-                                        items: snapshot.data,
-                                        initialSelection: server?.name,
-                                        onChanged: (v) {
-                                          print('onChanged ${v.name}');
-                                          server = v;
-                                        },
-                                      );
-                                    }
-                                  }
-                                  return Center(child: CircularProgressIndicator());
-                                });
-                          })),
+                    value: locator<ServerProvider>(),
+                    builder: (context, w) =>
+                        Consumer<ServerProvider>(builder: (ctx, data, child) {
+                      return FutureBuilder<List<ServerModel>>(
+                          future: data.getAll(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              if (snapshot.data.length == 0) {
+                                return Center(child: Text("Não ha Servidores"));
+                              } else if (snapshot.data.length > 0) {
+                                // servidor = snapshot.data.first;
+                                return ServidorPicker(
+                                  items: snapshot.data,
+                                  initialSelection: server?.name,
+                                  onChanged: (v) {
+                                    print('onChanged ${v.name}');
+                                    server = v;
+                                  },
+                                );
+                              }
+                            }
+                            return Center(child: CircularProgressIndicator());
+                          });
+                    }),
+                  ),
                 ],
-              )
+              ),
+              if (dropdownValue == StartBackup.scheduled)
+                Container(
+                  width: width,
+                  child: /*CronFormField(
+                      initialValue: '0 18 * * *',
+                      // controller: _cronController,
+                      labelText: 'Schedule',
+                      onChanged: (val) => print(val),
+                      onSaved: (val) => print(val),
+                    )*/
+                      CustomTextField(
+                          nameControl: whenToBackupControl,
+                          hintText:
+                              'Ex: A cada minuto: "* * * * *" ou todos os dias às 18h: "0 18 * * *"',
+                          label: 'Quando fazer?'),
+                ),
             ],
           ),
         );

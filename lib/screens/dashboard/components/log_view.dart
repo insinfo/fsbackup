@@ -28,14 +28,20 @@ class _LogViewWidgetState extends State<LogViewWidget> {
       ),
       child: ChangeNotifierProvider.value(
         value: locator<LogProvider>(),
-        builder: (context, w) => Consumer<LogProvider>(builder: (ctx, data, child) {
-          var list = data.getLines();
+        builder: (context, w) =>
+            Consumer<LogProvider>(builder: (ctx, data, child) {
+          /*var list = data.getLines();
           return ListView.builder(
               controller: widget.scrollController,
               itemCount: list.length,
               itemBuilder: (ctx, idx) {
-                return Text(list[idx]);
-              });
+                return SelectableText(list[idx]);
+              });*/
+
+          return SingleChildScrollView(
+            controller: widget.scrollController,
+            child: SelectableText(data.getAllText),
+          );
         }),
       ),
     );

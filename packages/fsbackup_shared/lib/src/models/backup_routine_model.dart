@@ -5,6 +5,12 @@ enum StartBackup { manual, scheduled }
 /// andamento | espera | falhou
 enum RoutineStatus { progress, waiting, failed }
 
+extension RoutineStatusToString on RoutineStatus {
+  String get text {
+    return this.toString().split('.').last;
+  }
+}
+
 extension StartBackupToString on StartBackup {
   String get text {
     return this.toString().split('.').last;
@@ -22,37 +28,60 @@ class BackupRoutineModel {
   StartBackup startBackup;
   String icon = 'assets/icons/media_file.svg';
 
-  //extras
-  String status = 'waiting'; //progress, waiting, failed  andamento/espera/falhou
+  /// progress/waiting/failed |  andamento/espera/falhou
+  RoutineStatus status = RoutineStatus.waiting;
   double percent = 0;
   String log = '';
+
+  /// data do ultimo backup
   DateTime lastBackup;
 
-  BackupRoutineModel({
-    this.id,
-    this.servers,
-    this.name,
-    this.destinationDirectory,
-    this.startBackup,
-    this.status,
-    this.percent,
-    this.lastBackup,
-    this.log,
-  });
+  /// quando fazer backup?
+  String whenToBackup;
+
+  BackupRoutineModel(
+      {this.id,
+      this.servers,
+      this.name,
+      this.destinationDirectory,
+      this.startBackup,
+      this.status,
+      this.percent,
+      this.lastBackup,
+      this.log,
+      this.whenToBackup});
+
+  static RoutineStatus statusFromString(String str) {
+    if (str == null) {
+      return RoutineStatus.waiting;
+    } else if (str == RoutineStatus.waiting.text) {
+      return RoutineStatus.waiting;
+    } else if (str == RoutineStatus.failed.text) {
+      return RoutineStatus.failed;
+    } else if (str == RoutineStatus.progress.text) {
+      return RoutineStatus.progress;
+    } else {
+      return RoutineStatus.waiting;
+    }
+  }
 
   factory BackupRoutineModel.fromMap(Map<String, dynamic> map) {
     var s = BackupRoutineModel(
       id: map['id'] as String,
       name: map['name'],
       destinationDirectory: map['destinationDirectory'],
-      startBackup: map['startBackup'].toString().contains('manual') ? StartBackup.manual : StartBackup.scheduled,
-      status: map['status'],
+      startBackup: map['startBackup'].toString().contains('manual')
+          ? StartBackup.manual
+          : StartBackup.scheduled,
+      status: statusFromString(map['status']),
       percent: map['percent'] is double ? map['percent'] : 0,
       lastBackup: DateTime.tryParse(map['lastBackup'].toString()),
       log: map['log'],
+      whenToBackup: map['whenToBackup'],
     );
     if (map.containsKey('servers')) {
-      s.servers = List<ServerModel>.from(map['servers'].map((x) => ServerModel.fromMap(x)));
+      s.servers = List<ServerModel>.from(
+          map['servers'].map((x) => ServerModel.fromMap(x)));
     }
 
     return s;
@@ -64,10 +93,11 @@ class BackupRoutineModel {
       'name': name,
       'destinationDirectory': destinationDirectory,
       'startBackup': startBackup.text,
-      'status': status,
+      'status': status.text,
       'percent': percent,
       'lastBackup': lastBackup?.toString(),
       'log': log,
+      'whenToBackup': whenToBackup,
     };
     if (servers != null) {
       map['servers'] = servers.map((x) => x.toMap()).toList();

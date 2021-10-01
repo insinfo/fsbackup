@@ -169,6 +169,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.2"
+  cron_form_field:
+    dependency: "direct main"
+    description:
+      name: cron_form_field
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   crypto:
     dependency: transitive
     description:
@@ -604,6 +611,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  queue:
+    dependency: "direct main"
+    description:
+      name: queue
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.1.0"
   rational:
     dependency: transitive
     description:
@@ -693,6 +707,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.0"
+  teledart:
+    dependency: "direct main"
+    description:
+      name: teledart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
   term_glyph:
     dependency: transitive
     description:

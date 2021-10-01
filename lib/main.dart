@@ -9,7 +9,7 @@ import 'package:fsbackup/screens/main/main_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-void main() {
+Future<void> main() async {
   runApp(MyApp());
 }
 
@@ -34,7 +34,8 @@ class MyApp extends StatelessWidget {
         title: 'FSBackup',
         theme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: bgColor,
-          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(bodyColor: Colors.white),
+          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)
+              .apply(bodyColor: Colors.white),
           canvasColor: secondaryColor,
         ),
         home: FutureBuilder(
@@ -44,7 +45,9 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return MainScreen();
             }
-            return Scaffold(backgroundColor: bgColor, body: Center(child: CircularProgressIndicator()));
+            return Scaffold(
+                backgroundColor: bgColor,
+                body: Center(child: CircularProgressIndicator()));
           },
         ));
   }

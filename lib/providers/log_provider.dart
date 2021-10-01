@@ -4,7 +4,7 @@ class LogProvider extends ChangeNotifier {
   List<String> _lines = [];
 
   void addLine(String value) {
-    if (_lines.length > 10) {
+    if (_lines.length > 100) {
       _lines.clear();
     }
     _lines.add(value);
@@ -13,5 +13,12 @@ class LogProvider extends ChangeNotifier {
 
   List<String> getLines() {
     return _lines;
+  }
+
+  String get getAllText => _lines.join('\r\n');
+
+  void clear() {
+    _lines.clear();
+    notifyListeners();
   }
 }

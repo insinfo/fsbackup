@@ -46,25 +46,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         //_showLog
                         ElevatedButton.icon(
                           style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: defaultPadding * 1.5, vertical: defaultPadding),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: defaultPadding * 1.5,
+                                vertical: defaultPadding),
                           ),
                           onPressed: () {
                             setState(() {
                               _showLog = !_showLog;
                             });
                           },
-                          icon: Icon(_showLog ? Icons.visibility : Icons.visibility_off),
+                          icon: Icon(_showLog
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                           label: Text(AppLocalizations.of(context).btnShowLog),
                         ),
                         ElevatedButton.icon(
                           style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: defaultPadding * 1.5, vertical: defaultPadding),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: defaultPadding * 1.5,
+                                vertical: defaultPadding),
                           ),
                           onPressed: () {
                             locator<FilaProvider>().start();
                           },
-                          icon: Icon(Icons.sync),
+                          icon: Icon(Icons.play_arrow),
                           label: Text(AppLocalizations.of(context).btnStart),
+                        ),
+                        ElevatedButton.icon(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: defaultPadding * 1.5,
+                                vertical: defaultPadding),
+                          ),
+                          onPressed: () {
+                            locator<FilaProvider>().stop();
+                          },
+                          icon: Icon(Icons.stop),
+                          label: Text('Stop'),
                         ),
                       ],
                     ),

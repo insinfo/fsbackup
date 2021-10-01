@@ -39,7 +39,6 @@ class BackupTask implements FileTask<Future<bool>> {
           .toList()
           .reduce((value, element) => value + element);
 
-      print('dirretorios ${fileObjects.map((e) => e.path).toList().join(", ")} totalSize: $totalSize');
       final start = DateTime.now();
       for (var item in fileObjects) {
         if (item.type == DirectoryItemType.directory) {
@@ -48,9 +47,9 @@ class BackupTask implements FileTask<Future<bool>> {
             rotinaBackup.destinationDirectory,
             printLog: (v) {
               tasklogCallback(v);
-              print(v);
             },
-            callbackStats: (int total, int loaded, int currentFileSize, int countDirectory, int countFiles) {
+            callbackStats: (int total, int loaded, int currentFileSize,
+                int countDirectory, int countFiles) {
               totalLoaded += currentFileSize;
               taskProgressCallback(totalSize, totalLoaded, 'a');
             },
@@ -67,19 +66,18 @@ class BackupTask implements FileTask<Future<bool>> {
           );
 
           totalLoaded += currentFileSize;
-          print('totalSize: $totalSize | totalLoaded: $totalLoaded');
           taskProgressCallback(totalSize, totalLoaded, 'a');
         }
+        print('i');
       }
 
-      print('\r\n${DateTime.now().difference(start)}');
-    } catch (e, s) {
-      print('BackupTask error: $e $s');
-      tasklogCallback('BackupTask error: $e $s');
-      //completer.complete(true);
-      //completer.completeError(e);
-    } finally {
+      tasklogCallback('${DateTime.now().difference(start)}');
       completer.complete(true);
+    } catch (e, s) {
+      tasklogCallback('BackupTask ${rotinaBackup.name} error: $e $s');
+      completer.completeError(e);
+    } finally {
+      // completer.complete(true);
       libssh.dispose();
     }
 
@@ -97,7 +95,9 @@ class BackupTask implements FileTask<Future<bool>> {
   ProgressCallback taskProgressCallback;
 
   @override
-  void handleCancel(String taskId) {}
+  void handleCancel(String taskId) {
+    print('handleCancel');
+  }
 
   @override
   LogCallback tasklogCallback;

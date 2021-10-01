@@ -43,11 +43,14 @@ class _EditServerState extends State<EditServer> {
   void fillControls(ServerModel model) {
     nameControl.text = widget.server == null ? '' : widget.server.name;
     hostControl.text = widget.server == null ? '' : widget.server.host;
-    portControl.text = widget.server?.port == null ? '' : widget.server.port.toString();
+    portControl.text =
+        widget.server?.port == null ? '' : widget.server.port.toString();
     userControl.text = widget.server == null ? '' : widget.server.user;
     passControl.text = widget.server == null ? '' : widget.server.password;
     fileObjects.clear();
-    if (widget.server == null || widget.server.fileObjects == null || widget.server.fileObjects.isEmpty) {
+    if (widget.server == null ||
+        widget.server.fileObjects == null ||
+        widget.server.fileObjects.isEmpty) {
       //fileObjects.add(FileSystemObject(path: ''));
     } else {
       fileObjects.addAll(widget.server.fileObjects);
@@ -152,18 +155,16 @@ class _EditServerState extends State<EditServer> {
                     padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: Text(
                       'Diretorios/Arquivos para backup:',
-                      style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.5), fontSize: 15),
+                      style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.5),
+                          fontSize: 15),
                     ),
                   ),
                   //for (var item in diretorios) DirWideget(diretorio: item),
-                  for (var item in fileObjects)
-                    DirWideget(item, hintText: 'Digite o caminho', onRemove: () {
-                      if (fileObjects.length > 1) {
-                        setState(() {
-                          fileObjects.remove(item);
-                        });
-                      }
-                    }),
+                  //for (var item in fileObjects)
+                  ...fileObjects
+                      .map((i) => dirWideget(i, hintText: 'Digite o caminho'))
+                      .toList()
                 ],
               ),
             ),
@@ -202,8 +203,8 @@ class _EditServerState extends State<EditServer> {
                   }
                 } catch (e, s) {
                   print('EditServerWidget@ Add Diretorio onPressed $e $s');
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Erro ao se conectar com o servidor!')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Erro ao se conectar com o servidor!')));
                 } finally {
                   libssh.dispose();
                 }
@@ -234,12 +235,13 @@ class _EditServerState extends State<EditServer> {
                   edit();
                 }
               } else {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Selecione pelo menos um diretorio ou arquivo para backup!')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'Selecione pelo menos um diretorio ou arquivo para backup!')));
               }
             } else {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text('Preencha corretamente o formulário!')));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Preencha corretamente o formulário!')));
             }
           },
         )
@@ -247,22 +249,9 @@ class _EditServerState extends State<EditServer> {
     );
   }
 
-  @override
-  void dispose() {
-    nameControl.dispose();
-    super.dispose();
-  }
-}
-
-class DirWideget extends StatelessWidget {
-  const DirWideget(this.fileObject, {Key key, this.onRemove, this.hintText}) : super(key: key);
-
-  final DirectoryItem fileObject;
-  final String hintText;
-  final void Function() onRemove;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget dirWideget(DirectoryItem fileObject, {String hintText}) {
+    var tec = TextEditingController();
+    tec.text = fileObject.path;
     return Flex(
       direction: Axis.horizontal,
       mainAxisSize: MainAxisSize.max,
@@ -273,9 +262,8 @@ class DirWideget extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(0.0),
             child: CustomTextField(
+              nameControl: tec,
               hintText: hintText,
-              //label: 'Diretorio para backup',
-              initialValue: fileObject.path,
               onChanged: (v) => fileObject.path = v,
             ),
           ),
@@ -284,10 +272,21 @@ class DirWideget extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: IconButton(
             icon: Icon(Icons.delete),
-            onPressed: onRemove,
+            onPressed: () {
+              if (fileObjects.length > 1) {
+                fileObjects.remove(fileObject);
+                setState(() {});
+              }
+            },
           ),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    nameControl.dispose();
+    super.dispose();
   }
 }

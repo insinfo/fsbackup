@@ -9,6 +9,7 @@ import 'package:worker_isolated/worker_isolated.dart';
 class BackupTask implements FileTask<Future<bool>> {
   final BackupRoutineModel rotinaBackup;
   LibsshWrapper libssh;
+
   BackupTask(this.rotinaBackup, {this.taskId});
   @override
   Future<bool> execute() {
@@ -53,6 +54,7 @@ class BackupTask implements FileTask<Future<bool>> {
               totalLoaded += currentFileSize;
               taskProgressCallback(totalSize, totalLoaded, 'a');
             },
+            cancelCallback: cancelCallback,
           );
         } else if (item.type == DirectoryItemType.file) {
           var currentFileSize = 0;
@@ -68,13 +70,13 @@ class BackupTask implements FileTask<Future<bool>> {
           totalLoaded += currentFileSize;
           taskProgressCallback(totalSize, totalLoaded, 'a');
         }
-        print('i');
       }
 
       tasklogCallback('${DateTime.now().difference(start)}');
       completer.complete(true);
     } catch (e, s) {
-      tasklogCallback('BackupTask ${rotinaBackup.name} error: $e $s');
+      tasklogCallback('BackupTask ${rotinaBackup.name} error: $e ');
+      print('BackupTask ${rotinaBackup.name} error: $e $s');
       completer.completeError(e);
     } finally {
       // completer.complete(true);
@@ -94,11 +96,14 @@ class BackupTask implements FileTask<Future<bool>> {
   @override
   ProgressCallback taskProgressCallback;
 
+  bool isCanceled = false;
+
   @override
-  void handleCancel(String taskId) {
-    print('handleCancel');
-  }
+  void handleCancel(String taskId) {}
 
   @override
   LogCallback tasklogCallback;
+
+  @override
+  CancelCallback cancelCallback;
 }

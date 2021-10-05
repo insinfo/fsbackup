@@ -12,11 +12,16 @@ void _workerMain(SendPort sendPort) {
     sendPort.send(receivePort.sendPort);
   }
 
+  bool isCanceled = false;
+
   receivePort.listen((dynamic message) {
     if (!_acceptMessage(sendPort, receivePort, message)) return;
 
     try {
-      if (message is Task) {
+      if (message is _WorkerCancel) {
+        isCanceled = true;
+        return;
+      } else if (message is Task) {
         var taskId = '';
         //  print('Worker: execute Task message=$message');
 
@@ -24,7 +29,6 @@ void _workerMain(SendPort sendPort) {
           if (message.actionType == ActionType.upload) {
             taskId = message.taskId;
             mapUploadTask[taskId] = message;
-
             sendPort.send(taskId);
             message.taskProgressCallback = (total, loaded, status) {
               sendPort.send(_WorkerProgress(
@@ -53,6 +57,10 @@ void _workerMain(SendPort sendPort) {
             message.tasklogCallback = (log) {
               sendPort.send(_WorkerLog(log: log, taskId: message.taskId));
             };
+
+            message.cancelCallback = () {
+              return isCanceled;
+            };
           } else if (message.actionType == ActionType.cancelUpload) {
             // print('... CancelUploadTask message=$message');
             mapUploadTask.forEach((taskId, uploadTask) {
@@ -63,7 +71,7 @@ void _workerMain(SendPort sendPort) {
 
             return;
           } else if (message.actionType == ActionType.cancelDownload) {
-            // print('... CancelDownloadTask message=$message');
+            print('_workerMain ... CancelDownloadTask message=$message');
             mapDownloadTask.forEach((taskId, downloadTask) {
               if (taskId == message.taskId) {
                 downloadTask.handleCancel(taskId);
@@ -106,7 +114,8 @@ void _workerMain(SendPort sendPort) {
   });
 }
 
-bool _acceptMessage(SendPort sendPort, ReceivePort receivePort, dynamic message) {
+bool _acceptMessage(
+    SendPort sendPort, ReceivePort receivePort, dynamic message) {
   if (message is _WorkerSignal && message.id == closeSignal.id) {
     sendPort.send(closeSignal);
     receivePort.close();
@@ -116,12 +125,14 @@ bool _acceptMessage(SendPort sendPort, ReceivePort receivePort, dynamic message)
   return true;
 }
 
-void sendException(SendPort sendPort, dynamic exception, StackTrace stackTrace) {
+void sendException(
+    SendPort sendPort, dynamic exception, StackTrace stackTrace) {
   if (exception is Error) {
     exception = Error.safeToString(exception);
   }
 
-  var stackTraceFrames = stackTrace != null ? Trace.from(stackTrace).frames : null;
+  var stackTraceFrames =
+      stackTrace != null ? Trace.from(stackTrace).frames : null;
 
   sendPort.send(_WorkerException(exception, stackTraceFrames));
 }

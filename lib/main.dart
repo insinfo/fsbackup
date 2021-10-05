@@ -4,6 +4,7 @@ import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 
 import 'package:fsbackup/screens/main/main_screen.dart';
+import 'package:fsbackup/services/backup_service.dart';
 
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:google_fonts/google_fonts.dart';
@@ -13,8 +14,13 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,5 +56,11 @@ class MyApp extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()));
           },
         ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    locator<BackupService>().stop();
   }
 }

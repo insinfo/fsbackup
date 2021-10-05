@@ -15,36 +15,43 @@ class _WorkerImpl implements Worker {
   final Queue<WorkerIsolate> isolates = Queue<WorkerIsolate>();
 
   @override
-  Iterable<WorkerIsolate> get availableIsolates => isolates.where((isolate) => isolate.isFree);
+  Iterable<WorkerIsolate> get availableIsolates =>
+      isolates.where((isolate) => isolate.isFree);
 
   @override
-  Iterable<WorkerIsolate> get workingIsolates => isolates.where((isolate) => !isolate.isFree);
+  Iterable<WorkerIsolate> get workingIsolates =>
+      isolates.where((isolate) => !isolate.isFree);
 
   final StreamController<IsolateSpawnedEvent> _isolateSpawnedEventController =
       StreamController<IsolateSpawnedEvent>.broadcast();
 
   @override
-  Stream<IsolateSpawnedEvent> get onIsolateSpawned => _isolateSpawnedEventController.stream;
+  Stream<IsolateSpawnedEvent> get onIsolateSpawned =>
+      _isolateSpawnedEventController.stream;
 
   final StreamController<IsolateClosedEvent> _isolateClosedEventController =
       StreamController<IsolateClosedEvent>.broadcast();
 
   @override
-  Stream<IsolateClosedEvent> get onIsolateClosed => _isolateClosedEventController.stream;
+  Stream<IsolateClosedEvent> get onIsolateClosed =>
+      _isolateClosedEventController.stream;
 
   final StreamController<TaskScheduledEvent> _taskScheduledEventController =
       StreamController<TaskScheduledEvent>.broadcast();
 
   @override
-  Stream<TaskScheduledEvent> get onTaskScheduled => _taskScheduledEventController.stream;
+  Stream<TaskScheduledEvent> get onTaskScheduled =>
+      _taskScheduledEventController.stream;
 
   final StreamController<TaskCompletedEvent> _taskCompletedEventController =
       StreamController<TaskCompletedEvent>.broadcast();
 
   @override
-  Stream<TaskCompletedEvent> get onTaskCompleted => _taskCompletedEventController.stream;
+  Stream<TaskCompletedEvent> get onTaskCompleted =>
+      _taskCompletedEventController.stream;
 
-  final StreamController<TaskFailedEvent> _taskFailedEventController = StreamController<TaskFailedEvent>.broadcast();
+  final StreamController<TaskFailedEvent> _taskFailedEventController =
+      StreamController<TaskFailedEvent>.broadcast();
 
   @override
   Stream<TaskFailedEvent> get onTaskFailed => _taskFailedEventController.stream;
@@ -75,16 +82,20 @@ class _WorkerImpl implements Worker {
 
   @override
   Future handle(Task task,
-      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback}) {
+      {Function(TransferProgress progress) progressCallback,
+      void Function(TaskLog taskLog) logCallback}) {
     if (isClosed) throw Exception('Worker is closed!');
 
     if (task is FileTask &&
-        (task.actionType == ActionType.cancelUpload || task.actionType == ActionType.cancelDownload)) {
+        (task.actionType == ActionType.cancelUpload ||
+            task.actionType == ActionType.cancelDownload)) {
       var taskId = task.taskId;
       for (var workerIsolate in workingIsolates) {
-        //  print('Worker: handle: CancelFileTask: $workerIsolate');
+        print(
+            'worker_impl.dart@handle Worker: handle: CancelFileTask: $workerIsolate');
         if (workerIsolate.taskId == taskId) {
-          workerIsolate.performTask(task, progressCallback: progressCallback, logCallback: logCallback);
+          workerIsolate.performTask(task,
+              progressCallback: progressCallback, logCallback: logCallback);
         }
       }
 
@@ -94,7 +105,8 @@ class _WorkerImpl implements Worker {
     var isolate = _selectIsolate();
 
     if (isolate != null) {
-      return isolate.performTask(task, progressCallback: progressCallback, logCallback: logCallback);
+      return isolate.performTask(task,
+          progressCallback: progressCallback, logCallback: logCallback);
     } else {
       throw Exception('No isolate available');
     }
@@ -108,7 +120,8 @@ class _WorkerImpl implements Worker {
         isolate = _spawnIsolate();
       } else {
         isolate = isolates.firstWhere((isolate) => isolate.isFree,
-            orElse: () => isolates.reduce((a, b) => a.scheduledTasks.length <= b.scheduledTasks.length ? a : b));
+            orElse: () => isolates.reduce((a, b) =>
+                a.scheduledTasks.length <= b.scheduledTasks.length ? a : b));
       }
 
       return isolate;
@@ -125,6 +138,12 @@ class _WorkerImpl implements Worker {
     isolates.add(isolate);
 
     return isolate;
+  }
+
+  Future<dynamic> cancel() async {
+    for (var isolate in isolates) {
+      await isolate.cancel();
+    }
   }
 
   @override
@@ -148,6 +167,7 @@ class _WorkerImpl implements Worker {
 class _WorkerIsolateImpl implements WorkerIsolate {
   Map<String, Function(TransferProgress progress)> mapTaskProgressCallback = {};
   Map<String, Function(TaskLog taskLog)> mapTaskLogCallback = {};
+  Map<String, Function(TaskLog taskLog)> mapTaskCancelCallback = {};
   bool _isClosed = false;
 
   @override
@@ -162,20 +182,25 @@ class _WorkerIsolateImpl implements WorkerIsolate {
   _ScheduledTask _runningScheduledTask;
 
   @override
-  Task get runningTask => _runningScheduledTask != null ? _runningScheduledTask.task : null;
+  Task get runningTask =>
+      _runningScheduledTask != null ? _runningScheduledTask.task : null;
 
   @override
-  List<Task> get scheduledTasks => _scheduledTasks.map((scheduledTask) => scheduledTask.task).toList(growable: false);
+  List<Task> get scheduledTasks => _scheduledTasks
+      .map((scheduledTask) => scheduledTask.task)
+      .toList(growable: false);
 
   @override
   bool get isFree => _scheduledTasks.isEmpty && _runningScheduledTask == null;
 
-  final StreamController<IsolateSpawnedEvent> _spawnEventController = StreamController<IsolateSpawnedEvent>.broadcast();
+  final StreamController<IsolateSpawnedEvent> _spawnEventController =
+      StreamController<IsolateSpawnedEvent>.broadcast();
 
   @override
   Stream<IsolateSpawnedEvent> get onSpawned => _spawnEventController.stream;
 
-  final StreamController<IsolateClosedEvent> _closeEventController = StreamController<IsolateClosedEvent>.broadcast();
+  final StreamController<IsolateClosedEvent> _closeEventController =
+      StreamController<IsolateClosedEvent>.broadcast();
 
   @override
   Stream<IsolateClosedEvent> get onClosed => _closeEventController.stream;
@@ -184,15 +209,18 @@ class _WorkerIsolateImpl implements WorkerIsolate {
       StreamController<TaskScheduledEvent>.broadcast();
 
   @override
-  Stream<TaskScheduledEvent> get onTaskScheduled => _taskScheduledEventController.stream;
+  Stream<TaskScheduledEvent> get onTaskScheduled =>
+      _taskScheduledEventController.stream;
 
   final StreamController<TaskCompletedEvent> _taskCompletedEventController =
       StreamController<TaskCompletedEvent>.broadcast();
 
   @override
-  Stream<TaskCompletedEvent> get onTaskCompleted => _taskCompletedEventController.stream;
+  Stream<TaskCompletedEvent> get onTaskCompleted =>
+      _taskCompletedEventController.stream;
 
-  final StreamController<TaskFailedEvent> _taskFailedEventController = StreamController<TaskFailedEvent>.broadcast();
+  final StreamController<TaskFailedEvent> _taskFailedEventController =
+      StreamController<TaskFailedEvent>.broadcast();
 
   @override
   Stream<TaskFailedEvent> get onTaskFailed => _taskFailedEventController.stream;
@@ -207,12 +235,14 @@ class _WorkerIsolateImpl implements WorkerIsolate {
 
   Future<WorkerIsolate> _spawnIsolate() {
     var completer = Completer<WorkerIsolate>();
-    Isolate.spawn(_workerMain, _receivePort.sendPort).then((isolate) {}, onError: (e) {
-      //print(e);
+    Isolate.spawn(_workerMain, _receivePort.sendPort).then((isolate) {},
+        onError: (e) {
+      print('worker_impl.dart@_spawnIsolate $e');
     });
 
     _receivePort.listen((dynamic message) {
 //      print('Worker: receivePort: $message');
+
       if (message is _WorkerLog) {
         Function callbackLog = mapTaskLogCallback[message.taskId];
         if (callbackLog != null) {
@@ -234,7 +264,8 @@ class _WorkerIsolateImpl implements WorkerIsolate {
         }
         return;
       } else if (message is FileTask &&
-          (message.actionType == ActionType.cancelUpload || message.actionType == ActionType.cancelDownload)) {
+          (message.actionType == ActionType.cancelUpload ||
+              message.actionType == ActionType.cancelDownload)) {
         //print('... CancelFileTask this=$this');
 
         return;
@@ -257,9 +288,10 @@ class _WorkerIsolateImpl implements WorkerIsolate {
 
         return;
       } else if (message is _WorkerException) {
-        _taskFailedEventController
-            .add(TaskFailedEvent(this, _runningScheduledTask.task, message.exception, message.stackTrace));
-        _runningScheduledTask.completer.completeError(message.exception, message.stackTrace);
+        _taskFailedEventController.add(TaskFailedEvent(this,
+            _runningScheduledTask.task, message.exception, message.stackTrace));
+        _runningScheduledTask.completer
+            .completeError(message.exception, message.stackTrace);
       } else if (message is _WorkerSignal) {
         if (message.id == closeSignal.id) {
           _closeEventController.add(IsolateClosedEvent(this));
@@ -268,7 +300,8 @@ class _WorkerIsolateImpl implements WorkerIsolate {
         }
       } else if (message is _WorkerResult) {
         // print('... WorkerResult result=${message.result}, this=$this');
-        _taskCompletedEventController.add(TaskCompletedEvent(this, _runningScheduledTask.task, message.result));
+        _taskCompletedEventController.add(TaskCompletedEvent(
+            this, _runningScheduledTask.task, message.result));
 
         _runningScheduledTask.completer.complete(message.result);
       }
@@ -284,14 +317,22 @@ class _WorkerIsolateImpl implements WorkerIsolate {
     return completer.future;
   }
 
+  ///cancel task
+  Future<dynamic> cancel() async {
+    _sendPort.send(_WorkerCancel(isCanceled: true));
+    return Future.delayed(Duration(milliseconds: 10), () => true);
+  }
+
   @override
   Future performTask(Task task,
-      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback}) {
+      {Function(TransferProgress progress) progressCallback,
+      void Function(TaskLog taskLog) logCallback}) {
     // print('Worker: performTask $task');
     if (isClosed) throw StateError('This WorkerIsolate is closed.');
 
     if (task is FileTask &&
-        (task.actionType == ActionType.cancelUpload || task.actionType == ActionType.cancelDownload)) {
+        (task.actionType == ActionType.cancelUpload ||
+            task.actionType == ActionType.cancelDownload)) {
       //  print('Worker: performTask _sendPort.send of CancelFileTask');
       _sendPort.send(task);
       return Future<void>.value(null);
@@ -299,7 +340,9 @@ class _WorkerIsolateImpl implements WorkerIsolate {
 
     var completer = Completer<void>();
 
-    if (task is FileTask && (task.actionType == ActionType.upload || task.actionType == ActionType.download)) {
+    if (task is FileTask &&
+        (task.actionType == ActionType.upload ||
+            task.actionType == ActionType.download)) {
       mapTaskProgressCallback[task.taskId] = progressCallback;
       mapTaskLogCallback[task.taskId] = logCallback;
     }
@@ -315,7 +358,8 @@ class _WorkerIsolateImpl implements WorkerIsolate {
   void _runNextTask() {
     if (_sendPort == null ||
         _scheduledTasks.isEmpty ||
-        (_runningScheduledTask != null && !_runningScheduledTask.completer.isCompleted)) {
+        (_runningScheduledTask != null &&
+            !_runningScheduledTask.completer.isCompleted)) {
       return;
     }
 
@@ -387,7 +431,8 @@ class _WorkerIsolateImpl implements WorkerIsolate {
       var exception = TaskCancelledException(scheduledTask.task);
       scheduledTask.completer.completeError(exception);
 
-      _taskFailedEventController.add(TaskFailedEvent(this, scheduledTask.task, exception));
+      _taskFailedEventController
+          .add(TaskFailedEvent(this, scheduledTask.task, exception));
     };
 
     if (_runningScheduledTask != null) {
@@ -399,6 +444,16 @@ class _WorkerIsolateImpl implements WorkerIsolate {
 
   @override
   String taskId;
+
+  @override
+  ReceivePort getReceivePort() {
+    return _receivePort;
+  }
+
+  @override
+  SendPort getSendPort() {
+    return _sendPort;
+  }
 }
 
 class _ScheduledTask {
@@ -443,7 +498,8 @@ class _WorkerException {
 
 void mergeStream(EventSink sink, Stream stream) {
   stream.listen((dynamic data) => sink.add(data),
-      onError: (dynamic errorEvent, StackTrace stackTrace) => sink.addError(errorEvent, stackTrace));
+      onError: (dynamic errorEvent, StackTrace stackTrace) =>
+          sink.addError(errorEvent, stackTrace));
 }
 
 // An add code
@@ -460,6 +516,12 @@ class _WorkerProgress {
   String toString() {
     return '_WorkerProgress{loaded=$loaded, total=$total}, status=$status';
   }
+}
+
+class _WorkerCancel {
+  bool isCanceled = false;
+
+  _WorkerCancel({this.isCanceled});
 }
 
 class _WorkerLog {

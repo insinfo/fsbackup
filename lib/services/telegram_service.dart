@@ -6,18 +6,24 @@ class TelegramService {
   var chatId = '971419711'; //isaque
   TeleDart teledart;
   TelegramService();
+  bool isFailed = false;
 
   Future<void> init() async {
-    var telegram = Telegram(tokenBot);
-    var user = await telegram.getMe();
-    //print('user $user');
-    var username = user.username;
-    //print('username $username');
-    var event = Event(username);
-    //print('event $event');
-    teledart = TeleDart(telegram, event);
-    // print('teledart $teledart');
-    teledart.start();
+    try {
+      var telegram = Telegram(tokenBot);
+      var user = await telegram.getMe();
+      //print('user $user');
+      var username = user.username;
+      //print('username $username');
+      var event = Event(username);
+      //print('event $event');
+      teledart = TeleDart(telegram, event);
+      // print('teledart $teledart');
+      teledart.start();
+    } catch (e) {
+      print('TelegramService: Telegram failed');
+      isFailed = true;
+    }
   }
 
   Future<void> sendMessage(String msg) async {
@@ -25,6 +31,8 @@ class TelegramService {
     print('message $message');
     teledart.telegram.sendMessage(message.chat.id, message.chat.id.toString());
   });*/
-    teledart.telegram.sendMessage(chatId, msg);
+    if (isFailed == false) {
+      teledart.telegram.sendMessage(chatId, msg);
+    }
   }
 }

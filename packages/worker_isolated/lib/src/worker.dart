@@ -57,11 +57,14 @@ abstract class Worker {
 
   /// Returns a [Future] with the result of the execution of the [Task].
   Future handle(Task task,
-      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback});
+      {Function(TransferProgress progress) progressCallback,
+      void Function(TaskLog taskLog) logCallback});
 
   /// Closes the [ReceivePort] of the isolates.
   /// Waits until all scheduled tasks have completed if [afterDone] is `true`.
   Future<Worker> close({bool afterDone});
+
+  Future<dynamic> cancel();
 }
 
 /// A representation of an isolate
@@ -93,11 +96,17 @@ abstract class WorkerIsolate {
   factory WorkerIsolate() => _WorkerIsolateImpl();
 
   Future performTask(Task task,
-      {Function(TransferProgress progress) progressCallback, void Function(TaskLog taskLog) logCallback});
+      {Function(TransferProgress progress) progressCallback,
+      void Function(TaskLog taskLog) logCallback});
 
   /// Closes the [ReceivePort] of the isolate.
   /// Waits until all scheduled tasks have completed if [afterDone] is `true`.
   Future<WorkerIsolate> close({bool afterDone});
+
+  ReceivePort getReceivePort();
+  SendPort getSendPort();
+
+  Future<dynamic> cancel();
 }
 
 class TaskCancelledException implements Exception {
@@ -121,9 +130,12 @@ typedef ProgressCallback = void Function(int total, int loaded, String status);
 
 typedef LogCallback = void Function(String log);
 
+typedef CancelCallback = bool Function();
+
 abstract class FileTask<T> extends Task<T> {
   ProgressCallback taskProgressCallback;
   LogCallback tasklogCallback;
+  CancelCallback cancelCallback;
   String taskId;
   ActionType actionType;
 

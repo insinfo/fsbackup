@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:libssh_binding/src/extensions/exec_command_extension.dart';
 import 'package:libssh_binding/src/extensions/scp_extension.dart';
 import 'package:libssh_binding/src/extensions/sftp_extension.dart';
@@ -55,7 +56,9 @@ class LibsshWrapper {
       DynamicLibrary? inDll,
       String ddlname = 'ssh.dll',
       this.verbosity = false}) {
-    var libraryPath = defaultDllPath ? ddlname : path.join(Directory.current.path, ddlname); //'libssh_compiled',
+    var libraryPath = defaultDllPath
+        ? ddlname
+        : path.join(Directory.current.path, ddlname); //'libssh_compiled',
     final dll = inDll == null ? DynamicLibrary.open(libraryPath) : inDll;
     libsshBinding = LibsshBinding(dll);
     mySshSession = initSsh();
@@ -64,14 +67,17 @@ class LibsshWrapper {
   LibsshWrapper.fromOptions(LibssOptions options) {
     var libraryPath = options.defaultDllPath
         ? options.ddlname
-        : path.join(Directory.current.path, options.ddlname); //'libssh_compiled',
+        : path.join(
+            Directory.current.path, options.ddlname); //'libssh_compiled',
     host = options.host;
     username = options.username;
     password = options.password;
     port = options.port;
     verbosity = options.verbosity;
 
-    final dll = options.inDll == null ? DynamicLibrary.open(libraryPath) : options.inDll;
+    final dll = options.inDll == null
+        ? DynamicLibrary.open(libraryPath)
+        : options.inDll;
     libsshBinding = LibsshBinding(dll!);
     mySshSession = initSsh();
   }
@@ -80,13 +86,18 @@ class LibsshWrapper {
   ssh_session initSsh() {
     // Open the session and set the options
     var mySession = libsshBinding.ssh_new();
-    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_HOST, stringToNativeVoid(host));
-    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_PORT, intToNativeVoid(port));
+    libsshBinding.ssh_options_set(
+        mySession, ssh_options_e.SSH_OPTIONS_HOST, stringToNativeVoid(host));
+    libsshBinding.ssh_options_set(
+        mySession, ssh_options_e.SSH_OPTIONS_PORT, intToNativeVoid(port));
     if (verbosity == true) {
       libsshBinding.ssh_options_set(
-          mySession, ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY, intToNativeVoid(SSH_LOG_PROTOCOL));
+          mySession,
+          ssh_options_e.SSH_OPTIONS_LOG_VERBOSITY,
+          intToNativeVoid(SSH_LOG_PROTOCOL));
     }
-    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_USER, stringToNativeVoid(username!));
+    libsshBinding.ssh_options_set(mySession, ssh_options_e.SSH_OPTIONS_USER,
+        stringToNativeVoid(username!));
     return mySession;
   }
 
@@ -97,8 +108,8 @@ class LibsshWrapper {
       isConnected = false;
       throw Exception('Error connecting to host: $host \n');
     }
-    rc =
-        libsshBinding.ssh_userauth_password(mySshSession, stringToNativeInt8(username!), stringToNativeInt8(password!));
+    rc = libsshBinding.ssh_userauth_password(mySshSession,
+        stringToNativeInt8(username!), stringToNativeInt8(password!));
     if (rc != ssh_auth_e.SSH_AUTH_SUCCESS) {
       isConnected = false;
       throw Exception(
@@ -118,26 +129,40 @@ class LibsshWrapper {
   }
 
   /// downloads a file from an SFTP/SCP server
-  Future<void> scpDownloadFileTo(String fullRemotePathSource, String fullLocalPathTarget,
-      {void Function(int, int)? callbackStats, bool recursive = true}) async {
+  Future<void> scpDownloadFileTo(
+      String fullRemotePathSource, String fullLocalPathTarget,
+      {void Function(int, int)? callbackStats,
+      bool recursive = true,
+      bool Function()? cancelCallback}) async {
     isReady();
-    await libsshBinding.scpDownloadFileTo(mySshSession, fullRemotePathSource, fullLocalPathTarget,
-        callbackStats: callbackStats, recursive: recursive);
+
+    await libsshBinding.scpDownloadFileTo(
+        mySshSession, fullRemotePathSource, fullLocalPathTarget,
+        callbackStats: callbackStats,
+        recursive: recursive,
+        cancelCallback: cancelCallback);
   }
 
   /// download one file via SFTP of remote server
   Future<void> sftpDownloadFileTo(String fullRemotePath, String fullLocalPath,
-      {Pointer<sftp_session_struct>? inSftp, Allocator allocator = calloc, bool recursive = true}) async {
+      {Pointer<sftp_session_struct>? inSftp,
+      Allocator allocator = calloc,
+      bool recursive = true}) async {
     isReady();
-    var ftpfile = fullRemotePath.toNativeUtf8(allocator: allocator).cast<Int8>();
-    await libsshBinding.sftpDownloadFileTo(mySshSession, ftpfile, fullLocalPath, inSftp: inSftp, allocator: allocator);
+    var ftpfile =
+        fullRemotePath.toNativeUtf8(allocator: allocator).cast<Int8>();
+    await libsshBinding.sftpDownloadFileTo(mySshSession, ftpfile, fullLocalPath,
+        inSftp: inSftp, allocator: allocator);
   }
 
-  Future<void> sftpDownloadFileToFromRawPath(Uint8List fullRemotePath, String fullLocalPath,
-      {Pointer<sftp_session_struct>? inSftp, Allocator allocator = calloc}) async {
+  Future<void> sftpDownloadFileToFromRawPath(
+      Uint8List fullRemotePath, String fullLocalPath,
+      {Pointer<sftp_session_struct>? inSftp,
+      Allocator allocator = calloc}) async {
     isReady();
 
-    await libsshBinding.sftpDownloadFileToFromRawPath(mySshSession, fullRemotePath, fullLocalPath,
+    await libsshBinding.sftpDownloadFileToFromRawPath(
+        mySshSession, fullRemotePath, fullLocalPath,
         inSftp: inSftp, allocator: allocator);
   }
 
@@ -151,7 +176,8 @@ class LibsshWrapper {
     Allocator allocator = calloc,
   }) {
     isReady();
-    return libsshBinding.execCommandSync(mySshSession, command, allocator: allocator);
+    return libsshBinding.execCommandSync(mySshSession, command,
+        allocator: allocator);
   }
 
   /// experimental as it may not be able to detect the prompt
@@ -164,8 +190,10 @@ class LibsshWrapper {
   /// Listing the contents of a directory
   /// [fullRemotePath] one String fullRemotePath
   /// [allowMalformed] allow Malformed utf8 file and directory name
-  List<DirectoryItem> sftpListDir(String fullRemotePath, {Allocator allocator = calloc, bool allowMalformed = false}) {
-    return libsshBinding.sftpListDir(mySshSession, fullRemotePath, allowMalformed: allowMalformed);
+  List<DirectoryItem> sftpListDir(String fullRemotePath,
+      {Allocator allocator = calloc, bool allowMalformed = false}) {
+    return libsshBinding.sftpListDir(mySshSession, fullRemotePath,
+        allowMalformed: allowMalformed);
   }
 
   /// Listing the contents of a directory
@@ -173,17 +201,21 @@ class LibsshWrapper {
   /// [allowMalformed] allow Malformed utf8 file and directory name
   List<DirectoryItem> sftpListDirFromRawPath(List<int> fullRemotePath,
       {Allocator allocator = calloc, bool allowMalformed = false}) {
-    return libsshBinding.sftpListDirFromRawPath(mySshSession, Uint8List.fromList(fullRemotePath),
+    return libsshBinding.sftpListDirFromRawPath(
+        mySshSession, Uint8List.fromList(fullRemotePath),
         allowMalformed: allowMalformed);
   }
 
   ///return total size in bytes of each file inside folder ignoring linux directory metadata size
-  int getSizeOfDirectory(String remoteDirectoryPath, {bool isThrowException = true}) {
-    return libsshBinding.getSizeOfDirectory(mySshSession, remoteDirectoryPath, isThrowException: isThrowException);
+  int getSizeOfDirectory(String remoteDirectoryPath,
+      {bool isThrowException = true}) {
+    return libsshBinding.getSizeOfDirectory(mySshSession, remoteDirectoryPath,
+        isThrowException: isThrowException);
   }
 
   ///return total size in bytes of file or directory , work on  GNU/Linux systems, tested in debian 10
-  int getSizeOfFileSystemItem(DirectoryItem item, {bool isThrowException = true}) {
+  int getSizeOfFileSystemItem(DirectoryItem item,
+      {bool isThrowException = true}) {
     if (item.type == DirectoryItemType.directory) {
       return getSizeOfDirectory(item.path, isThrowException: isThrowException);
     } else {
@@ -194,19 +226,32 @@ class LibsshWrapper {
   ///return total size in bytes of file , work on  GNU/Linux systems, tested in debian 10
   ///based on https://unix.stackexchange.com/questions/16640/how-can-i-get-the-size-of-a-file-in-a-bash-script/185039#185039
   int getSizeOfFile(String remoteFilePath, {bool isThrowException = true}) {
-    return libsshBinding.getSizeOfFile(mySshSession, remoteFilePath, isThrowException: isThrowException);
+    return libsshBinding.getSizeOfFile(mySshSession, remoteFilePath,
+        isThrowException: isThrowException);
   }
 
   /// [fullLocalDirectoryPathTarget] example c:\downloads
   /// [remoteDirectoryPath] example /var/www
   /// this function work only if remote is linux debian like sytem
-  Future<void> scpDownloadDirectory(String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
+  Future<void> scpDownloadDirectory(
+      String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
       {Allocator allocator = calloc,
-      void Function(int totalBytes, int loaded, int currentFileSize, int countDirectory, int countFiles)? callbackStats,
+      void Function(int totalBytes, int loaded, int currentFileSize,
+              int countDirectory, int countFiles)?
+          callbackStats,
       void Function(Object? obj)? printLog,
+      bool Function()? cancelCallback,
       bool isThrowException = false}) async {
-    await libsshBinding.scpDownloadDirectory(mySshSession, remoteDirectoryPath, fullLocalDirectoryPathTarget,
-        allocator: allocator, callbackStats: callbackStats, printLog: printLog, isThrowException: isThrowException);
+    await libsshBinding.scpDownloadDirectory(
+      mySshSession,
+      remoteDirectoryPath,
+      fullLocalDirectoryPathTarget,
+      allocator: allocator,
+      callbackStats: callbackStats,
+      printLog: printLog,
+      isThrowException: isThrowException,
+      cancelCallback: cancelCallback,
+    );
   }
 
   /// disconnect from server

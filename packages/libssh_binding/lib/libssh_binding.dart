@@ -15,5 +15,5 @@ export 'src/extensions/base_extension.dart';
 export 'src/pscp_binding.dart';
 
 export 'src/models/directory_item.dart';
-
+export 'src/cancellation_token.dart';
 export 'src/libssh_wrapper.dart';

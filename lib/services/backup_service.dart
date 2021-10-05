@@ -31,16 +31,18 @@ class BackupService {
       print('BackupService Cron start');
       dashboardProvider.routines.clear();
       dashboardProvider.routines = await repository.all();
-      dashboardProvider.routines?.forEach((rotina) {
-        if (rotina.startBackup == StartBackup.scheduled) {
-          cron.schedule(
-            Schedule.parse(rotina.whenToBackup),
-            () => backupQueue.add(() => _task(rotina)),
-          );
-        } else {
-          backupQueue.add(() => _task(rotina));
+      if (dashboardProvider.routines != null) {
+        for (var rotina in dashboardProvider.routines) {
+          if (rotina.startBackup == StartBackup.scheduled) {
+            cron.schedule(
+              Schedule.parse(rotina.whenToBackup),
+              () => backupQueue.add(() => _task(rotina)),
+            );
+          } else {
+            backupQueue.add(() => _task(rotina));
+          }
         }
-      });
+      }
       dashboardProvider.updateUi();
     }
 
@@ -50,11 +52,15 @@ class BackupService {
   Future<dynamic> _task(BackupRoutineModel rotina) async {
     print('executando rotina ${rotina.name}');
 
-    var task = BackupTask(rotina, taskId: rotina.id);
+    var task = BackupTask(rotina.cloneWithoutHandleCancel(), taskId: rotina.id);
 
     rotina.log = '';
 
     final worker = Worker(poolSize: 1);
+
+    rotina.handleCancel = () async {
+      await worker.cancel();
+    };
 
     try {
       rotina.status = RoutineStatus.progress;
@@ -68,7 +74,8 @@ class BackupService {
       rotina.status = RoutineStatus.waiting;
     } catch (e) {
       rotina.status = RoutineStatus.failed;
-      telegramService.sendMessage('Erro no backup da rotina ${rotina.name}');
+      telegramService.sendMessage(
+          'Erro no backup da rotina: ${rotina.name}\r\nLog:\r\n${rotina.log}');
     }
 
     repository.update(rotina);
@@ -76,16 +83,24 @@ class BackupService {
   }
 
   Future<void> restart() async {
-    stop();
+    await stop();
     start();
   }
 
   Future<void> stop() async {
     if (isRunning) {
+      if (dashboardProvider.routines != null) {
+        for (var rotina in dashboardProvider.routines) {
+          if (rotina.handleCancel is Future Function()) {
+            await rotina.handleCancel();
+          }
+        }
+      }
       await cron.close();
       backupQueue?.cancel();
       backupQueue?.dispose();
       dashboardProvider.routines.clear();
+
       dashboardProvider.updateUi();
     }
     isRunning = false;

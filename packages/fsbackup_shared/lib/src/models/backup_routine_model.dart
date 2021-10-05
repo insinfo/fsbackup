@@ -39,6 +39,8 @@ class BackupRoutineModel {
   /// quando fazer backup?
   String whenToBackup;
 
+  dynamic handleCancel;
+
   BackupRoutineModel(
       {this.id,
       this.servers,
@@ -63,6 +65,20 @@ class BackupRoutineModel {
     } else {
       return RoutineStatus.waiting;
     }
+  }
+
+  BackupRoutineModel cloneWithoutHandleCancel() {
+    return BackupRoutineModel(
+        id: id,
+        name: name,
+        servers: [...servers],
+        destinationDirectory: destinationDirectory,
+        startBackup: startBackup,
+        status: status,
+        percent: percent,
+        lastBackup: lastBackup,
+        log: log,
+        whenToBackup: whenToBackup);
   }
 
   factory BackupRoutineModel.fromMap(Map<String, dynamic> map) {

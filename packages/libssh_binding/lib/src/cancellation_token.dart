@@ -1,74 +1,34 @@
 import 'dart:async';
 
-//Cancellation token to cancel future in dart
-class CancellationToken {
-  /// list to store complter future
-  final List<Completer<dynamic>> _completers = <Completer<dynamic>>[];
+import 'package:libssh_binding/src/exceptions/libssh_cancel_exception.dart';
 
-  ///cancel error
-  OperationCanceledError? _cancelError;
-
-  /// whether has canceled
-  bool get isCanceled {
-    return _cancelError != null;
+/// You can cancel a request by using a cancel token.
+/// One token can be shared with different requests.
+/// when a token's [cancel] method invoked, all requests
+/// with this token will be cancelled.
+class LibsshCancelToken {
+  LibsshCancelToken() {
+    _completer = Completer<LibsshCancelException>();
   }
 
-  /// if request have been canceled, save the cancel Error.
-  OperationCanceledError? get cancelError => _cancelError;
+  /// If request have been canceled, save the cancel Error.
+  LibsshCancelException? _cancelError;
 
-  /// cancel operation
-  void cancel([String? msg]) {
-    _cancelError = OperationCanceledError(msg ?? 'cancel this token');
-    if (_completers.isNotEmpty) {
-      _completers
-          // ignore: avoid_function_literals_in_foreach_calls
-          .forEach((Completer<dynamic> e) => e.completeError(cancelError!));
-    }
-  }
+  /// If request have been canceled, save the cancel Error.
+  LibsshCancelException? get cancelError => _cancelError;
 
-  /// add a [completer] to this token
-  void _addCompleter(Completer<dynamic> completer) {
-    if (isCanceled) {
-      completer.completeError(_cancelError!);
-      _completers.remove(completer);
-    } else {
-      if (!_completers.contains(completer)) {
-        _completers.add(completer);
-      }
-    }
-  }
+  late Completer<LibsshCancelException> _completer;
 
-  /// remove a [completer] from this token
-  void _removeCompleter(Completer<dynamic> completer) {
-    _completers.remove(completer);
-  }
+  /// whether cancelled
+  bool get isCancelled => _cancelError != null;
 
-  //check whether it has canceled, yes ,throw
-  void throwIfCancellationRequested() {
-    if (isCanceled) {
-      throw OperationCanceledError('this token has aleady canceled');
-    }
-  }
-}
+  /// When cancelled, this future will be resolved.
+  Future<LibsshCancelException> get whenCancel => _completer.future;
 
-class OperationCanceledError extends Error {
-  OperationCanceledError(this.msg);
-  final String msg;
-}
-
-class CancellationTokenSource {
-  static Future<T> register<T>(CancellationToken? cancelToken, Future<T> future) {
-    if (cancelToken != null && !cancelToken.isCanceled) {
-      final Completer<T> completer = Completer<T>();
-      cancelToken._addCompleter(completer);
-      return Future.any(<Future<T>>[completer.future, future]).then<T>((T result) async {
-        cancelToken._removeCompleter(completer);
-        return result;
-      }).catchError((Object error) {
-        cancelToken._removeCompleter(completer);
-      });
-    } else {
-      return future;
-    }
+  /// Cancel the request
+  void cancel([dynamic reason]) {
+    _cancelError = LibsshCancelException(reason);
+    _cancelError!.stackTrace = StackTrace.current;
+    _completer.complete(_cancelError);
   }
 }

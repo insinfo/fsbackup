@@ -39,19 +39,23 @@ class BackupRoutineModel {
   /// quando fazer backup?
   String whenToBackup;
 
+  bool compressAsZip = false;
+
   dynamic handleCancel;
 
-  BackupRoutineModel(
-      {this.id,
-      this.servers,
-      this.name,
-      this.destinationDirectory,
-      this.startBackup,
-      this.status,
-      this.percent,
-      this.lastBackup,
-      this.log,
-      this.whenToBackup});
+  BackupRoutineModel({
+    this.id,
+    this.servers,
+    this.name,
+    this.destinationDirectory,
+    this.startBackup,
+    this.status,
+    this.percent,
+    this.lastBackup,
+    this.log,
+    this.whenToBackup,
+    this.compressAsZip,
+  });
 
   static RoutineStatus statusFromString(String str) {
     if (str == null) {
@@ -69,32 +73,34 @@ class BackupRoutineModel {
 
   BackupRoutineModel cloneWithoutHandleCancel() {
     return BackupRoutineModel(
-        id: id,
-        name: name,
-        servers: [...servers],
-        destinationDirectory: destinationDirectory,
-        startBackup: startBackup,
-        status: status,
-        percent: percent,
-        lastBackup: lastBackup,
-        log: log,
-        whenToBackup: whenToBackup);
+      id: id,
+      name: name,
+      servers: [...servers],
+      destinationDirectory: destinationDirectory,
+      startBackup: startBackup,
+      status: status,
+      percent: percent,
+      lastBackup: lastBackup,
+      log: log,
+      whenToBackup: whenToBackup,
+      compressAsZip: compressAsZip,
+    );
   }
 
   factory BackupRoutineModel.fromMap(Map<String, dynamic> map) {
     var s = BackupRoutineModel(
-      id: map['id'] as String,
-      name: map['name'],
-      destinationDirectory: map['destinationDirectory'],
-      startBackup: map['startBackup'].toString().contains('manual')
-          ? StartBackup.manual
-          : StartBackup.scheduled,
-      status: statusFromString(map['status']),
-      percent: map['percent'] is double ? map['percent'] : 0,
-      lastBackup: DateTime.tryParse(map['lastBackup'].toString()),
-      log: map['log'],
-      whenToBackup: map['whenToBackup'],
-    );
+        id: map['id'] as String,
+        name: map['name'],
+        destinationDirectory: map['destinationDirectory'],
+        startBackup: map['startBackup'].toString().contains('manual')
+            ? StartBackup.manual
+            : StartBackup.scheduled,
+        status: statusFromString(map['status']),
+        percent: map['percent'] is double ? map['percent'] : 0,
+        lastBackup: DateTime.tryParse(map['lastBackup'].toString()),
+        log: map['log'],
+        whenToBackup: map['whenToBackup'],
+        compressAsZip: map['compressAsZip']);
     if (map.containsKey('servers')) {
       s.servers = List<ServerModel>.from(
           map['servers'].map((x) => ServerModel.fromMap(x)));
@@ -114,6 +120,7 @@ class BackupRoutineModel {
       'lastBackup': lastBackup?.toString(),
       'log': log,
       'whenToBackup': whenToBackup,
+      'compressAsZip': compressAsZip,
     };
     if (servers != null) {
       map['servers'] = servers.map((x) => x.toMap()).toList();

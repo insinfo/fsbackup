@@ -9,6 +9,9 @@ import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
 
+import 'package:loading/loading.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+
 class FilaBackupWidget extends StatefulWidget {
   @override
   _FilaBackupWidgetState createState() => _FilaBackupWidgetState();
@@ -58,7 +61,8 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
                                 DataColumn(label: Text('Destino')),
                                 DataColumn(label: Text('%')),
                                 DataColumn(label: Text('Status')),
-                                DataColumn(label: Text('Ações')),
+                                DataColumn(label: Text('')),
+                                //DataColumn(label: Text('Ações')),
                               ],
                               rows: snapshot.data
                                   .map<DataRow>(
@@ -99,9 +103,28 @@ DataRow createItem(BackupRoutineModel routine, BuildContext ctx) {
           '${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
       DataCell(Text('${routine.percent.toStringAsFixed(2)}%')),
       DataCell(Text('${routine.status.text}')),
-      DataCell(Row(children: [
-        //
-      ])),
+      DataCell(
+        routine.status == RoutineStatus.progress
+            ? SizedBox(
+                height: 50,
+                child: Loading(
+                    indicator: BallPulseIndicator(),
+                    size: 50.0,
+                    color: Colors.amber),
+              )
+            : routine.status == RoutineStatus.failed
+                ? Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  )
+                : Icon(
+                    Icons.hourglass_empty,
+                    color: Colors.white,
+                  ),
+      ),
+      /* DataCell(Row(children: [
+        //ações
+      ])),*/
     ],
   );
 }

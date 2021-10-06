@@ -34,7 +34,8 @@ class Utils {
     return myDir;
   }
 
-  static Future<String> createDirectoryIfNotExist(String path) async {
+  static Future<String> createDirectoryIfNotExistInDocuments(
+      String path) async {
     final dir = await getApplicationDocumentsDirectory();
 
     var downloadPath = '${dir.path}/$path';
@@ -50,11 +51,33 @@ class Utils {
     return p;
   }
 
+  static String createDirectoryIfNotExist(String path) {
+    final myDir = Directory(path);
+    if (myDir.existsSync()) {
+      return myDir.path;
+    } else {
+      myDir.createSync(recursive: true);
+    }
+    var p = myDir.path;
+    return p;
+  }
+
+  static Future<Directory> createDirectoryIfNotExist2(String path) async {
+    final myDir = Directory(path);
+    if (myDir.existsSync()) {
+      return myDir;
+    } else {
+      await myDir.create(recursive: true);
+    }
+    return myDir;
+  }
+
   static Future<File> getImageFileFromAssets(String path) async {
     final byteData = await rootBundle.load('assets/$path');
 
     final file = File('${(await getTemporaryDirectory()).path}/$path');
-    await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
 
     return file;
   }

@@ -6,6 +6,7 @@ import 'package:fsbackup/constants.dart';
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/providers/backup_routine_provider.dart';
 import 'package:fsbackup/responsive.dart';
+
 import 'package:fsbackup/shared/components/servidor_picker/servidor_picker.dart';
 import 'package:fsbackup/shared/components/custom_textfield.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
@@ -27,6 +28,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
   var dirDestinoControl = TextEditingController();
   var whenToBackupControl = TextEditingController();
   var dropdownValue = StartBackup.manual;
+  var compressAsZip = false;
   ServerModel server;
 
   @override
@@ -45,6 +47,8 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
     whenToBackupControl.text =
         widget.routine == null ? '' : widget.routine.whenToBackup;
     server = widget.routine == null ? null : widget.routine.servers.first;
+    compressAsZip =
+        widget.routine == null ? false : widget.routine.compressAsZip;
     /*if (widget.rotina != null) {
       if (widget.rotina.servidores != null && widget.rotina.servidores.isNotEmpty) {
         servidor = widget.rotina.servidores.first;
@@ -62,6 +66,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
     model.startBackup = dropdownValue;
     model.whenToBackup = whenToBackupControl.text;
     model.servers = [server];
+    model.compressAsZip = compressAsZip;
   }
 
   void edit() async {
@@ -183,6 +188,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
               ),
               if (dropdownValue == StartBackup.scheduled)
                 Container(
+                  padding: EdgeInsets.only(bottom: 3),
                   width: width,
                   child: /*CronFormField(
                       initialValue: '0 18 * * *',
@@ -197,6 +203,22 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                               'Ex: A cada minuto: "* * * * *" ou todos os dias às 18h: "0 18 * * *"',
                           label: 'Quando fazer?'),
                 ),
+              Row(children: [
+                Padding(
+                  padding: EdgeInsets.only(right: 20),
+                  child: Text('Comprimir:',
+                      style: TextStyle(color: Colors.white.withAlpha(150))),
+                ),
+                Switch(
+                  activeColor: Colors.pinkAccent,
+                  value: compressAsZip,
+                  onChanged: (value) {
+                    setState(() {
+                      compressAsZip = value;
+                    });
+                  },
+                ),
+              ]),
             ],
           ),
         );

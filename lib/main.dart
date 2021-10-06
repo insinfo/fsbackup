@@ -1,3 +1,4 @@
+import 'package:f_logs/f_logs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fsbackup/app_injector.dart';
@@ -11,6 +12,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
+  var config = FLog.getDefaultConfigurations();
+
+  config.dataLogTypes = [DataLogType.DEFAULT.toString()];
+  config.formatType = FormatType.FORMAT_SQUARE;
+
+  FLog.applyConfigurations(config);
   runApp(MyApp());
 }
 

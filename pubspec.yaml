@@ -34,7 +34,7 @@ dependencies:
   process_run: ^0.12.1+1    
   google_fonts: any
   flutter_svg: ^0.22.0
-  fl_chart: ^0.36.4
+  fl_chart: ^0.36.4  
   provider: ^6.0.0
   data_table_2: ^2.1.1
   get_it: ^7.2.0
@@ -49,14 +49,16 @@ dependencies:
   #os: ^0.1.2
   web_socket_channel: any
   teledart: ^0.2.1
+  f_logs: ^2.0.0
   worker_isolated:
     path: packages/worker_isolated
   fsbackup_shared:
     path: packages/fsbackup_shared
   os:
     path: packages/os_utils
-
+  slugify: ^2.0.0
   file_picker: ^4.0.3
+  loading: ^1.0.2
   #mask_text_input_formatter: ^2.0.0
   #docking: ^0.6.0 #https://pub.dev/packages/docking
 
@@ -68,7 +70,8 @@ dependencies:
   sftp_file_picker:
     path: packages/sftp_file_picker
   #dcli: any
-
+  archive: ^3.1.5
+  
 dev_dependencies:
   #flutter_test:
     #sdk: flutter

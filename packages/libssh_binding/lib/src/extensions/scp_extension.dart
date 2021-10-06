@@ -283,7 +283,8 @@ extension ScpExtension on LibsshBinding {
 
     totalSize = getSizeOfDirectory(session, remoteDirectoryPath,
         isThrowException: isThrowException);
-    printFunc('Total Size: $totalSize of directory $remoteDirectoryPath');
+    printFunc(
+        'scpDownloadDirectory: total size: $totalSize of directory $remoteDirectoryPath');
     var scp = initDirectoryScp(session, source);
 
     var rc = 0;
@@ -372,14 +373,15 @@ extension ScpExtension on LibsshBinding {
           //print("End of directory ");
           break;
         case ssh_scp_request_types.SSH_SCP_REQUEST_EOF:
-          printFunc("scpDownloadDirectory: End of directories");
+          printFunc("scpDownloadDirectory: end of directories");
           exitLoop = true;
           break;
         default:
           break;
       }
     } while (true);
-    printFunc('Total Size: $totalSize | Copied: $loaded ');
+    printFunc(
+        'scpDownloadDirectory: total size: $totalSize | copied: $loaded ');
     allocator.free(source);
     ssh_scp_close(scp);
     ssh_scp_free(scp);

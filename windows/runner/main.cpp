@@ -8,7 +8,7 @@
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
 
-   //add this lines for prevent  multiple instances of application                   
+   //add this lines for prevent  multiple instances of application  isaque adicionou isso                 
 	HANDLE hMutexHandle = CreateMutex(NULL, TRUE, L"com.mutex.fsbackup");
 	HWND handle=FindWindowA(NULL, "fsbackup");
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
@@ -40,7 +40,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
     CreateAndAttachConsole();
   }
-
+  // Workaround from: https://github.com/dart-lang/sdk/issues/39945#issuecomment-870428151 isaque adicionou isso para esconder a janela de console do process.start
+  else {
+    AllocConsole();
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+  }
+  // Workaround end
+  
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -69,11 +75,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   ::CoUninitialize();
 
     //add this lines for prevent  multiple instances of application 
-   // Upon app closing:
-   
+   // Upon app closing: isaque adicionou isso    
    ReleaseMutex( hMutexHandle ); // Explicitly release mutex
-   CloseHandle( hMutexHandle ); // close handle before terminating
-   
+   CloseHandle( hMutexHandle ); // close handle before terminating   
 
   return EXIT_SUCCESS;
 }

@@ -1,4 +1,5 @@
 import 'package:cron/cron.dart';
+import 'package:f_logs/f_logs.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup/providers/log_provider.dart';
@@ -12,7 +13,7 @@ import 'package:worker_isolated/worker_isolated.dart';
 class BackupService {
   final BackupRoutineRepository repository;
   final FilaProvider dashboardProvider;
-  TelegramService telegramService;
+
   LogProvider logProvider;
   bool isRunning = false;
 
@@ -20,8 +21,7 @@ class BackupService {
   Queue backupQueue;
 
   BackupService(this.repository, this.dashboardProvider) {
-    telegramService = TelegramService();
-    telegramService.init();
+    //
   }
   Future<void> start() async {
     if (isRunning == false) {
@@ -53,11 +53,8 @@ class BackupService {
     print('executando rotina ${rotina.name}');
 
     var task = BackupTask(rotina.cloneWithoutHandleCancel(), taskId: rotina.id);
-
     rotina.log = '';
-
     final worker = Worker(poolSize: 1);
-
     rotina.handleCancel = () async {
       await worker.cancel();
     };
@@ -71,14 +68,29 @@ class BackupService {
         rotina.log += '${taskLog.log}\r\n';
         logProvider.addLine(taskLog.log);
       });
+      rotina.lastBackup = DateTime.now();
       rotina.status = RoutineStatus.waiting;
-    } catch (e) {
+    } catch (e, s) {
+      rotina.percent = 0;
       rotina.status = RoutineStatus.failed;
-      telegramService.sendMessage(
-          'Erro no backup da rotina: ${rotina.name}\r\nLog:\r\n${rotina.log}');
+
+      FLog.info(
+        className: 'BackupService',
+        methodName: '_task',
+        text: 'Erro na execução da rotina de backup: ${rotina.name}',
+        /* type: LogLevel.SEVERE,
+          exception: e,
+          stacktrace: s*/
+      );
+
+      var t = TelegramService();
+      await t.init();
+      await t.sendMessage(
+          'Erro na execução da rotina de backup: ${rotina.name}\r\nLog:\r\n${rotina.log}');
     }
 
     repository.update(rotina);
+    dashboardProvider.updateUi();
     //fim
   }
 

@@ -36,7 +36,7 @@ Future appInjector() async {
     locator.registerSingleton<BackupService>(BackupService(
         locator<BackupRoutineRepository>(), locator<FilaProvider>()));
 
-    locator<BackupService>().start();
+    //locator<BackupService>().start();
 
     isLoadedDb = true;
   }

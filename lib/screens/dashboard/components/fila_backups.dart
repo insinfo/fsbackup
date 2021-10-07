@@ -3,7 +3,6 @@ import 'package:fsbackup/constants.dart';
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
@@ -87,10 +86,9 @@ DataRow createItem(BackupRoutineModel routine, BuildContext ctx) {
       DataCell(
         Row(
           children: [
-            SvgPicture.asset(
-              routine.icon,
-              height: 30,
-              width: 30,
+            Icon(
+              Icons.access_time,
+              color: Colors.blueAccent,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: defaultPadding),

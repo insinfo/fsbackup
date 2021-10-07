@@ -145,6 +145,11 @@ extension ScpExtension on LibsshBinding {
       ssh_scp_free(scp);
     }
   }
+  //copy all files from a directory to a remote directory using scp?
+  //scp -r ~/local_dir user@host.com:/var/www/html/target_dir
+  //scp -r /var/www/html/portal2018/wp-content/themes/pmro/educacao isaque.neves@192.168.133.13:/var/www/html/educacao
+  //nano /etc/nginx/sites-enabled/default
+  // find ./ -type f -print0 | xargs -0 stat --format=%s | awk '{s+=$1} END {print s}'
 
   ///return total size in bytes of each file inside folder ignoring linux directory metadata size
   int getSizeOfDirectory(

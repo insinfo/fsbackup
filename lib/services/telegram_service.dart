@@ -1,3 +1,4 @@
+import 'package:f_logs/f_logs.dart';
 import 'package:teledart/teledart.dart';
 import 'package:teledart/telegram.dart';
 
@@ -23,7 +24,10 @@ class TelegramService {
       // print('teledart $teledart');
       // teledart.start();
     } catch (e) {
-      print('TelegramService: Telegram failed');
+      FLog.info(
+          className: 'TelegramService',
+          methodName: 'init',
+          text: 'TelegramService: Telegram failed $e');
       isFailed = true;
     }
   }

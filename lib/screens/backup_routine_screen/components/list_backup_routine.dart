@@ -2,7 +2,7 @@ import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:fsbackup/providers/backup_routine_provider.dart';
 import 'package:fsbackup/screens/backup_routine_screen/components/edit_backup_routine.dart';
 import 'package:fsbackup/screens/backup_routine_screen/components/log_view_dialog.dart';
@@ -93,10 +93,9 @@ class ListBackupRoutine extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              SvgPicture.asset(
-                routine.icon,
-                height: 30,
-                width: 30,
+              Icon(
+                Icons.event_available,
+                color: Colors.purpleAccent,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),

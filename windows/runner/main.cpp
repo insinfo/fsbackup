@@ -9,7 +9,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
 
    //add this lines for prevent  multiple instances of application  isaque adicionou isso                 
-	HANDLE hMutexHandle = CreateMutex(NULL, TRUE, L"com.mutex.fsbackup");
+	HANDLE hMutexHandle = CreateMutex(NULL, TRUE, L"br.gov.rj.riodasostras.fsbackup");
 	HWND handle=FindWindowA(NULL, "fsbackup");
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{

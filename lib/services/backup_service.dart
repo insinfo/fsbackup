@@ -70,7 +70,7 @@ class BackupService {
       });
       rotina.lastBackup = DateTime.now();
       rotina.status = RoutineStatus.waiting;
-    } catch (e, s) {
+    } catch (e) {
       rotina.percent = 0;
       rotina.status = RoutineStatus.failed;
 

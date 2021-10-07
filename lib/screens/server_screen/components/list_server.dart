@@ -2,7 +2,7 @@ import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/screens/server_screen/components/edit_server.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
@@ -29,24 +29,42 @@ class ListServer extends StatelessWidget {
             width: double.infinity,
             child: ChangeNotifierProvider.value(
               value: locator<ServerProvider>(),
-              builder: (context, w) => Consumer<ServerProvider>(builder: (ctx, data, child) {
+              builder: (context, w) =>
+                  Consumer<ServerProvider>(builder: (ctx, data, child) {
                 return FutureBuilder<List<ServerModel>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(child: Text(AppLocalizations.of(context).noItems));
+                          return Center(
+                              child:
+                                  Text(AppLocalizations.of(context).noItems));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
-                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnHost)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnPort)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnActions)),
+                                DataColumn(
+                                    label: Text(AppLocalizations.of(context)
+                                        .columnName)),
+                                DataColumn(
+                                    label: Text(AppLocalizations.of(context)
+                                        .columnHost)),
+                                DataColumn(
+                                    label: Text(AppLocalizations.of(context)
+                                        .columnPort)),
+                                DataColumn(
+                                    label: Center(
+                                  child: Text(
+                                    AppLocalizations.of(context).columnActions,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
                               ],
-                              rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
+                              rows: snapshot.data
+                                  .map<DataRow>(
+                                      (server) => servidorDataRow(server, ctx))
+                                  .toList());
                         }
                       }
                       return Center(child: CircularProgressIndicator());
@@ -65,7 +83,10 @@ class ListServer extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              SvgPicture.asset(server.icon, height: 30, width: 30),
+              Icon(
+                Icons.dns,
+                color: Colors.pinkAccent,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: Text(server.name == null ? '' : server.name),
@@ -76,6 +97,7 @@ class ListServer extends StatelessWidget {
         DataCell(Text('${server.host}')),
         DataCell(Text('${server.port}')),
         DataCell(Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
                 icon: Icon(Icons.edit),
@@ -94,17 +116,21 @@ class ListServer extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text("Alert"),
-                        content: Text(AppLocalizations.of(context).confirmDeletionMessage),
+                        content: Text(AppLocalizations.of(context)
+                            .confirmDeletionMessage),
                         actions: <Widget>[
                           TextButton(
                               onPressed: () async {
                                 Navigator.of(context).pop(true);
-                                await locator<ServerProvider>().delete(server.id);
+                                await locator<ServerProvider>()
+                                    .delete(server.id);
                               },
-                              child: Text(AppLocalizations.of(context).btnDelete)),
+                              child:
+                                  Text(AppLocalizations.of(context).btnDelete)),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child: Text(AppLocalizations.of(context).btnCancelar),
+                            child:
+                                Text(AppLocalizations.of(context).btnCancelar),
                           ),
                         ],
                       );

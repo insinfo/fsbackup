@@ -113,16 +113,18 @@ class BackupTask implements FileTask<Future<bool>> {
       tasklogCallback(
           'total backup run time: ${DateTime.now().difference(start)}');
       completer.complete(true);
-    } catch (e, s) {
+    } catch (e) {
       tasklogCallback('BackupTask ${rotinaBackup.name} error: $e ');
       //remove o arquivo imcompleto
       if (rotinaBackup.compressAsZip == true && zipFileName.isNotEmpty) {
         if (await File(zipFileName).exists()) {
           await File(zipFileName).delete();
+          tasklogCallback('remove $zipFileName');
         }
       }
       if (await Directory(destinationDirectory).exists()) {
         await Directory(destinationDirectory).delete(recursive: true);
+        tasklogCallback('remove $destinationDirectory');
       }
 
       //print('backupTask ${rotinaBackup.name} error: $e $s');

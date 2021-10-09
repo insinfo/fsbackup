@@ -51,12 +51,12 @@ class Utils {
     return p;
   }
 
-  static String createDirectoryIfNotExist(String path) {
+  static Future<String> createDirectoryIfNotExist(String path) async {
     final myDir = Directory(path);
-    if (myDir.existsSync()) {
+    if (await myDir.exists()) {
       return myDir.path;
     } else {
-      myDir.createSync(recursive: true);
+      await myDir.create(recursive: true);
     }
     var p = myDir.path;
     return p;
@@ -64,7 +64,7 @@ class Utils {
 
   static Future<Directory> createDirectoryIfNotExist2(String path) async {
     final myDir = Directory(path);
-    if (myDir.existsSync()) {
+    if (await myDir.exists()) {
       return myDir;
     } else {
       await myDir.create(recursive: true);

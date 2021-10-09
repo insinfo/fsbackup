@@ -29,6 +29,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
   var whenToBackupControl = TextEditingController();
   var dropdownValue = StartBackup.manual;
   var compressAsZip = false;
+  var dontStopIfFileException = false;
   ServerModel server;
 
   @override
@@ -49,6 +50,8 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
     server = widget.routine == null ? null : widget.routine.servers.first;
     compressAsZip =
         widget.routine == null ? false : widget.routine.compressAsZip;
+    dontStopIfFileException =
+        widget.routine == null ? false : widget.routine.dontStopIfFileException;
     /*if (widget.rotina != null) {
       if (widget.rotina.servidores != null && widget.rotina.servidores.isNotEmpty) {
         servidor = widget.rotina.servidores.first;
@@ -67,6 +70,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
     model.whenToBackup = whenToBackupControl.text;
     model.servers = [server];
     model.compressAsZip = compressAsZip;
+    model.dontStopIfFileException = dontStopIfFileException;
   }
 
   void edit() async {
@@ -204,6 +208,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                           label: 'Quando fazer?'),
                 ),
               Row(children: [
+                //Comprimir
                 Padding(
                   padding: EdgeInsets.only(right: 20),
                   child: Text('Comprimir:',
@@ -215,6 +220,21 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                   onChanged: (value) {
                     setState(() {
                       compressAsZip = value;
+                    });
+                  },
+                ),
+                //não pare
+                Padding(
+                  padding: EdgeInsets.only(right: 20),
+                  child: Text('Ignorar falha de arquivo:',
+                      style: TextStyle(color: Colors.white.withAlpha(150))),
+                ),
+                Switch(
+                  activeColor: Colors.pinkAccent,
+                  value: dontStopIfFileException,
+                  onChanged: (value) {
+                    setState(() {
+                      dontStopIfFileException = value;
                     });
                   },
                 ),

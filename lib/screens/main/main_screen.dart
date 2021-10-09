@@ -3,10 +3,9 @@ import 'package:fsbackup/app_injector.dart';
 
 import 'package:fsbackup/providers/menu_provider.dart';
 import 'package:fsbackup/responsive.dart';
+import 'package:fsbackup/screens/main/components/side_menu.dart';
 
 import 'package:fsbackup/shared/routes.dart';
-
-import 'components/side_menu.dart';
 
 class MainScreen extends StatelessWidget {
   @override
@@ -32,7 +31,8 @@ class MainScreen extends StatelessWidget {
                 // It takes 5/6 part of the screen
                 flex: 5,
                 child: Navigator(
-                  key: navigatorKey, initialRoute: '/', onGenerateRoute: onGenerateRoute,
+                  key: navigatorKey, initialRoute: '/',
+                  onGenerateRoute: onGenerateRoute,
                   // DashboardScreen(),
                 )),
           ],

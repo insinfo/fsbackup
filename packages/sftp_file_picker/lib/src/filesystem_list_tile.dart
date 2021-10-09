@@ -26,7 +26,7 @@ class FilesystemListTile extends StatelessWidget {
   Widget _leading(BuildContext context) {
     if (item.type == DirectoryItemType.directory) {
       return Icon(
-        Icons.folder,
+        item.isSymbolicLink == true ? Icons.drive_file_move : Icons.folder,
         color: folderIconColor ?? Theme.of(context).unselectedWidgetColor,
         size: iconSize,
       );
@@ -37,13 +37,21 @@ class FilesystemListTile extends StatelessWidget {
 
   /// Set the icon for a file
   Icon _fileIcon(String filename, Color color) {
-    IconData icon = Icons.description;
-
-    final _extension = filename.split(".").last;
-    if (_extension == "db" || _extension == "sqlite" || _extension == "sqlite3") {
-      icon = Icons.dns;
-    } else if (_extension == "jpg" || _extension == "jpeg" || _extension == "png") {
-      icon = Icons.image;
+    var icon = Icons.description;
+    if (filename.contains('.')) {
+      final _extension = filename.split(".").last;
+      if (_extension == "db" ||
+          _extension == "sqlite" ||
+          _extension == "sqlite3") {
+        icon = Icons.dns;
+      } else if (_extension == "jpg" ||
+          _extension == "jpeg" ||
+          _extension == "png") {
+        icon = Icons.image;
+      }
+    }
+    if (item.isSymbolicLink == true) {
+      icon = Icons.upload_file;
     }
     // default
     return Icon(
@@ -79,7 +87,8 @@ class FilesystemListTile extends StatelessWidget {
         title: Text(Path.basename(item.path), textScaleFactor: 1.2),
         onTap: (item.type == DirectoryItemType.directory)
             ? () => onChange(item)
-            : ((fsType == FilesystemType.file && fileTileSelectMode == FileTileSelectMode.wholeTile)
+            : ((fsType == FilesystemType.file &&
+                    fileTileSelectMode == FileTileSelectMode.wholeTile)
                 ? () => onSelect(item)
                 : null));
   }

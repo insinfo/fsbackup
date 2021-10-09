@@ -9,22 +9,29 @@ import 'libssh_binding.dart';
 /// Bindings to sftp
 
 class sftp_attributes_struct extends ffi.Struct {
+  ///char * 	name
   external ffi.Pointer<ffi.Int8> name;
 
+  ///char *longname; /* ls -l output on openssh, not reliable else */
   external ffi.Pointer<ffi.Int8> longname;
 
+  /// uint32_t flags;
   @ffi.Uint32()
   external int flags;
 
+  /// uint8_t 	type, file type flags SSH_FILEXFER_TYPE_SYMLINK | SSH_FILEXFER_TYPE_REGULAR | SSH_FILEXFER_TYPE_DIRECTORY | SSH_FILEXFER_TYPE_UNKNOWN
   @ffi.Uint8()
   external int type;
 
+  ///uint64_t size , size of file, in bytes
   @ffi.Uint64()
   external int size;
 
+  ///uint32_t  uid, numerical representation of the user owner of the file
   @ffi.Uint32()
   external int uid;
 
+  ///uint32_t gid, numerical representation of the group owner of the file
   @ffi.Uint32()
   external int gid;
 
@@ -32,15 +39,18 @@ class sftp_attributes_struct extends ffi.Struct {
 
   external ffi.Pointer<ffi.Int8> group;
 
+  /// bitmask of permissions
   @ffi.Uint32()
   external int permissions;
 
   @ffi.Uint64()
   external int atime64;
 
+  ///access time of file
   @ffi.Uint32()
   external int atime;
 
+  ///access time of file
   @ffi.Uint32()
   external int atime_nseconds;
 
@@ -50,9 +60,11 @@ class sftp_attributes_struct extends ffi.Struct {
   @ffi.Uint32()
   external int createtime_nseconds;
 
+  /// modified time of file
   @ffi.Uint64()
   external int mtime64;
 
+  /// modified time of file
   @ffi.Uint32()
   external int mtime;
 
@@ -289,7 +301,7 @@ typedef sftp_statvfs_t = ffi.Pointer<sftp_statvfs_struct>;
 typedef sftp_client_message = ffi.Pointer<sftp_client_message_struct>;
 
 const int LIBSFTP_VERSION = 3;
-
+/* SFTP commands and constants */
 const int SSH_FXP_INIT = 1;
 
 const int SSH_FXP_VERSION = 2;
@@ -343,7 +355,10 @@ const int SSH_FXP_ATTRS = 105;
 const int SSH_FXP_EXTENDED = 200;
 
 const int SSH_FXP_EXTENDED_REPLY = 201;
-
+/* attributes */
+/* sftp draft is completely braindead : version 3 and 4 have different flags for same constants */
+/* and even worst, version 4 has same flag for 2 different constants */
+/* follow up : i won't develop any sftp4 compliant library before having a clarification */
 const int SSH_FILEXFER_ATTR_SIZE = 1;
 
 const int SSH_FILEXFER_ATTR_PERMISSIONS = 4;
@@ -366,10 +381,14 @@ const int SSH_FILEXFER_ATTR_EXTENDED = 2147483648;
 
 const int SSH_FILEXFER_ATTR_UIDGID = 2;
 
+// types
+/// is file
 const int SSH_FILEXFER_TYPE_REGULAR = 1;
 
+///i s directory
 const int SSH_FILEXFER_TYPE_DIRECTORY = 2;
 
+/// is symbolic link
 const int SSH_FILEXFER_TYPE_SYMLINK = 3;
 
 const int SSH_FILEXFER_TYPE_SPECIAL = 4;
@@ -403,7 +422,7 @@ const int SSH_FX_FILE_ALREADY_EXISTS = 11;
 const int SSH_FX_WRITE_PROTECT = 12;
 
 const int SSH_FX_NO_MEDIA = 13;
-
+//***************** file flags *****************
 const int SSH_FXF_READ = 1;
 
 const int SSH_FXF_WRITE = 2;
@@ -418,22 +437,31 @@ const int SSH_FXF_EXCL = 32;
 
 const int SSH_FXF_TEXT = 64;
 
+//***************** start file type flags *****************
 const int SSH_S_IFMT = 61440;
 
+///Teste para um soquete
 const int SSH_S_IFSOCK = 49152;
 
+///Teste para um link simbólico
 const int SSH_S_IFLNK = 40960;
 
+///Teste para um arquivo normal
 const int SSH_S_IFREG = 32768;
 
+///Teste para um arquivo especial de bloco
 const int SSH_S_IFBLK = 24576;
 
+///Teste para um diretório
 const int SSH_S_IFDIR = 16384;
 
+///Teste para um arquivo especial de caracteres
 const int SSH_S_IFCHR = 8192;
 
+///Teste para um tubo ou arquivo especial FIFO
 const int SSH_S_IFIFO = 4096;
-
+//***************** end file type flags *****************
+/* rename flags */
 const int SSH_FXF_RENAME_OVERWRITE = 1;
 
 const int SSH_FXF_RENAME_ATOMIC = 2;
@@ -477,7 +505,9 @@ const int SFTP_READLINK = 19;
 const int SFTP_SYMLINK = 20;
 
 const int SFTP_EXTENDED = 200;
-
+// openssh flags
+/// read-only
 const int SSH_FXE_STATVFS_ST_RDONLY = 1;
 
+/// no setuid
 const int SSH_FXE_STATVFS_ST_NOSUID = 2;

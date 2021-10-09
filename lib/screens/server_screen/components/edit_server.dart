@@ -262,6 +262,7 @@ class _EditServerState extends State<EditServer> {
           child: Padding(
             padding: EdgeInsets.all(0.0),
             child: CustomTextField(
+              readOnly: true,
               nameControl: tec,
               hintText: hintText,
               onChanged: (v) => fileObject.path = v,

@@ -41,6 +41,9 @@ class BackupRoutineModel {
 
   bool compressAsZip = false;
 
+  /// não parar backup em casa de falha em algum arquivo
+  bool dontStopIfFileException = false;
+
   dynamic handleCancel;
 
   BackupRoutineModel({
@@ -55,6 +58,7 @@ class BackupRoutineModel {
     this.log,
     this.whenToBackup,
     this.compressAsZip,
+    this.dontStopIfFileException = false,
   });
 
   static RoutineStatus statusFromString(String str) {
@@ -84,6 +88,7 @@ class BackupRoutineModel {
       log: log,
       whenToBackup: whenToBackup,
       compressAsZip: compressAsZip,
+      dontStopIfFileException: dontStopIfFileException,
     );
   }
 
@@ -100,7 +105,8 @@ class BackupRoutineModel {
         lastBackup: DateTime.tryParse(map['lastBackup'].toString()),
         log: map['log'],
         whenToBackup: map['whenToBackup'],
-        compressAsZip: map['compressAsZip']);
+        compressAsZip: map['compressAsZip'],
+        dontStopIfFileException: map['dontStopIfFileException']);
     if (map.containsKey('servers')) {
       s.servers = List<ServerModel>.from(
           map['servers'].map((x) => ServerModel.fromMap(x)));
@@ -121,6 +127,7 @@ class BackupRoutineModel {
       'log': log,
       'whenToBackup': whenToBackup,
       'compressAsZip': compressAsZip,
+      'dontStopIfFileException': dontStopIfFileException,
     };
     if (servers != null) {
       map['servers'] = servers.map((x) => x.toMap()).toList();

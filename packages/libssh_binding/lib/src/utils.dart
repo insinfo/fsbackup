@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
+import 'package:libssh_binding/src/numeral_system_converter.dart';
 
 Pointer<Void> stringToNativeVoid(String str, {Allocator allocator = calloc}) {
   final units = utf8.encode(str);
@@ -82,13 +83,210 @@ Uint8List concatUint8List(List<Uint8List> lists) {
   return bytesBuilder.toBytes();
 }
 
+dynamic permToCct(String $permissions) {
+  var $mode = 0;
+  if ($permissions[0] == '1') $mode += 01000;
+  if ($permissions[0] == '2') $mode += 02000;
+  if ($permissions[0] == '3') $mode += 03000;
+  if ($permissions[0] == '4') $mode += 04000;
+  if ($permissions[0] == '5') $mode += 05000;
+  if ($permissions[0] == '6') $mode += 06000;
+  if ($permissions[0] == '7') $mode += 07000;
+
+  if ($permissions[1] == '1') $mode += 0100;
+  if ($permissions[1] == '2') $mode += 0200;
+  if ($permissions[1] == '3') $mode += 0300;
+  if ($permissions[1] == '4') $mode += 0400;
+  if ($permissions[1] == '5') $mode += 0500;
+  if ($permissions[1] == '6') $mode += 0600;
+  if ($permissions[1] == '7') $mode += 0700;
+
+  if ($permissions[2] == '1') $mode += 010;
+  if ($permissions[2] == '2') $mode += 020;
+  if ($permissions[2] == '3') $mode += 030;
+  if ($permissions[2] == '4') $mode += 040;
+  if ($permissions[2] == '5') $mode += 050;
+  if ($permissions[2] == '6') $mode += 060;
+  if ($permissions[2] == '7') $mode += 070;
+
+  if ($permissions[3] == '1') $mode += 01;
+  if ($permissions[3] == '2') $mode += 02;
+  if ($permissions[3] == '3') $mode += 03;
+  if ($permissions[3] == '4') $mode += 04;
+  if ($permissions[3] == '5') $mode += 05;
+  if ($permissions[3] == '6') $mode += 06;
+  if ($permissions[3] == '7') $mode += 07;
+
+  return ($mode);
+}
+
+/// ex: stringPermissionToOctal('-rwxrwxrwx') => 777
+/// [value] input '-rwxrwxrwx' => 777
+String stringPermissionToOctal(String value, {bool withType = false}) {
+  // drwxr-xr-x
+  // skip first d
+  // go through remaining in sets of 3
+  var output = '';
+  var grouping = 0;
+  int permission = 0;
+  var combinedPermission = 0;
+  var fileType = '';
+  var charPosition = 1;
+  for (var i = 0; i < value.length; i++) {
+    var alpha = value[i]; //charCodeAt
+
+    // leading '-', ie. files, not directories
+    if (i == 0 && alpha == '-') {
+      grouping = 0;
+      if (withType) {
+        fileType = 'File: ';
+      }
+      continue;
+    }
+
+    // If first char entered is 'd' we're dealing with a directory
+    if (i == 0 && alpha == 'd') {
+      grouping = 0;
+      if (withType) {
+        fileType = 'Directory: ';
+      }
+      continue;
+    }
+
+    // Valid characters entered
+    if (i >= 1 && (alpha.allMatches('[rwx-]').toList().isEmpty == true)) {
+      return "Invalid";
+    }
+
+    // update character position validator when user starts with read
+    if (i == 0 && alpha == 'r') {
+      charPosition = 0;
+    }
+
+    // char positions matter drwx-rxw-x
+    if ((i == charPosition ||
+            i == (charPosition + 3) ||
+            i == (charPosition + 6)) &&
+        (alpha.allMatches('[r-]').toList().isEmpty == true)) {
+      return "Invalid";
+    }
+    if ((i == (charPosition + 1) ||
+            i == (charPosition + 4) ||
+            i == (charPosition + 7)) &&
+        (alpha.allMatches('[w-]').toList().isEmpty == true)) {
+      return "Invalid";
+    }
+    if ((i == (charPosition + 2) ||
+            i == (charPosition + 5) ||
+            i == (charPosition + 8)) &&
+        (alpha.allMatches('[x-]').toList().isEmpty == true)) {
+      return "Invalid";
+    }
+
+    switch (alpha) {
+      case 'r':
+        permission = 4;
+        grouping++;
+        break;
+      case 'w':
+        permission = 2;
+        grouping++;
+        break;
+      case 'x':
+        permission = 1;
+        grouping++;
+        break;
+      case '-':
+        permission = 0;
+        grouping++;
+        break;
+      default:
+      //permission = "Invalid";
+    }
+
+    combinedPermission += permission;
+
+    // Process in groups of three, then reset and continue to the next batch
+    if (grouping % 3 == 0) {
+      output = '$output$combinedPermission';
+      grouping = 0;
+      combinedPermission = 0;
+      permission = 0;
+    }
+  }
+  return fileType + output;
+}
+
+/// input Ex: 511  out: 777 => rwxrwxrwx
+/// [type] file | dir | link
+String intToPermissionString(int intPermission,
+    {String type = 'file', bool withType = true}) {
+  //lrwxrwxrwx
+  //0777 = -rwxrwxrwx
+  //drwxr-xr-x 755 bancoDeEmpregos
+  //lrwxrwxrwx 777 /etc/systemd/system/php7.3-fpm.service
+  //-rwxrwxrwx 777 /var/www/html/teste.txt
+  // 7 = rwx
+//  6 = rw-
+//  4 = r--
+//  3 = -wx
+//  2 = -w-
+//  1 = --x
+  var result = '';
+
+  //int r = 4, w = 2, x = 1, hifen = 0;
+  var octal = NumeralSystemConverter.decimalToOctal2(intPermission);
+  for (var i = 0; i < octal.length; i++) {
+    var permission = '';
+    switch (octal[i]) {
+      case '7':
+        permission = 'rwx';
+        break;
+      case '6':
+        permission = 'rw-';
+        break;
+      case '5':
+        permission = 'r-x';
+        break;
+      case '4':
+        permission = 'r--';
+        break;
+      case '3':
+        permission = '-wx';
+        break;
+      case '2':
+        permission = '-w-';
+        break;
+      case '1':
+        permission = '--x';
+        break;
+      case '0':
+        permission = '---';
+        break;
+      case '':
+        permission = '';
+        break;
+      default:
+        permission = 'Invalid';
+    }
+    result += permission;
+  }
+
+  var tp = "${type.startsWith('f') ? '-' : type.startsWith('d') ? 'd' : 'l'}";
+
+  result = withType ? '$tp$result' : result;
+
+  return result;
+}
+
 Pointer<Void> intToNativeVoid(int number) {
   final ptr = calloc.allocate<Int32>(sizeOf<Int32>());
   ptr.value = number;
   return ptr.cast();
 }
 
-Pointer<Int8> uint8ListToPointerInt8(Uint8List units, {Allocator allocator = calloc}) {
+Pointer<Int8> uint8ListToPointerInt8(Uint8List units,
+    {Allocator allocator = calloc}) {
   /*final pointer = allocator<Uint8>(list.length);
   for (int i = 0; i < list.length; i++) {
     pointer[i] = list[i];

@@ -8,9 +8,6 @@ import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
 
-import 'package:loading/loading.dart';
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-
 class FilaBackupWidget extends StatefulWidget {
   @override
   _FilaBackupWidgetState createState() => _FilaBackupWidgetState();
@@ -104,11 +101,17 @@ DataRow createItem(BackupRoutineModel routine, BuildContext ctx) {
       DataCell(
         routine.status == RoutineStatus.progress
             ? SizedBox(
-                height: 50,
-                child: Loading(
+                height: 20,
+                width: 20,
+                child: /* Loading(
                     indicator: BallPulseIndicator(),
                     size: 50.0,
-                    color: Colors.amber),
+                    color: Colors.amber)*/
+                    CircularProgressIndicator(),
+                /* Icon(
+                  Icons.timelapse,
+                  color: Colors.amber,
+                ),*/
               )
             : routine.status == RoutineStatus.failed
                 ? Icon(

@@ -130,17 +130,24 @@ class LibsshWrapper {
 
   /// downloads a file from an SFTP/SCP server
   Future<void> scpDownloadFileTo(
-      String fullRemotePathSource, String fullLocalPathTarget,
-      {void Function(int, int)? callbackStats,
-      bool recursive = true,
-      bool Function()? cancelCallback}) async {
+    String fullRemotePathSource,
+    String fullLocalPathTarget, {
+    void Function(int, int)? callbackStats,
+    bool recursive = true,
+    bool Function()? cancelCallback,
+    bool dontStopIfFileException = false,
+  }) async {
     isReady();
 
     await libsshBinding.scpDownloadFileTo(
-        mySshSession, fullRemotePathSource, fullLocalPathTarget,
-        callbackStats: callbackStats,
-        recursive: recursive,
-        cancelCallback: cancelCallback);
+      mySshSession,
+      fullRemotePathSource,
+      fullLocalPathTarget,
+      callbackStats: callbackStats,
+      recursive: recursive,
+      cancelCallback: cancelCallback,
+      dontStopIfFileException: dontStopIfFileException,
+    );
   }
 
   /// download one file via SFTP of remote server
@@ -234,14 +241,18 @@ class LibsshWrapper {
   /// [remoteDirectoryPath] example /var/www
   /// this function work only if remote is linux debian like sytem
   Future<void> scpDownloadDirectory(
-      String remoteDirectoryPath, String fullLocalDirectoryPathTarget,
-      {Allocator allocator = calloc,
-      void Function(int totalBytes, int loaded, int currentFileSize,
-              int countDirectory, int countFiles)?
-          callbackStats,
-      void Function(Object? obj)? printLog,
-      bool Function()? cancelCallback,
-      bool isThrowException = false}) async {
+    String remoteDirectoryPath,
+    String fullLocalDirectoryPathTarget, {
+    Allocator allocator = calloc,
+    void Function(int totalBytes, int loaded, int currentFileSize,
+            int countDirectory, int countFiles)?
+        callbackStats,
+    void Function(Object? obj)? printLog,
+    bool Function()? cancelCallback,
+    bool isThrowException = false,
+    bool updateStatsOnFileEnd = true,
+    bool dontStopIfFileException = false,
+  }) async {
     await libsshBinding.scpDownloadDirectory(
       mySshSession,
       remoteDirectoryPath,
@@ -251,6 +262,8 @@ class LibsshWrapper {
       printLog: printLog,
       isThrowException: isThrowException,
       cancelCallback: cancelCallback,
+      updateStatsOnFileEnd: updateStatsOnFileEnd,
+      dontStopIfFileException: dontStopIfFileException,
     );
   }
 

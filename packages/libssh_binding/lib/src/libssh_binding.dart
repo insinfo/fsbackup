@@ -13,13 +13,17 @@ import 'sftp_binding.dart';
 /// https://www.libssh.org/
 class LibsshBinding {
   /// Holds the symbol lookup function.
-  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) _lookup;
+  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
+      _lookup;
 
   /// The symbols are looked up in [dynamicLibrary].
-  LibsshBinding(ffi.DynamicLibrary dynamicLibrary) : _lookup = dynamicLibrary.lookup;
+  LibsshBinding(ffi.DynamicLibrary dynamicLibrary)
+      : _lookup = dynamicLibrary.lookup;
 
   /// The symbols are looked up with [lookup].
-  LibsshBinding.fromLookup(ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) lookup)
+  LibsshBinding.fromLookup(
+      ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
+          lookup)
       : _lookup = lookup;
 
   /*********************************** INICIO SFTP ***************************************/
@@ -44,7 +48,9 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_newPtr = _lookup<ffi.NativeFunction<sftp_session Function(ssh_session)>>('sftp_new');
+  late final _sftp_newPtr =
+      _lookup<ffi.NativeFunction<sftp_session Function(ssh_session)>>(
+          'sftp_new');
   late final sftp_session Function(ssh_session) _sftp_new =
       _sftp_newPtr.asFunction<sftp_session Function(ssh_session)>();
 
@@ -66,9 +72,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_new_channelPtr =
-      _lookup<ffi.NativeFunction<sftp_session Function(ssh_session, ssh_channel)>>('sftp_new_channel');
-  late final _sftp_new_channel = _sftp_new_channelPtr.asFunction<sftp_session Function(ssh_session, ssh_channel)>();
+  late final _sftp_new_channelPtr = _lookup<
+          ffi.NativeFunction<sftp_session Function(ssh_session, ssh_channel)>>(
+      'sftp_new_channel');
+  late final _sftp_new_channel = _sftp_new_channelPtr
+      .asFunction<sftp_session Function(ssh_session, ssh_channel)>();
 
   /// @brief Close and deallocate a sftp session.
   ///
@@ -81,8 +89,10 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(sftp_session)>>('sftp_free');
-  late final _sftp_free = _sftp_freePtr.asFunction<void Function(sftp_session)>();
+  late final _sftp_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_session)>>('sftp_free');
+  late final _sftp_free =
+      _sftp_freePtr.asFunction<void Function(sftp_session)>();
 
   /// @brief Initialize the sftp protocol with the server.
   ///
@@ -102,8 +112,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_initPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session)>>('sftp_init');
-  late final _sftp_init = _sftp_initPtr.asFunction<int Function(sftp_session)>();
+  late final _sftp_initPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session)>>(
+          'sftp_init');
+  late final _sftp_init =
+      _sftp_initPtr.asFunction<int Function(sftp_session)>();
 
   /// @brief Get the last sftp error.
   ///
@@ -123,8 +136,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_get_errorPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session)>>('sftp_get_error');
-  late final _sftp_get_error = _sftp_get_errorPtr.asFunction<int Function(sftp_session)>();
+  late final _sftp_get_errorPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session)>>(
+          'sftp_get_error');
+  late final _sftp_get_error =
+      _sftp_get_errorPtr.asFunction<int Function(sftp_session)>();
 
   /// @brief Get the count of extensions provided by the server.
   ///
@@ -141,8 +157,10 @@ class LibsshBinding {
   }
 
   late final _sftp_extensions_get_countPtr =
-      _lookup<ffi.NativeFunction<ffi.Uint32 Function(sftp_session)>>('sftp_extensions_get_count');
-  late final _sftp_extensions_get_count = _sftp_extensions_get_countPtr.asFunction<int Function(sftp_session)>();
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(sftp_session)>>(
+          'sftp_extensions_get_count');
+  late final _sftp_extensions_get_count =
+      _sftp_extensions_get_countPtr.asFunction<int Function(sftp_session)>();
 
   /// @brief Get the name of the extension provided by the server.
   ///
@@ -161,10 +179,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_extensions_get_namePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Uint32)>>('sftp_extensions_get_name');
-  late final _sftp_extensions_get_name =
-      _sftp_extensions_get_namePtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, int)>();
+  late final _sftp_extensions_get_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_session, ffi.Uint32)>>('sftp_extensions_get_name');
+  late final _sftp_extensions_get_name = _sftp_extensions_get_namePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, int)>();
 
   /// @brief Get the data of the extension provided by the server.
   ///
@@ -185,10 +205,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_extensions_get_dataPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Uint32)>>('sftp_extensions_get_data');
-  late final _sftp_extensions_get_data =
-      _sftp_extensions_get_dataPtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, int)>();
+  late final _sftp_extensions_get_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_session, ffi.Uint32)>>('sftp_extensions_get_data');
+  late final _sftp_extensions_get_data = _sftp_extensions_get_dataPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, int)>();
 
   /// @brief Check if the given extension is supported.
   ///
@@ -217,11 +239,14 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_extension_supportedPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'sftp_extension_supported');
-  late final _sftp_extension_supported = _sftp_extension_supportedPtr
-      .asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_extension_supportedPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('sftp_extension_supported');
+  late final _sftp_extension_supported =
+      _sftp_extension_supportedPtr.asFunction<
+          int Function(
+              sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Open a directory used to obtain directory entries.
   ///
@@ -243,9 +268,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_opendirPtr =
-      _lookup<ffi.NativeFunction<sftp_dir Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_opendir');
-  late final _sftp_opendir = _sftp_opendirPtr.asFunction<sftp_dir Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_opendirPtr = _lookup<
+      ffi.NativeFunction<
+          sftp_dir Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_opendir');
+  late final _sftp_opendir = _sftp_opendirPtr
+      .asFunction<sftp_dir Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Get a single file attributes structure of a directory.
   ///
@@ -268,9 +296,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_readdirPtr =
-      _lookup<ffi.NativeFunction<sftp_attributes Function(sftp_session, sftp_dir)>>('sftp_readdir');
-  late final _sftp_readdir = _sftp_readdirPtr.asFunction<sftp_attributes Function(sftp_session, sftp_dir)>();
+  late final _sftp_readdirPtr = _lookup<
+          ffi.NativeFunction<sftp_attributes Function(sftp_session, sftp_dir)>>(
+      'sftp_readdir');
+  late final _sftp_readdir = _sftp_readdirPtr
+      .asFunction<sftp_attributes Function(sftp_session, sftp_dir)>();
 
   /// @brief Tell if the directory has reached EOF (End Of File).
   ///
@@ -287,8 +317,10 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_dir_eofPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_dir)>>('sftp_dir_eof');
-  late final _sftp_dir_eof = _sftp_dir_eofPtr.asFunction<int Function(sftp_dir)>();
+  late final _sftp_dir_eofPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_dir)>>('sftp_dir_eof');
+  late final _sftp_dir_eof =
+      _sftp_dir_eofPtr.asFunction<int Function(sftp_dir)>();
 
   /// @brief Get information about a file or directory.
   ///
@@ -310,9 +342,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_statPtr =
-      _lookup<ffi.NativeFunction<sftp_attributes Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_stat');
-  late final _sftp_stat = _sftp_statPtr.asFunction<sftp_attributes Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_statPtr = _lookup<
+      ffi.NativeFunction<
+          sftp_attributes Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_stat');
+  late final _sftp_stat = _sftp_statPtr.asFunction<
+      sftp_attributes Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Get information about a file or directory.
   ///
@@ -337,9 +372,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_lstatPtr =
-      _lookup<ffi.NativeFunction<sftp_attributes Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_lstat');
-  late final _sftp_lstat = _sftp_lstatPtr.asFunction<sftp_attributes Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_lstatPtr = _lookup<
+      ffi.NativeFunction<
+          sftp_attributes Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_lstat');
+  late final _sftp_lstat = _sftp_lstatPtr.asFunction<
+      sftp_attributes Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Get information about a file or directory from a file handle.
   ///
@@ -357,8 +395,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_fstatPtr = _lookup<ffi.NativeFunction<sftp_attributes Function(sftp_file)>>('sftp_fstat');
-  late final _sftp_fstat = _sftp_fstatPtr.asFunction<sftp_attributes Function(sftp_file)>();
+  late final _sftp_fstatPtr =
+      _lookup<ffi.NativeFunction<sftp_attributes Function(sftp_file)>>(
+          'sftp_fstat');
+  late final _sftp_fstat =
+      _sftp_fstatPtr.asFunction<sftp_attributes Function(sftp_file)>();
 
   /// @brief Free a sftp attribute structure.
   ///
@@ -372,8 +413,10 @@ class LibsshBinding {
   }
 
   late final _sftp_attributes_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_attributes)>>('sftp_attributes_free');
-  late final _sftp_attributes_free = _sftp_attributes_freePtr.asFunction<void Function(sftp_attributes)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_attributes)>>(
+          'sftp_attributes_free');
+  late final _sftp_attributes_free =
+      _sftp_attributes_freePtr.asFunction<void Function(sftp_attributes)>();
 
   /// @brief Close a directory handle opened by sftp_opendir().
   ///
@@ -388,8 +431,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_closedirPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_dir)>>('sftp_closedir');
-  late final _sftp_closedir = _sftp_closedirPtr.asFunction<int Function(sftp_dir)>();
+  late final _sftp_closedirPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_dir)>>(
+          'sftp_closedir');
+  late final _sftp_closedir =
+      _sftp_closedirPtr.asFunction<int Function(sftp_dir)>();
 
   /// @brief Close an open file handle.
   ///
@@ -406,7 +452,8 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_closePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file)>>('sftp_close');
+  late final _sftp_closePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file)>>('sftp_close');
   late final _sftp_close = _sftp_closePtr.asFunction<int Function(sftp_file)>();
 
   /// @brief Open a file on the server.
@@ -449,10 +496,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_openPtr =
-      _lookup<ffi.NativeFunction<sftp_file Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Int32, mode_t)>>(
-          'sftp_open');
-  late final _sftp_open = _sftp_openPtr.asFunction<sftp_file Function(sftp_session, ffi.Pointer<ffi.Int8>, int, int)>();
+  late final _sftp_openPtr = _lookup<
+      ffi.NativeFunction<
+          sftp_file Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Int32,
+              mode_t)>>('sftp_open');
+  late final _sftp_open = _sftp_openPtr.asFunction<
+      sftp_file Function(sftp_session, ffi.Pointer<ffi.Int8>, int, int)>();
 
   /// @brief Make the sftp communication for this file handle non blocking.
   ///
@@ -466,8 +515,10 @@ class LibsshBinding {
   }
 
   late final _sftp_file_set_nonblockingPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_file)>>('sftp_file_set_nonblocking');
-  late final _sftp_file_set_nonblocking = _sftp_file_set_nonblockingPtr.asFunction<void Function(sftp_file)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_file)>>(
+          'sftp_file_set_nonblocking');
+  late final _sftp_file_set_nonblocking =
+      _sftp_file_set_nonblockingPtr.asFunction<void Function(sftp_file)>();
 
   /// @brief Make the sftp communication for this file handle blocking.
   ///
@@ -481,8 +532,10 @@ class LibsshBinding {
   }
 
   late final _sftp_file_set_blockingPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_file)>>('sftp_file_set_blocking');
-  late final _sftp_file_set_blocking = _sftp_file_set_blockingPtr.asFunction<void Function(sftp_file)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_file)>>(
+          'sftp_file_set_blocking');
+  late final _sftp_file_set_blocking =
+      _sftp_file_set_blockingPtr.asFunction<void Function(sftp_file)>();
 
   /// @brief Read from a file using an opened sftp file handle.
   ///
@@ -508,9 +561,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_readPtr =
-      _lookup<ffi.NativeFunction<ssize_t Function(sftp_file, ffi.Pointer<ffi.Void>, size_t)>>('sftp_read');
-  late final _sftp_read = _sftp_readPtr.asFunction<int Function(sftp_file, ffi.Pointer<ffi.Void>, int)>();
+  late final _sftp_readPtr = _lookup<
+      ffi.NativeFunction<
+          ssize_t Function(
+              sftp_file, ffi.Pointer<ffi.Void>, size_t)>>('sftp_read');
+  late final _sftp_read = _sftp_readPtr
+      .asFunction<int Function(sftp_file, ffi.Pointer<ffi.Void>, int)>();
 
   /// @brief Start an asynchronous read from a file using an opened sftp file handle.
   ///
@@ -552,8 +608,10 @@ class LibsshBinding {
   }
 
   late final _sftp_async_read_beginPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Uint32)>>('sftp_async_read_begin');
-  late final _sftp_async_read_begin = _sftp_async_read_beginPtr.asFunction<int Function(sftp_file, int)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Uint32)>>(
+          'sftp_async_read_begin');
+  late final _sftp_async_read_begin =
+      _sftp_async_read_beginPtr.asFunction<int Function(sftp_file, int)>();
 
   /// @brief Wait for an asynchronous read to complete and save the data.
   ///
@@ -590,11 +648,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_async_readPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Pointer<ffi.Void>, ffi.Uint32, ffi.Uint32)>>(
-          'sftp_async_read');
-  late final _sftp_async_read =
-      _sftp_async_readPtr.asFunction<int Function(sftp_file, ffi.Pointer<ffi.Void>, int, int)>();
+  late final _sftp_async_readPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_file, ffi.Pointer<ffi.Void>, ffi.Uint32,
+              ffi.Uint32)>>('sftp_async_read');
+  late final _sftp_async_read = _sftp_async_readPtr
+      .asFunction<int Function(sftp_file, ffi.Pointer<ffi.Void>, int, int)>();
 
   /// @brief Write to a file using an opened sftp file handle.
   ///
@@ -622,9 +681,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_writePtr =
-      _lookup<ffi.NativeFunction<ssize_t Function(sftp_file, ffi.Pointer<ffi.Void>, size_t)>>('sftp_write');
-  late final _sftp_write = _sftp_writePtr.asFunction<int Function(sftp_file, ffi.Pointer<ffi.Void>, int)>();
+  late final _sftp_writePtr = _lookup<
+      ffi.NativeFunction<
+          ssize_t Function(
+              sftp_file, ffi.Pointer<ffi.Void>, size_t)>>('sftp_write');
+  late final _sftp_write = _sftp_writePtr
+      .asFunction<int Function(sftp_file, ffi.Pointer<ffi.Void>, int)>();
 
   /// @brief Seek to a specific location in a file.
   ///
@@ -643,8 +705,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_seekPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Uint32)>>('sftp_seek');
-  late final _sftp_seek = _sftp_seekPtr.asFunction<int Function(sftp_file, int)>();
+  late final _sftp_seekPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Uint32)>>(
+          'sftp_seek');
+  late final _sftp_seek =
+      _sftp_seekPtr.asFunction<int Function(sftp_file, int)>();
 
   /// @brief Seek to a specific location in a file. This is the
   /// 64bit version.
@@ -664,8 +729,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_seek64Ptr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Uint64)>>('sftp_seek64');
-  late final _sftp_seek64 = _sftp_seek64Ptr.asFunction<int Function(sftp_file, int)>();
+  late final _sftp_seek64Ptr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file, ffi.Uint64)>>(
+          'sftp_seek64');
+  late final _sftp_seek64 =
+      _sftp_seek64Ptr.asFunction<int Function(sftp_file, int)>();
 
   /// @brief Report current byte position in file.
   ///
@@ -682,7 +750,8 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_tellPtr = _lookup<ffi.NativeFunction<ffi.Uint64 Function(sftp_file)>>('sftp_tell');
+  late final _sftp_tellPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint64 Function(sftp_file)>>('sftp_tell');
   late final _sftp_tell = _sftp_tellPtr.asFunction<int Function(sftp_file)>();
 
   /// @brief Report current byte position in file.
@@ -700,8 +769,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_tell64Ptr = _lookup<ffi.NativeFunction<ffi.Uint64 Function(sftp_file)>>('sftp_tell64');
-  late final _sftp_tell64 = _sftp_tell64Ptr.asFunction<int Function(sftp_file)>();
+  late final _sftp_tell64Ptr =
+      _lookup<ffi.NativeFunction<ffi.Uint64 Function(sftp_file)>>(
+          'sftp_tell64');
+  late final _sftp_tell64 =
+      _sftp_tell64Ptr.asFunction<int Function(sftp_file)>();
 
   /// @brief Rewinds the position of the file pointer to the beginning of the
   /// file.
@@ -715,8 +787,10 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_rewindPtr = _lookup<ffi.NativeFunction<ffi.Void Function(sftp_file)>>('sftp_rewind');
-  late final _sftp_rewind = _sftp_rewindPtr.asFunction<void Function(sftp_file)>();
+  late final _sftp_rewindPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_file)>>('sftp_rewind');
+  late final _sftp_rewind =
+      _sftp_rewindPtr.asFunction<void Function(sftp_file)>();
 
   /// @brief Unlink (delete) a file.
   ///
@@ -737,9 +811,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_unlinkPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_unlink');
-  late final _sftp_unlink = _sftp_unlinkPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_unlinkPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_unlink');
+  late final _sftp_unlink = _sftp_unlinkPtr
+      .asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Remove a directoy.
   ///
@@ -760,9 +837,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_rmdirPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_rmdir');
-  late final _sftp_rmdir = _sftp_rmdirPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_rmdirPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_rmdir');
+  late final _sftp_rmdir = _sftp_rmdirPtr
+      .asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Create a directory.
   ///
@@ -789,9 +869,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_mkdirPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, mode_t)>>('sftp_mkdir');
-  late final _sftp_mkdir = _sftp_mkdirPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, int)>();
+  late final _sftp_mkdirPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_session, ffi.Pointer<ffi.Int8>, mode_t)>>('sftp_mkdir');
+  late final _sftp_mkdir = _sftp_mkdirPtr
+      .asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, int)>();
 
   /// @brief Rename or move a file or directory.
   ///
@@ -818,11 +901,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_renamePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'sftp_rename');
-  late final _sftp_rename =
-      _sftp_renamePtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_renamePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('sftp_rename');
+  late final _sftp_rename = _sftp_renamePtr.asFunction<
+      int Function(
+          sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Set file attributes on a file, directory or symbolic link.
   ///
@@ -848,11 +933,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_setstatPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, sftp_attributes)>>(
-          'sftp_setstat');
-  late final _sftp_setstat =
-      _sftp_setstatPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, sftp_attributes)>();
+  late final _sftp_setstatPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>,
+              sftp_attributes)>>('sftp_setstat');
+  late final _sftp_setstat = _sftp_setstatPtr.asFunction<
+      int Function(sftp_session, ffi.Pointer<ffi.Int8>, sftp_attributes)>();
 
   /// @brief Change the file owner and group
   ///
@@ -881,9 +967,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_chownPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, uid_t, gid_t)>>('sftp_chown');
-  late final _sftp_chown = _sftp_chownPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, int, int)>();
+  late final _sftp_chownPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, uid_t,
+              gid_t)>>('sftp_chown');
+  late final _sftp_chown = _sftp_chownPtr.asFunction<
+      int Function(sftp_session, ffi.Pointer<ffi.Int8>, int, int)>();
 
   /// @brief Change permissions of a file
   ///
@@ -910,9 +999,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_chmodPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, mode_t)>>('sftp_chmod');
-  late final _sftp_chmod = _sftp_chmodPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, int)>();
+  late final _sftp_chmodPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_session, ffi.Pointer<ffi.Int8>, mode_t)>>('sftp_chmod');
+  late final _sftp_chmod = _sftp_chmodPtr
+      .asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, int)>();
 
   /// @brief Change the last modification and access time of a file.
   ///
@@ -938,11 +1030,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_utimesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<timeval>)>>(
-          'sftp_utimes');
-  late final _sftp_utimes =
-      _sftp_utimesPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<timeval>)>();
+  late final _sftp_utimesPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<timeval>)>>('sftp_utimes');
+  late final _sftp_utimes = _sftp_utimesPtr.asFunction<
+      int Function(
+          sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<timeval>)>();
 
   /// @brief Create a symbolic link.
   ///
@@ -967,11 +1061,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_symlinkPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'sftp_symlink');
-  late final _sftp_symlink =
-      _sftp_symlinkPtr.asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_symlinkPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('sftp_symlink');
+  late final _sftp_symlink = _sftp_symlinkPtr.asFunction<
+      int Function(
+          sftp_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Read the value of a symbolic link.
   ///
@@ -992,10 +1088,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_readlinkPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_readlink');
-  late final _sftp_readlink =
-      _sftp_readlinkPtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_readlinkPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_readlink');
+  late final _sftp_readlink = _sftp_readlinkPtr.asFunction<
+      ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Get information about a mounted file system.
   ///
@@ -1016,10 +1114,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_statvfsPtr =
-      _lookup<ffi.NativeFunction<sftp_statvfs_t Function(sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_statvfs');
-  late final _sftp_statvfs =
-      _sftp_statvfsPtr.asFunction<sftp_statvfs_t Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_statvfsPtr = _lookup<
+      ffi.NativeFunction<
+          sftp_statvfs_t Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_statvfs');
+  late final _sftp_statvfs = _sftp_statvfsPtr.asFunction<
+      sftp_statvfs_t Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Get information about a mounted file system.
   ///
@@ -1036,8 +1136,11 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_fstatvfsPtr = _lookup<ffi.NativeFunction<sftp_statvfs_t Function(sftp_file)>>('sftp_fstatvfs');
-  late final _sftp_fstatvfs = _sftp_fstatvfsPtr.asFunction<sftp_statvfs_t Function(sftp_file)>();
+  late final _sftp_fstatvfsPtr =
+      _lookup<ffi.NativeFunction<sftp_statvfs_t Function(sftp_file)>>(
+          'sftp_fstatvfs');
+  late final _sftp_fstatvfs =
+      _sftp_fstatvfsPtr.asFunction<sftp_statvfs_t Function(sftp_file)>();
 
   /// @brief Free the memory of an allocated statvfs.
   ///
@@ -1051,8 +1154,10 @@ class LibsshBinding {
   }
 
   late final _sftp_statvfs_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_statvfs_t)>>('sftp_statvfs_free');
-  late final _sftp_statvfs_free = _sftp_statvfs_freePtr.asFunction<void Function(sftp_statvfs_t)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_statvfs_t)>>(
+          'sftp_statvfs_free');
+  late final _sftp_statvfs_free =
+      _sftp_statvfs_freePtr.asFunction<void Function(sftp_statvfs_t)>();
 
   /// @brief Synchronize a file's in-core state with storage device
   ///
@@ -1074,7 +1179,8 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_fsyncPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file)>>('sftp_fsync');
+  late final _sftp_fsyncPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_file)>>('sftp_fsync');
   late final _sftp_fsync = _sftp_fsyncPtr.asFunction<int Function(sftp_file)>();
 
   /// @brief Canonicalize a sftp path.
@@ -1096,11 +1202,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_canonicalize_pathPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Pointer<ffi.Int8>)>>(
-          'sftp_canonicalize_path');
-  late final _sftp_canonicalize_path =
-      _sftp_canonicalize_pathPtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_canonicalize_pathPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_canonicalize_path');
+  late final _sftp_canonicalize_path = _sftp_canonicalize_pathPtr.asFunction<
+      ffi.Pointer<ffi.Int8> Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 
   /// @brief Get the version of the SFTP protocol supported by the server
   ///
@@ -1116,8 +1223,10 @@ class LibsshBinding {
   }
 
   late final _sftp_server_versionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session)>>('sftp_server_version');
-  late final _sftp_server_version = _sftp_server_versionPtr.asFunction<int Function(sftp_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session)>>(
+          'sftp_server_version');
+  late final _sftp_server_version =
+      _sftp_server_versionPtr.asFunction<int Function(sftp_session)>();
 
   sftp_client_message sftp_get_client_message(
     sftp_session sftp,
@@ -1128,9 +1237,10 @@ class LibsshBinding {
   }
 
   late final _sftp_get_client_messagePtr =
-      _lookup<ffi.NativeFunction<sftp_client_message Function(sftp_session)>>('sftp_get_client_message');
-  late final _sftp_get_client_message =
-      _sftp_get_client_messagePtr.asFunction<sftp_client_message Function(sftp_session)>();
+      _lookup<ffi.NativeFunction<sftp_client_message Function(sftp_session)>>(
+          'sftp_get_client_message');
+  late final _sftp_get_client_message = _sftp_get_client_messagePtr
+      .asFunction<sftp_client_message Function(sftp_session)>();
 
   void sftp_client_message_free(
     sftp_client_message msg,
@@ -1141,8 +1251,10 @@ class LibsshBinding {
   }
 
   late final _sftp_client_message_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_client_message)>>('sftp_client_message_free');
-  late final _sftp_client_message_free = _sftp_client_message_freePtr.asFunction<void Function(sftp_client_message)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_client_message)>>(
+          'sftp_client_message_free');
+  late final _sftp_client_message_free = _sftp_client_message_freePtr
+      .asFunction<void Function(sftp_client_message)>();
 
   int sftp_client_message_get_type(
     sftp_client_message msg,
@@ -1153,9 +1265,10 @@ class LibsshBinding {
   }
 
   late final _sftp_client_message_get_typePtr =
-      _lookup<ffi.NativeFunction<ffi.Uint8 Function(sftp_client_message)>>('sftp_client_message_get_type');
-  late final _sftp_client_message_get_type =
-      _sftp_client_message_get_typePtr.asFunction<int Function(sftp_client_message)>();
+      _lookup<ffi.NativeFunction<ffi.Uint8 Function(sftp_client_message)>>(
+          'sftp_client_message_get_type');
+  late final _sftp_client_message_get_type = _sftp_client_message_get_typePtr
+      .asFunction<int Function(sftp_client_message)>();
 
   ffi.Pointer<ffi.Int8> sftp_client_message_get_filename(
     sftp_client_message msg,
@@ -1165,11 +1278,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_client_message_get_filenamePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>>(
-          'sftp_client_message_get_filename');
+  late final _sftp_client_message_get_filenamePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_client_message)>>('sftp_client_message_get_filename');
   late final _sftp_client_message_get_filename =
-      _sftp_client_message_get_filenamePtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>();
+      _sftp_client_message_get_filenamePtr
+          .asFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>();
 
   void sftp_client_message_set_filename(
     sftp_client_message msg,
@@ -1181,11 +1296,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_client_message_set_filenamePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_client_message, ffi.Pointer<ffi.Int8>)>>(
-          'sftp_client_message_set_filename');
+  late final _sftp_client_message_set_filenamePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(sftp_client_message,
+              ffi.Pointer<ffi.Int8>)>>('sftp_client_message_set_filename');
   late final _sftp_client_message_set_filename =
-      _sftp_client_message_set_filenamePtr.asFunction<void Function(sftp_client_message, ffi.Pointer<ffi.Int8>)>();
+      _sftp_client_message_set_filenamePtr.asFunction<
+          void Function(sftp_client_message, ffi.Pointer<ffi.Int8>)>();
 
   ffi.Pointer<ffi.Int8> sftp_client_message_get_data(
     sftp_client_message msg,
@@ -1195,10 +1312,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_client_message_get_dataPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>>('sftp_client_message_get_data');
-  late final _sftp_client_message_get_data =
-      _sftp_client_message_get_dataPtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>();
+  late final _sftp_client_message_get_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_client_message)>>('sftp_client_message_get_data');
+  late final _sftp_client_message_get_data = _sftp_client_message_get_dataPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>();
 
   int sftp_client_message_get_flags(
     sftp_client_message msg,
@@ -1209,9 +1328,10 @@ class LibsshBinding {
   }
 
   late final _sftp_client_message_get_flagsPtr =
-      _lookup<ffi.NativeFunction<ffi.Uint32 Function(sftp_client_message)>>('sftp_client_message_get_flags');
-  late final _sftp_client_message_get_flags =
-      _sftp_client_message_get_flagsPtr.asFunction<int Function(sftp_client_message)>();
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(sftp_client_message)>>(
+          'sftp_client_message_get_flags');
+  late final _sftp_client_message_get_flags = _sftp_client_message_get_flagsPtr
+      .asFunction<int Function(sftp_client_message)>();
 
   ffi.Pointer<ffi.Int8> sftp_client_message_get_submessage(
     sftp_client_message msg,
@@ -1221,11 +1341,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_client_message_get_submessagePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>>(
-          'sftp_client_message_get_submessage');
+  late final _sftp_client_message_get_submessagePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              sftp_client_message)>>('sftp_client_message_get_submessage');
   late final _sftp_client_message_get_submessage =
-      _sftp_client_message_get_submessagePtr.asFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>();
+      _sftp_client_message_get_submessagePtr
+          .asFunction<ffi.Pointer<ffi.Int8> Function(sftp_client_message)>();
 
   int sftp_send_client_message(
     sftp_session sftp,
@@ -1237,10 +1359,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_send_client_messagePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_session, sftp_client_message)>>('sftp_send_client_message');
-  late final _sftp_send_client_message =
-      _sftp_send_client_messagePtr.asFunction<int Function(sftp_session, sftp_client_message)>();
+  late final _sftp_send_client_messagePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_session, sftp_client_message)>>('sftp_send_client_message');
+  late final _sftp_send_client_message = _sftp_send_client_messagePtr
+      .asFunction<int Function(sftp_session, sftp_client_message)>();
 
   int sftp_reply_name(
     sftp_client_message msg,
@@ -1254,11 +1378,13 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_reply_namePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message, ffi.Pointer<ffi.Int8>, sftp_attributes)>>(
-          'sftp_reply_name');
-  late final _sftp_reply_name =
-      _sftp_reply_namePtr.asFunction<int Function(sftp_client_message, ffi.Pointer<ffi.Int8>, sftp_attributes)>();
+  late final _sftp_reply_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_client_message, ffi.Pointer<ffi.Int8>,
+              sftp_attributes)>>('sftp_reply_name');
+  late final _sftp_reply_name = _sftp_reply_namePtr.asFunction<
+      int Function(
+          sftp_client_message, ffi.Pointer<ffi.Int8>, sftp_attributes)>();
 
   int sftp_reply_handle(
     sftp_client_message msg,
@@ -1270,9 +1396,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_reply_handlePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message, ssh_string)>>('sftp_reply_handle');
-  late final _sftp_reply_handle = _sftp_reply_handlePtr.asFunction<int Function(sftp_client_message, ssh_string)>();
+  late final _sftp_reply_handlePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_client_message, ssh_string)>>('sftp_reply_handle');
+  late final _sftp_reply_handle = _sftp_reply_handlePtr
+      .asFunction<int Function(sftp_client_message, ssh_string)>();
 
   ssh_string sftp_handle_alloc(
     sftp_session sftp,
@@ -1284,10 +1413,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_handle_allocPtr =
-      _lookup<ffi.NativeFunction<ssh_string Function(sftp_session, ffi.Pointer<ffi.Void>)>>('sftp_handle_alloc');
-  late final _sftp_handle_alloc =
-      _sftp_handle_allocPtr.asFunction<ssh_string Function(sftp_session, ffi.Pointer<ffi.Void>)>();
+  late final _sftp_handle_allocPtr = _lookup<
+      ffi.NativeFunction<
+          ssh_string Function(
+              sftp_session, ffi.Pointer<ffi.Void>)>>('sftp_handle_alloc');
+  late final _sftp_handle_alloc = _sftp_handle_allocPtr
+      .asFunction<ssh_string Function(sftp_session, ffi.Pointer<ffi.Void>)>();
 
   int sftp_reply_attr(
     sftp_client_message msg,
@@ -1299,9 +1430,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_reply_attrPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message, sftp_attributes)>>('sftp_reply_attr');
-  late final _sftp_reply_attr = _sftp_reply_attrPtr.asFunction<int Function(sftp_client_message, sftp_attributes)>();
+  late final _sftp_reply_attrPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              sftp_client_message, sftp_attributes)>>('sftp_reply_attr');
+  late final _sftp_reply_attr = _sftp_reply_attrPtr
+      .asFunction<int Function(sftp_client_message, sftp_attributes)>();
 
   ffi.Pointer<ffi.Void> sftp_handle(
     sftp_session sftp,
@@ -1313,9 +1447,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_handlePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function(sftp_session, ssh_string)>>('sftp_handle');
-  late final _sftp_handle = _sftp_handlePtr.asFunction<ffi.Pointer<ffi.Void> Function(sftp_session, ssh_string)>();
+  late final _sftp_handlePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Void> Function(
+              sftp_session, ssh_string)>>('sftp_handle');
+  late final _sftp_handle = _sftp_handlePtr
+      .asFunction<ffi.Pointer<ffi.Void> Function(sftp_session, ssh_string)>();
 
   int sftp_reply_status(
     sftp_client_message msg,
@@ -1329,11 +1466,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_reply_statusPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message, ffi.Uint32, ffi.Pointer<ffi.Int8>)>>(
-          'sftp_reply_status');
-  late final _sftp_reply_status =
-      _sftp_reply_statusPtr.asFunction<int Function(sftp_client_message, int, ffi.Pointer<ffi.Int8>)>();
+  late final _sftp_reply_statusPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_client_message, ffi.Uint32,
+              ffi.Pointer<ffi.Int8>)>>('sftp_reply_status');
+  late final _sftp_reply_status = _sftp_reply_statusPtr.asFunction<
+      int Function(sftp_client_message, int, ffi.Pointer<ffi.Int8>)>();
 
   int sftp_reply_names_add(
     sftp_client_message msg,
@@ -1351,10 +1489,11 @@ class LibsshBinding {
 
   late final _sftp_reply_names_addPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(sftp_client_message, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>,
-              sftp_attributes)>>('sftp_reply_names_add');
-  late final _sftp_reply_names_add = _sftp_reply_names_addPtr
-      .asFunction<int Function(sftp_client_message, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, sftp_attributes)>();
+          ffi.Int32 Function(sftp_client_message, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>, sftp_attributes)>>('sftp_reply_names_add');
+  late final _sftp_reply_names_add = _sftp_reply_names_addPtr.asFunction<
+      int Function(sftp_client_message, ffi.Pointer<ffi.Int8>,
+          ffi.Pointer<ffi.Int8>, sftp_attributes)>();
 
   int sftp_reply_names(
     sftp_client_message msg,
@@ -1365,8 +1504,10 @@ class LibsshBinding {
   }
 
   late final _sftp_reply_namesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message)>>('sftp_reply_names');
-  late final _sftp_reply_names = _sftp_reply_namesPtr.asFunction<int Function(sftp_client_message)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message)>>(
+          'sftp_reply_names');
+  late final _sftp_reply_names =
+      _sftp_reply_namesPtr.asFunction<int Function(sftp_client_message)>();
 
   int sftp_reply_data(
     sftp_client_message msg,
@@ -1380,11 +1521,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_reply_dataPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(sftp_client_message, ffi.Pointer<ffi.Void>, ffi.Int32)>>(
-          'sftp_reply_data');
-  late final _sftp_reply_data =
-      _sftp_reply_dataPtr.asFunction<int Function(sftp_client_message, ffi.Pointer<ffi.Void>, int)>();
+  late final _sftp_reply_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(sftp_client_message, ffi.Pointer<ffi.Void>,
+              ffi.Int32)>>('sftp_reply_data');
+  late final _sftp_reply_data = _sftp_reply_dataPtr.asFunction<
+      int Function(sftp_client_message, ffi.Pointer<ffi.Void>, int)>();
 
   void sftp_handle_remove(
     sftp_session sftp,
@@ -1396,10 +1538,12 @@ class LibsshBinding {
     );
   }
 
-  late final _sftp_handle_removePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(sftp_session, ffi.Pointer<ffi.Void>)>>('sftp_handle_remove');
-  late final _sftp_handle_remove =
-      _sftp_handle_removePtr.asFunction<void Function(sftp_session, ffi.Pointer<ffi.Void>)>();
+  late final _sftp_handle_removePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              sftp_session, ffi.Pointer<ffi.Void>)>>('sftp_handle_remove');
+  late final _sftp_handle_remove = _sftp_handle_removePtr
+      .asFunction<void Function(sftp_session, ffi.Pointer<ffi.Void>)>();
 
   /*********************************** FIM SFTP **********************************************/
 
@@ -1433,10 +1577,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_server_callbacksPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Int32, ssh_server_callbacks)>>('ssh_set_server_callbacks');
-  late final _ssh_set_server_callbacks =
-      _ssh_set_server_callbacksPtr.asFunction<int Function(int, ssh_server_callbacks)>();
+  late final _ssh_set_server_callbacksPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Int32, ssh_server_callbacks)>>('ssh_set_server_callbacks');
+  late final _ssh_set_server_callbacks = _ssh_set_server_callbacksPtr
+      .asFunction<int Function(int, ssh_server_callbacks)>();
 
   /// @brief Set the session callback functions.
   ///
@@ -1468,8 +1614,10 @@ class LibsshBinding {
   }
 
   late final _ssh_set_callbacksPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Int32, ssh_callbacks)>>('ssh_set_callbacks');
-  late final _ssh_set_callbacks = _ssh_set_callbacksPtr.asFunction<int Function(int, ssh_callbacks)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Int32, ssh_callbacks)>>(
+          'ssh_set_callbacks');
+  late final _ssh_set_callbacks =
+      _ssh_set_callbacksPtr.asFunction<int Function(int, ssh_callbacks)>();
 
   /// @brief Set the channel callback functions.
   ///
@@ -1502,11 +1650,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_channel_callbacksPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>>(
-          'ssh_set_channel_callbacks');
+  late final _ssh_set_channel_callbacksPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ssh_channel>,
+              ssh_channel_callbacks)>>('ssh_set_channel_callbacks');
   late final _ssh_set_channel_callbacks =
-      _ssh_set_channel_callbacksPtr.asFunction<int Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>();
+      _ssh_set_channel_callbacksPtr.asFunction<
+          int Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>();
 
   /// @brief Add channel callback functions
   ///
@@ -1532,11 +1682,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_add_channel_callbacksPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>>(
-          'ssh_add_channel_callbacks');
+  late final _ssh_add_channel_callbacksPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ssh_channel>,
+              ssh_channel_callbacks)>>('ssh_add_channel_callbacks');
   late final _ssh_add_channel_callbacks =
-      _ssh_add_channel_callbacksPtr.asFunction<int Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>();
+      _ssh_add_channel_callbacksPtr.asFunction<
+          int Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>();
 
   /// @brief Remove a channel callback.
   ///
@@ -1558,11 +1710,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_remove_channel_callbacksPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>>(
-          'ssh_remove_channel_callbacks');
+  late final _ssh_remove_channel_callbacksPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ssh_channel>,
+              ssh_channel_callbacks)>>('ssh_remove_channel_callbacks');
   late final _ssh_remove_channel_callbacks =
-      _ssh_remove_channel_callbacksPtr.asFunction<int Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>();
+      _ssh_remove_channel_callbacksPtr.asFunction<
+          int Function(ffi.Pointer<ssh_channel>, ssh_channel_callbacks)>();
 
   /// @brief Set the thread callbacks structure.
   ///
@@ -1587,11 +1741,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_threads_set_callbacksPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ssh_threads_callbacks_struct>)>>(
-          'ssh_threads_set_callbacks');
-  late final _ssh_threads_set_callbacks =
-      _ssh_threads_set_callbacksPtr.asFunction<int Function(ffi.Pointer<ssh_threads_callbacks_struct>)>();
+  late final _ssh_threads_set_callbacksPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(ffi.Pointer<ssh_threads_callbacks_struct>)>>(
+      'ssh_threads_set_callbacks');
+  late final _ssh_threads_set_callbacks = _ssh_threads_set_callbacksPtr
+      .asFunction<int Function(ffi.Pointer<ssh_threads_callbacks_struct>)>();
 
   /// @brief Returns a pointer to the appropriate callbacks structure for the
   /// environment, to be used with ssh_threads_set_callbacks.
@@ -1605,8 +1760,10 @@ class LibsshBinding {
   }
 
   late final _ssh_threads_get_defaultPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function()>>('ssh_threads_get_default');
-  late final _ssh_threads_get_default = _ssh_threads_get_defaultPtr.asFunction<ffi.Pointer<ffi.Int32> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function()>>(
+          'ssh_threads_get_default');
+  late final _ssh_threads_get_default = _ssh_threads_get_defaultPtr
+      .asFunction<ffi.Pointer<ffi.Int32> Function()>();
 
   /// @brief Returns a pointer on the pthread threads callbacks, to be used with
   /// ssh_threads_set_callbacks.
@@ -1617,8 +1774,10 @@ class LibsshBinding {
   }
 
   late final _ssh_threads_get_pthreadPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function()>>('ssh_threads_get_pthread');
-  late final _ssh_threads_get_pthread = _ssh_threads_get_pthreadPtr.asFunction<ffi.Pointer<ffi.Int32> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function()>>(
+          'ssh_threads_get_pthread');
+  late final _ssh_threads_get_pthread = _ssh_threads_get_pthreadPtr
+      .asFunction<ffi.Pointer<ffi.Int32> Function()>();
 
   /// @brief Get the noop threads callbacks structure
   ///
@@ -1633,8 +1792,10 @@ class LibsshBinding {
   }
 
   late final _ssh_threads_get_noopPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function()>>('ssh_threads_get_noop');
-  late final _ssh_threads_get_noop = _ssh_threads_get_noopPtr.asFunction<ffi.Pointer<ffi.Int32> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function()>>(
+          'ssh_threads_get_noop');
+  late final _ssh_threads_get_noop =
+      _ssh_threads_get_noopPtr.asFunction<ffi.Pointer<ffi.Int32> Function()>();
 
   /// @brief Set the logging callback function.
   ///
@@ -1650,13 +1811,16 @@ class LibsshBinding {
   }
 
   late final _ssh_set_log_callbackPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_logging_callback)>>('ssh_set_log_callback');
-  late final _ssh_set_log_callback = _ssh_set_log_callbackPtr.asFunction<int Function(ssh_logging_callback)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_logging_callback)>>(
+          'ssh_set_log_callback');
+  late final _ssh_set_log_callback =
+      _ssh_set_log_callbackPtr.asFunction<int Function(ssh_logging_callback)>();
 
   /// @brief Get the pointer to the logging callback function.
   ///
   /// @return The pointer the the callback or NULL if none set.
-  late final ffi.Pointer<ffi.Int32> _ssh_logging_callback1 = _lookup<ffi.Int32>('ssh_logging_callback');
+  late final ffi.Pointer<ffi.Int32> _ssh_logging_callback1 =
+      _lookup<ffi.Int32>('ssh_logging_callback');
 
   int get ssh_logging_callback1 => _ssh_logging_callback1.value;
 
@@ -1674,8 +1838,10 @@ class LibsshBinding {
   }
 
   late final _ssh_blocking_flushPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Int32)>>('ssh_blocking_flush');
-  late final _ssh_blocking_flush = _ssh_blocking_flushPtr.asFunction<int Function(ssh_session, int)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Int32)>>(
+          'ssh_blocking_flush');
+  late final _ssh_blocking_flush =
+      _ssh_blocking_flushPtr.asFunction<int Function(ssh_session, int)>();
 
   ssh_channel ssh_channel_accept_x11(
     ssh_channel channel,
@@ -1688,8 +1854,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_accept_x11Ptr =
-      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_channel, ffi.Int32)>>('ssh_channel_accept_x11');
-  late final _ssh_channel_accept_x11 = _ssh_channel_accept_x11Ptr.asFunction<ssh_channel Function(ssh_channel, int)>();
+      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_channel, ffi.Int32)>>(
+          'ssh_channel_accept_x11');
+  late final _ssh_channel_accept_x11 = _ssh_channel_accept_x11Ptr
+      .asFunction<ssh_channel Function(ssh_channel, int)>();
 
   int ssh_channel_change_pty_size(
     ssh_channel channel,
@@ -1703,10 +1871,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_change_pty_sizePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Int32, ffi.Int32)>>('ssh_channel_change_pty_size');
-  late final _ssh_channel_change_pty_size =
-      _ssh_channel_change_pty_sizePtr.asFunction<int Function(ssh_channel, int, int)>();
+  late final _ssh_channel_change_pty_sizePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Int32,
+              ffi.Int32)>>('ssh_channel_change_pty_size');
+  late final _ssh_channel_change_pty_size = _ssh_channel_change_pty_sizePtr
+      .asFunction<int Function(ssh_channel, int, int)>();
 
   int ssh_channel_close(
     ssh_channel channel,
@@ -1716,8 +1886,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_closePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_close');
-  late final _ssh_channel_close = _ssh_channel_closePtr.asFunction<int Function(ssh_channel)>();
+  late final _ssh_channel_closePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_close');
+  late final _ssh_channel_close =
+      _ssh_channel_closePtr.asFunction<int Function(ssh_channel)>();
 
   void ssh_channel_free(
     ssh_channel channel,
@@ -1727,8 +1900,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_channel)>>('ssh_channel_free');
-  late final _ssh_channel_free = _ssh_channel_freePtr.asFunction<void Function(ssh_channel)>();
+  late final _ssh_channel_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_channel)>>(
+          'ssh_channel_free');
+  late final _ssh_channel_free =
+      _ssh_channel_freePtr.asFunction<void Function(ssh_channel)>();
 
   int ssh_channel_get_exit_status(
     ssh_channel channel,
@@ -1739,8 +1915,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_get_exit_statusPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_get_exit_status');
-  late final _ssh_channel_get_exit_status = _ssh_channel_get_exit_statusPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_get_exit_status');
+  late final _ssh_channel_get_exit_status =
+      _ssh_channel_get_exit_statusPtr.asFunction<int Function(ssh_channel)>();
 
   ssh_session ssh_channel_get_session(
     ssh_channel channel,
@@ -1751,8 +1929,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_get_sessionPtr =
-      _lookup<ffi.NativeFunction<ssh_session Function(ssh_channel)>>('ssh_channel_get_session');
-  late final _ssh_channel_get_session = _ssh_channel_get_sessionPtr.asFunction<ssh_session Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ssh_session Function(ssh_channel)>>(
+          'ssh_channel_get_session');
+  late final _ssh_channel_get_session = _ssh_channel_get_sessionPtr
+      .asFunction<ssh_session Function(ssh_channel)>();
 
   int ssh_channel_is_closed(
     ssh_channel channel,
@@ -1763,8 +1943,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_is_closedPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_is_closed');
-  late final _ssh_channel_is_closed = _ssh_channel_is_closedPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_is_closed');
+  late final _ssh_channel_is_closed =
+      _ssh_channel_is_closedPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_is_eof(
     ssh_channel channel,
@@ -1775,8 +1957,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_is_eofPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_is_eof');
-  late final _ssh_channel_is_eof = _ssh_channel_is_eofPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_is_eof');
+  late final _ssh_channel_is_eof =
+      _ssh_channel_is_eofPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_is_open(
     ssh_channel channel,
@@ -1787,8 +1971,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_is_openPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_is_open');
-  late final _ssh_channel_is_open = _ssh_channel_is_openPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_is_open');
+  late final _ssh_channel_is_open =
+      _ssh_channel_is_openPtr.asFunction<int Function(ssh_channel)>();
 
   ssh_channel ssh_channel_new(
     ssh_session session,
@@ -1798,8 +1984,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_newPtr = _lookup<ffi.NativeFunction<ssh_channel Function(ssh_session)>>('ssh_channel_new');
-  late final _ssh_channel_new = _ssh_channel_newPtr.asFunction<ssh_channel Function(ssh_session)>();
+  late final _ssh_channel_newPtr =
+      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_session)>>(
+          'ssh_channel_new');
+  late final _ssh_channel_new =
+      _ssh_channel_newPtr.asFunction<ssh_channel Function(ssh_session)>();
 
   int ssh_channel_open_auth_agent(
     ssh_channel channel,
@@ -1810,8 +1999,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_open_auth_agentPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_open_auth_agent');
-  late final _ssh_channel_open_auth_agent = _ssh_channel_open_auth_agentPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_open_auth_agent');
+  late final _ssh_channel_open_auth_agent =
+      _ssh_channel_open_auth_agentPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_open_forward(
     ssh_channel channel,
@@ -1831,10 +2022,12 @@ class LibsshBinding {
 
   late final _ssh_channel_open_forwardPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Int32, ffi.Pointer<ffi.Int8>,
-              ffi.Int32)>>('ssh_channel_open_forward');
-  late final _ssh_channel_open_forward = _ssh_channel_open_forwardPtr
-      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ffi.Int8>, int)>();
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Int32,
+              ffi.Pointer<ffi.Int8>, ffi.Int32)>>('ssh_channel_open_forward');
+  late final _ssh_channel_open_forward =
+      _ssh_channel_open_forwardPtr.asFunction<
+          int Function(ssh_channel, ffi.Pointer<ffi.Int8>, int,
+              ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_channel_open_forward_unix(
     ssh_channel channel,
@@ -1851,10 +2044,16 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_open_forward_unixPtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, ffi.Int32)>>(
-      'ssh_channel_open_forward_unix');
-  late final _ssh_channel_open_forward_unix = _ssh_channel_open_forward_unixPtr
-      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, int)>();
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_channel,
+              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('ssh_channel_open_forward_unix');
+  late final _ssh_channel_open_forward_unix =
+      _ssh_channel_open_forward_unixPtr.asFunction<
+          int Function(ssh_channel, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_channel_open_session(
     ssh_channel channel,
@@ -1865,8 +2064,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_open_sessionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_open_session');
-  late final _ssh_channel_open_session = _ssh_channel_open_sessionPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_open_session');
+  late final _ssh_channel_open_session =
+      _ssh_channel_open_sessionPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_open_x11(
     ssh_channel channel,
@@ -1880,11 +2081,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_open_x11Ptr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Int32)>>(
-          'ssh_channel_open_x11');
-  late final _ssh_channel_open_x11 =
-      _ssh_channel_open_x11Ptr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, int)>();
+  late final _ssh_channel_open_x11Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('ssh_channel_open_x11');
+  late final _ssh_channel_open_x11 = _ssh_channel_open_x11Ptr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_channel_poll(
     ssh_channel channel,
@@ -1897,8 +2099,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_pollPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Int32)>>('ssh_channel_poll');
-  late final _ssh_channel_poll = _ssh_channel_pollPtr.asFunction<int Function(ssh_channel, int)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Int32)>>(
+          'ssh_channel_poll');
+  late final _ssh_channel_poll =
+      _ssh_channel_pollPtr.asFunction<int Function(ssh_channel, int)>();
 
   int ssh_channel_poll_timeout(
     ssh_channel channel,
@@ -1912,9 +2116,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_poll_timeoutPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Int32, ffi.Int32)>>('ssh_channel_poll_timeout');
-  late final _ssh_channel_poll_timeout = _ssh_channel_poll_timeoutPtr.asFunction<int Function(ssh_channel, int, int)>();
+  late final _ssh_channel_poll_timeoutPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_channel, ffi.Int32, ffi.Int32)>>('ssh_channel_poll_timeout');
+  late final _ssh_channel_poll_timeout = _ssh_channel_poll_timeoutPtr
+      .asFunction<int Function(ssh_channel, int, int)>();
 
   int ssh_channel_read(
     ssh_channel channel,
@@ -1930,11 +2137,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_readPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32, ffi.Int32)>>(
-          'ssh_channel_read');
-  late final _ssh_channel_read =
-      _ssh_channel_readPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int, int)>();
+  late final _ssh_channel_readPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32,
+              ffi.Int32)>>('ssh_channel_read');
+  late final _ssh_channel_read = _ssh_channel_readPtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int, int)>();
 
   int ssh_channel_read_timeout(
     ssh_channel channel,
@@ -1953,10 +2161,12 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_read_timeoutPtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32, ffi.Int32, ffi.Int32)>>(
-      'ssh_channel_read_timeout');
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32,
+              ffi.Int32, ffi.Int32)>>('ssh_channel_read_timeout');
   late final _ssh_channel_read_timeout =
-      _ssh_channel_read_timeoutPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int, int, int)>();
+      _ssh_channel_read_timeoutPtr.asFunction<
+          int Function(ssh_channel, ffi.Pointer<ffi.Void>, int, int, int)>();
 
   int ssh_channel_read_nonblocking(
     ssh_channel channel,
@@ -1972,11 +2182,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_read_nonblockingPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32, ffi.Int32)>>(
-          'ssh_channel_read_nonblocking');
-  late final _ssh_channel_read_nonblocking =
-      _ssh_channel_read_nonblockingPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int, int)>();
+  late final _ssh_channel_read_nonblockingPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32,
+              ffi.Int32)>>('ssh_channel_read_nonblocking');
+  late final _ssh_channel_read_nonblocking = _ssh_channel_read_nonblockingPtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int, int)>();
 
   int ssh_channel_request_env(
     ssh_channel channel,
@@ -1990,11 +2201,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_request_envPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_channel_request_env');
-  late final _ssh_channel_request_env =
-      _ssh_channel_request_envPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_channel_request_envPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('ssh_channel_request_env');
+  late final _ssh_channel_request_env = _ssh_channel_request_envPtr.asFunction<
+      int Function(
+          ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_channel_request_exec(
     ssh_channel channel,
@@ -2006,10 +2219,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_request_execPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>)>>('ssh_channel_request_exec');
-  late final _ssh_channel_request_exec =
-      _ssh_channel_request_execPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_channel_request_execPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_channel, ffi.Pointer<ffi.Int8>)>>('ssh_channel_request_exec');
+  late final _ssh_channel_request_exec = _ssh_channel_request_execPtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_channel_request_pty(
     ssh_channel channel,
@@ -2020,8 +2235,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_request_ptyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_request_pty');
-  late final _ssh_channel_request_pty = _ssh_channel_request_ptyPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_request_pty');
+  late final _ssh_channel_request_pty =
+      _ssh_channel_request_ptyPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_request_pty_size(
     ssh_channel channel,
@@ -2037,11 +2254,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_request_pty_sizePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Int32, ffi.Int32)>>(
-          'ssh_channel_request_pty_size');
-  late final _ssh_channel_request_pty_size =
-      _ssh_channel_request_pty_sizePtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, int, int)>();
+  late final _ssh_channel_request_pty_sizePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>, ffi.Int32,
+              ffi.Int32)>>('ssh_channel_request_pty_size');
+  late final _ssh_channel_request_pty_size = _ssh_channel_request_pty_sizePtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>, int, int)>();
 
   int ssh_channel_request_shell(
     ssh_channel channel,
@@ -2052,8 +2270,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_request_shellPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_request_shell');
-  late final _ssh_channel_request_shell = _ssh_channel_request_shellPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_request_shell');
+  late final _ssh_channel_request_shell =
+      _ssh_channel_request_shellPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_request_send_signal(
     ssh_channel channel,
@@ -2065,11 +2285,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_request_send_signalPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_channel_request_send_signal');
+  late final _ssh_channel_request_send_signalPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel,
+              ffi.Pointer<ffi.Int8>)>>('ssh_channel_request_send_signal');
   late final _ssh_channel_request_send_signal =
-      _ssh_channel_request_send_signalPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>)>();
+      _ssh_channel_request_send_signalPtr
+          .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_channel_request_send_break(
     ssh_channel channel,
@@ -2082,9 +2304,11 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_request_send_breakPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Uint32)>>('ssh_channel_request_send_break');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Uint32)>>(
+          'ssh_channel_request_send_break');
   late final _ssh_channel_request_send_break =
-      _ssh_channel_request_send_breakPtr.asFunction<int Function(ssh_channel, int)>();
+      _ssh_channel_request_send_breakPtr
+          .asFunction<int Function(ssh_channel, int)>();
 
   int ssh_channel_request_sftp(
     ssh_channel channel,
@@ -2095,8 +2319,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_request_sftpPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_request_sftp');
-  late final _ssh_channel_request_sftp = _ssh_channel_request_sftpPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_request_sftp');
+  late final _ssh_channel_request_sftp =
+      _ssh_channel_request_sftpPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_request_subsystem(
     ssh_channel channel,
@@ -2108,11 +2334,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_request_subsystemPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_channel_request_subsystem');
-  late final _ssh_channel_request_subsystem =
-      _ssh_channel_request_subsystemPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_channel_request_subsystemPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel,
+              ffi.Pointer<ffi.Int8>)>>('ssh_channel_request_subsystem');
+  late final _ssh_channel_request_subsystem = _ssh_channel_request_subsystemPtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_channel_request_x11(
     ssh_channel channel,
@@ -2132,10 +2359,11 @@ class LibsshBinding {
 
   late final _ssh_channel_request_x11Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ssh_channel, ffi.Int32, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>,
-              ffi.Int32)>>('ssh_channel_request_x11');
-  late final _ssh_channel_request_x11 = _ssh_channel_request_x11Ptr
-      .asFunction<int Function(ssh_channel, int, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, int)>();
+          ffi.Int32 Function(ssh_channel, ffi.Int32, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>, ffi.Int32)>>('ssh_channel_request_x11');
+  late final _ssh_channel_request_x11 = _ssh_channel_request_x11Ptr.asFunction<
+      int Function(ssh_channel, int, ffi.Pointer<ffi.Int8>,
+          ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_channel_request_auth_agent(
     ssh_channel channel,
@@ -2146,9 +2374,11 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_request_auth_agentPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_request_auth_agent');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_request_auth_agent');
   late final _ssh_channel_request_auth_agent =
-      _ssh_channel_request_auth_agentPtr.asFunction<int Function(ssh_channel)>();
+      _ssh_channel_request_auth_agentPtr
+          .asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_send_eof(
     ssh_channel channel,
@@ -2159,8 +2389,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_send_eofPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>('ssh_channel_send_eof');
-  late final _ssh_channel_send_eof = _ssh_channel_send_eofPtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel)>>(
+          'ssh_channel_send_eof');
+  late final _ssh_channel_send_eof =
+      _ssh_channel_send_eofPtr.asFunction<int Function(ssh_channel)>();
 
   int ssh_channel_select(
     ffi.Pointer<ssh_channel> readchans,
@@ -2178,11 +2410,14 @@ class LibsshBinding {
 
   late final _ssh_channel_selectPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>,
+          ffi.Int32 Function(
+              ffi.Pointer<ssh_channel>,
+              ffi.Pointer<ssh_channel>,
+              ffi.Pointer<ssh_channel>,
               ffi.Pointer<timeval>)>>('ssh_channel_select');
   late final _ssh_channel_select = _ssh_channel_selectPtr.asFunction<
-      int Function(
-          ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>, ffi.Pointer<timeval>)>();
+      int Function(ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>,
+          ffi.Pointer<ssh_channel>, ffi.Pointer<timeval>)>();
 
   void ssh_channel_set_blocking(
     ssh_channel channel,
@@ -2195,8 +2430,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_set_blockingPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_channel, ffi.Int32)>>('ssh_channel_set_blocking');
-  late final _ssh_channel_set_blocking = _ssh_channel_set_blockingPtr.asFunction<void Function(ssh_channel, int)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_channel, ffi.Int32)>>(
+          'ssh_channel_set_blocking');
+  late final _ssh_channel_set_blocking = _ssh_channel_set_blockingPtr
+      .asFunction<void Function(ssh_channel, int)>();
 
   void ssh_channel_set_counter(
     ssh_channel channel,
@@ -2209,9 +2446,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_set_counterPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_channel, ssh_counter)>>('ssh_channel_set_counter');
-  late final _ssh_channel_set_counter =
-      _ssh_channel_set_counterPtr.asFunction<void Function(ssh_channel, ssh_counter)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_channel, ssh_counter)>>(
+          'ssh_channel_set_counter');
+  late final _ssh_channel_set_counter = _ssh_channel_set_counterPtr
+      .asFunction<void Function(ssh_channel, ssh_counter)>();
 
   int ssh_channel_write(
     ssh_channel channel,
@@ -2225,11 +2463,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_writePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32)>>(
-          'ssh_channel_write');
-  late final _ssh_channel_write =
-      _ssh_channel_writePtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_channel_writePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>,
+              ffi.Uint32)>>('ssh_channel_write');
+  late final _ssh_channel_write = _ssh_channel_writePtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int)>();
 
   int ssh_channel_write_stderr(
     ssh_channel channel,
@@ -2243,11 +2482,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_write_stderrPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>, ffi.Uint32)>>(
-          'ssh_channel_write_stderr');
-  late final _ssh_channel_write_stderr =
-      _ssh_channel_write_stderrPtr.asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_channel_write_stderrPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_channel, ffi.Pointer<ffi.Void>,
+              ffi.Uint32)>>('ssh_channel_write_stderr');
+  late final _ssh_channel_write_stderr = _ssh_channel_write_stderrPtr
+      .asFunction<int Function(ssh_channel, ffi.Pointer<ffi.Void>, int)>();
 
   int ssh_channel_window_size(
     ssh_channel channel,
@@ -2258,8 +2498,10 @@ class LibsshBinding {
   }
 
   late final _ssh_channel_window_sizePtr =
-      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ssh_channel)>>('ssh_channel_window_size');
-  late final _ssh_channel_window_size = _ssh_channel_window_sizePtr.asFunction<int Function(ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ssh_channel)>>(
+          'ssh_channel_window_size');
+  late final _ssh_channel_window_size =
+      _ssh_channel_window_sizePtr.asFunction<int Function(ssh_channel)>();
 
   ffi.Pointer<ffi.Int8> ssh_basename(
     ffi.Pointer<ffi.Int8> path,
@@ -2269,9 +2511,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_basenamePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Int8>)>>('ssh_basename');
-  late final _ssh_basename = _ssh_basenamePtr.asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_basenamePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              ffi.Pointer<ffi.Int8>)>>('ssh_basename');
+  late final _ssh_basename = _ssh_basenamePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Int8>)>();
 
   void ssh_clean_pubkey_hash(
     ffi.Pointer<ffi.Pointer<ffi.Uint8>> hash,
@@ -2281,10 +2526,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_clean_pubkey_hashPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>>('ssh_clean_pubkey_hash');
-  late final _ssh_clean_pubkey_hash =
-      _ssh_clean_pubkey_hashPtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>();
+  late final _ssh_clean_pubkey_hashPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>>('ssh_clean_pubkey_hash');
+  late final _ssh_clean_pubkey_hash = _ssh_clean_pubkey_hashPtr
+      .asFunction<void Function(ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>();
 
   int ssh_connect(
     ssh_session session,
@@ -2294,8 +2541,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_connectPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_connect');
-  late final _ssh_connect = _ssh_connectPtr.asFunction<int Function(ssh_session)>();
+  late final _ssh_connectPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_connect');
+  late final _ssh_connect =
+      _ssh_connectPtr.asFunction<int Function(ssh_session)>();
 
   ssh_connector ssh_connector_new(
     ssh_session session,
@@ -2306,8 +2556,10 @@ class LibsshBinding {
   }
 
   late final _ssh_connector_newPtr =
-      _lookup<ffi.NativeFunction<ssh_connector Function(ssh_session)>>('ssh_connector_new');
-  late final _ssh_connector_new = _ssh_connector_newPtr.asFunction<ssh_connector Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ssh_connector Function(ssh_session)>>(
+          'ssh_connector_new');
+  late final _ssh_connector_new =
+      _ssh_connector_newPtr.asFunction<ssh_connector Function(ssh_session)>();
 
   void ssh_connector_free(
     ssh_connector connector,
@@ -2318,8 +2570,10 @@ class LibsshBinding {
   }
 
   late final _ssh_connector_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_connector)>>('ssh_connector_free');
-  late final _ssh_connector_free = _ssh_connector_freePtr.asFunction<void Function(ssh_connector)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_connector)>>(
+          'ssh_connector_free');
+  late final _ssh_connector_free =
+      _ssh_connector_freePtr.asFunction<void Function(ssh_connector)>();
 
   int ssh_connector_set_in_channel(
     ssh_connector connector,
@@ -2333,11 +2587,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_connector_set_in_channelPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_connector, ssh_channel, ffi.Int32)>>(
-          'ssh_connector_set_in_channel');
-  late final _ssh_connector_set_in_channel =
-      _ssh_connector_set_in_channelPtr.asFunction<int Function(ssh_connector, ssh_channel, int)>();
+  late final _ssh_connector_set_in_channelPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_connector, ssh_channel,
+              ffi.Int32)>>('ssh_connector_set_in_channel');
+  late final _ssh_connector_set_in_channel = _ssh_connector_set_in_channelPtr
+      .asFunction<int Function(ssh_connector, ssh_channel, int)>();
 
   int ssh_connector_set_out_channel(
     ssh_connector connector,
@@ -2351,11 +2606,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_connector_set_out_channelPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_connector, ssh_channel, ffi.Int32)>>(
-          'ssh_connector_set_out_channel');
-  late final _ssh_connector_set_out_channel =
-      _ssh_connector_set_out_channelPtr.asFunction<int Function(ssh_connector, ssh_channel, int)>();
+  late final _ssh_connector_set_out_channelPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_connector, ssh_channel,
+              ffi.Int32)>>('ssh_connector_set_out_channel');
+  late final _ssh_connector_set_out_channel = _ssh_connector_set_out_channelPtr
+      .asFunction<int Function(ssh_connector, ssh_channel, int)>();
 
   void ssh_connector_set_in_fd(
     ssh_connector connector,
@@ -2368,8 +2624,10 @@ class LibsshBinding {
   }
 
   late final _ssh_connector_set_in_fdPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_connector, socket_t)>>('ssh_connector_set_in_fd');
-  late final _ssh_connector_set_in_fd = _ssh_connector_set_in_fdPtr.asFunction<void Function(ssh_connector, int)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_connector, socket_t)>>(
+          'ssh_connector_set_in_fd');
+  late final _ssh_connector_set_in_fd = _ssh_connector_set_in_fdPtr
+      .asFunction<void Function(ssh_connector, int)>();
 
   void ssh_connector_set_out_fd(
     ssh_connector connector,
@@ -2382,15 +2640,20 @@ class LibsshBinding {
   }
 
   late final _ssh_connector_set_out_fdPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_connector, socket_t)>>('ssh_connector_set_out_fd');
-  late final _ssh_connector_set_out_fd = _ssh_connector_set_out_fdPtr.asFunction<void Function(ssh_connector, int)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_connector, socket_t)>>(
+          'ssh_connector_set_out_fd');
+  late final _ssh_connector_set_out_fd = _ssh_connector_set_out_fdPtr
+      .asFunction<void Function(ssh_connector, int)>();
 
   ffi.Pointer<ffi.Int8> ssh_copyright() {
     return _ssh_copyright();
   }
 
-  late final _ssh_copyrightPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function()>>('ssh_copyright');
-  late final _ssh_copyright = _ssh_copyrightPtr.asFunction<ffi.Pointer<ffi.Int8> Function()>();
+  late final _ssh_copyrightPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function()>>(
+          'ssh_copyright');
+  late final _ssh_copyright =
+      _ssh_copyrightPtr.asFunction<ffi.Pointer<ffi.Int8> Function()>();
 
   void ssh_disconnect(
     ssh_session session,
@@ -2400,8 +2663,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_disconnectPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_disconnect');
-  late final _ssh_disconnect = _ssh_disconnectPtr.asFunction<void Function(ssh_session)>();
+  late final _ssh_disconnectPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>(
+          'ssh_disconnect');
+  late final _ssh_disconnect =
+      _ssh_disconnectPtr.asFunction<void Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_dirname(
     ffi.Pointer<ffi.Int8> path,
@@ -2411,15 +2677,19 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_dirnamePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Int8>)>>('ssh_dirname');
-  late final _ssh_dirname = _ssh_dirnamePtr.asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_dirnamePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              ffi.Pointer<ffi.Int8>)>>('ssh_dirname');
+  late final _ssh_dirname = _ssh_dirnamePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Int8>)>();
 
   int ssh_finalize() {
     return _ssh_finalize();
   }
 
-  late final _ssh_finalizePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('ssh_finalize');
+  late final _ssh_finalizePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('ssh_finalize');
   late final _ssh_finalize = _ssh_finalizePtr.asFunction<int Function()>();
 
   ssh_channel ssh_channel_accept_forward(
@@ -2434,11 +2704,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_accept_forwardPtr =
-      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_session, ffi.Int32, ffi.Pointer<ffi.Int32>)>>(
-          'ssh_channel_accept_forward');
+  late final _ssh_channel_accept_forwardPtr = _lookup<
+      ffi.NativeFunction<
+          ssh_channel Function(ssh_session, ffi.Int32,
+              ffi.Pointer<ffi.Int32>)>>('ssh_channel_accept_forward');
   late final _ssh_channel_accept_forward =
-      _ssh_channel_accept_forwardPtr.asFunction<ssh_channel Function(ssh_session, int, ffi.Pointer<ffi.Int32>)>();
+      _ssh_channel_accept_forwardPtr.asFunction<
+          ssh_channel Function(ssh_session, int, ffi.Pointer<ffi.Int32>)>();
 
   int ssh_channel_cancel_forward(
     ssh_session session,
@@ -2452,11 +2724,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_channel_cancel_forwardPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32)>>(
-          'ssh_channel_cancel_forward');
-  late final _ssh_channel_cancel_forward =
-      _ssh_channel_cancel_forwardPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int)>();
+  late final _ssh_channel_cancel_forwardPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('ssh_channel_cancel_forward');
+  late final _ssh_channel_cancel_forward = _ssh_channel_cancel_forwardPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_channel_listen_forward(
     ssh_session session,
@@ -2474,10 +2747,12 @@ class LibsshBinding {
 
   late final _ssh_channel_listen_forwardPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32, ffi.Pointer<ffi.Int32>)>>('ssh_channel_listen_forward');
-  late final _ssh_channel_listen_forward = _ssh_channel_listen_forwardPtr
-      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ffi.Int32>)>();
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32,
+              ffi.Pointer<ffi.Int32>)>>('ssh_channel_listen_forward');
+  late final _ssh_channel_listen_forward =
+      _ssh_channel_listen_forwardPtr.asFunction<
+          int Function(ssh_session, ffi.Pointer<ffi.Int8>, int,
+              ffi.Pointer<ffi.Int32>)>();
 
   void ssh_free(
     ssh_session session,
@@ -2487,7 +2762,8 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_free');
+  late final _ssh_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_free');
   late final _ssh_free = _ssh_freePtr.asFunction<void Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_disconnect_message(
@@ -2499,9 +2775,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_disconnect_messagePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_disconnect_message');
-  late final _ssh_get_disconnect_message =
-      _ssh_get_disconnect_messagePtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_disconnect_message');
+  late final _ssh_get_disconnect_message = _ssh_get_disconnect_messagePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_error(
     ffi.Pointer<ffi.Void> error,
@@ -2511,9 +2788,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_errorPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Void>)>>('ssh_get_error');
-  late final _ssh_get_error = _ssh_get_errorPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Void>)>();
+  late final _ssh_get_errorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              ffi.Pointer<ffi.Void>)>>('ssh_get_error');
+  late final _ssh_get_error = _ssh_get_errorPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Void>)>();
 
   int ssh_get_error_code(
     ffi.Pointer<ffi.Void> error,
@@ -2524,8 +2804,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_error_codePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Void>)>>('ssh_get_error_code');
-  late final _ssh_get_error_code = _ssh_get_error_codePtr.asFunction<int Function(ffi.Pointer<ffi.Void>)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Void>)>>(
+          'ssh_get_error_code');
+  late final _ssh_get_error_code =
+      _ssh_get_error_codePtr.asFunction<int Function(ffi.Pointer<ffi.Void>)>();
 
   int ssh_get_fd(
     ssh_session session,
@@ -2535,8 +2817,10 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_fdPtr = _lookup<ffi.NativeFunction<socket_t Function(ssh_session)>>('ssh_get_fd');
-  late final _ssh_get_fd = _ssh_get_fdPtr.asFunction<int Function(ssh_session)>();
+  late final _ssh_get_fdPtr =
+      _lookup<ffi.NativeFunction<socket_t Function(ssh_session)>>('ssh_get_fd');
+  late final _ssh_get_fd =
+      _ssh_get_fdPtr.asFunction<int Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_hexa(
     ffi.Pointer<ffi.Uint8> what,
@@ -2548,9 +2832,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_hexaPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Uint8>, size_t)>>('ssh_get_hexa');
-  late final _ssh_get_hexa = _ssh_get_hexaPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Uint8>, int)>();
+  late final _ssh_get_hexaPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              ffi.Pointer<ffi.Uint8>, size_t)>>('ssh_get_hexa');
+  late final _ssh_get_hexa = _ssh_get_hexaPtr.asFunction<
+      ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ffi.Uint8>, int)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_issue_banner(
     ssh_session session,
@@ -2561,8 +2848,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_issue_bannerPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_issue_banner');
-  late final _ssh_get_issue_banner = _ssh_get_issue_bannerPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_issue_banner');
+  late final _ssh_get_issue_banner = _ssh_get_issue_bannerPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   int ssh_get_openssh_version(
     ssh_session session,
@@ -2573,8 +2862,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_openssh_versionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_get_openssh_version');
-  late final _ssh_get_openssh_version = _ssh_get_openssh_versionPtr.asFunction<int Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_get_openssh_version');
+  late final _ssh_get_openssh_version =
+      _ssh_get_openssh_versionPtr.asFunction<int Function(ssh_session)>();
 
   int ssh_get_server_publickey(
     ssh_session session,
@@ -2586,10 +2877,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_server_publickeyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ssh_key>)>>('ssh_get_server_publickey');
-  late final _ssh_get_server_publickey =
-      _ssh_get_server_publickeyPtr.asFunction<int Function(ssh_session, ffi.Pointer<ssh_key>)>();
+  late final _ssh_get_server_publickeyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ssh_key>)>>('ssh_get_server_publickey');
+  late final _ssh_get_server_publickey = _ssh_get_server_publickeyPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ssh_key>)>();
 
   int ssh_get_publickey_hash(
     ssh_key key,
@@ -2608,9 +2901,13 @@ class LibsshBinding {
   late final _ssh_get_publickey_hashPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(
-              ssh_key, ffi.Int32, ffi.Pointer<ffi.Pointer<ffi.Uint8>>, ffi.Pointer<size_t>)>>('ssh_get_publickey_hash');
-  late final _ssh_get_publickey_hash = _ssh_get_publickey_hashPtr
-      .asFunction<int Function(ssh_key, int, ffi.Pointer<ffi.Pointer<ffi.Uint8>>, ffi.Pointer<size_t>)>();
+              ssh_key,
+              ffi.Int32,
+              ffi.Pointer<ffi.Pointer<ffi.Uint8>>,
+              ffi.Pointer<size_t>)>>('ssh_get_publickey_hash');
+  late final _ssh_get_publickey_hash = _ssh_get_publickey_hashPtr.asFunction<
+      int Function(ssh_key, int, ffi.Pointer<ffi.Pointer<ffi.Uint8>>,
+          ffi.Pointer<size_t>)>();
 
   int ssh_get_pubkey_hash(
     ssh_session session,
@@ -2622,11 +2919,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_pubkey_hashPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>>(
-          'ssh_get_pubkey_hash');
-  late final _ssh_get_pubkey_hash =
-      _ssh_get_pubkey_hashPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>();
+  late final _ssh_get_pubkey_hashPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session,
+              ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>>('ssh_get_pubkey_hash');
+  late final _ssh_get_pubkey_hash = _ssh_get_pubkey_hashPtr.asFunction<
+      int Function(ssh_session, ffi.Pointer<ffi.Pointer<ffi.Uint8>>)>();
 
   ssh_channel ssh_forward_accept(
     ssh_session session,
@@ -2639,8 +2937,10 @@ class LibsshBinding {
   }
 
   late final _ssh_forward_acceptPtr =
-      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_session, ffi.Int32)>>('ssh_forward_accept');
-  late final _ssh_forward_accept = _ssh_forward_acceptPtr.asFunction<ssh_channel Function(ssh_session, int)>();
+      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_session, ffi.Int32)>>(
+          'ssh_forward_accept');
+  late final _ssh_forward_accept = _ssh_forward_acceptPtr
+      .asFunction<ssh_channel Function(ssh_session, int)>();
 
   int ssh_forward_cancel(
     ssh_session session,
@@ -2654,11 +2954,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_forward_cancelPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32)>>(
-          'ssh_forward_cancel');
-  late final _ssh_forward_cancel =
-      _ssh_forward_cancelPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int)>();
+  late final _ssh_forward_cancelPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('ssh_forward_cancel');
+  late final _ssh_forward_cancel = _ssh_forward_cancelPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_forward_listen(
     ssh_session session,
@@ -2676,10 +2977,11 @@ class LibsshBinding {
 
   late final _ssh_forward_listenPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32, ffi.Pointer<ffi.Int32>)>>('ssh_forward_listen');
-  late final _ssh_forward_listen = _ssh_forward_listenPtr
-      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ffi.Int32>)>();
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32,
+              ffi.Pointer<ffi.Int32>)>>('ssh_forward_listen');
+  late final _ssh_forward_listen = _ssh_forward_listenPtr.asFunction<
+      int Function(
+          ssh_session, ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ffi.Int32>)>();
 
   int ssh_get_publickey(
     ssh_session session,
@@ -2691,9 +2993,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_publickeyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ssh_key>)>>('ssh_get_publickey');
-  late final _ssh_get_publickey = _ssh_get_publickeyPtr.asFunction<int Function(ssh_session, ffi.Pointer<ssh_key>)>();
+  late final _ssh_get_publickeyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ssh_key>)>>('ssh_get_publickey');
+  late final _ssh_get_publickey = _ssh_get_publickeyPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ssh_key>)>();
 
   int ssh_write_knownhost(
     ssh_session session,
@@ -2704,8 +3009,10 @@ class LibsshBinding {
   }
 
   late final _ssh_write_knownhostPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_write_knownhost');
-  late final _ssh_write_knownhost = _ssh_write_knownhostPtr.asFunction<int Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_write_knownhost');
+  late final _ssh_write_knownhost =
+      _ssh_write_knownhostPtr.asFunction<int Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_dump_knownhost(
     ssh_session session,
@@ -2716,8 +3023,10 @@ class LibsshBinding {
   }
 
   late final _ssh_dump_knownhostPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_dump_knownhost');
-  late final _ssh_dump_knownhost = _ssh_dump_knownhostPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_dump_knownhost');
+  late final _ssh_dump_knownhost = _ssh_dump_knownhostPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   int ssh_is_server_known(
     ssh_session session,
@@ -2728,8 +3037,10 @@ class LibsshBinding {
   }
 
   late final _ssh_is_server_knownPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_is_server_known');
-  late final _ssh_is_server_known = _ssh_is_server_knownPtr.asFunction<int Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_is_server_known');
+  late final _ssh_is_server_known =
+      _ssh_is_server_knownPtr.asFunction<int Function(ssh_session)>();
 
   void ssh_print_hexa(
     ffi.Pointer<ffi.Int8> descr,
@@ -2743,11 +3054,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_print_hexaPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Uint8>, size_t)>>(
-          'ssh_print_hexa');
-  late final _ssh_print_hexa =
-      _ssh_print_hexaPtr.asFunction<void Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Uint8>, int)>();
+  late final _ssh_print_hexaPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Uint8>,
+              size_t)>>('ssh_print_hexa');
+  late final _ssh_print_hexa = _ssh_print_hexaPtr.asFunction<
+      void Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Uint8>, int)>();
 
   int ssh_get_random(
     ffi.Pointer<ffi.Void> where,
@@ -2761,9 +3073,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_randomPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.Int32, ffi.Int32)>>('ssh_get_random');
-  late final _ssh_get_random = _ssh_get_randomPtr.asFunction<int Function(ffi.Pointer<ffi.Void>, int, int)>();
+  late final _ssh_get_randomPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void>, ffi.Int32, ffi.Int32)>>('ssh_get_random');
+  late final _ssh_get_random = _ssh_get_randomPtr
+      .asFunction<int Function(ffi.Pointer<ffi.Void>, int, int)>();
 
   int ssh_get_version(
     ssh_session session,
@@ -2773,8 +3088,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_versionPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_get_version');
-  late final _ssh_get_version = _ssh_get_versionPtr.asFunction<int Function(ssh_session)>();
+  late final _ssh_get_versionPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_get_version');
+  late final _ssh_get_version =
+      _ssh_get_versionPtr.asFunction<int Function(ssh_session)>();
 
   int ssh_get_status(
     ssh_session session,
@@ -2784,8 +3102,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_statusPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_get_status');
-  late final _ssh_get_status = _ssh_get_statusPtr.asFunction<int Function(ssh_session)>();
+  late final _ssh_get_statusPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_get_status');
+  late final _ssh_get_status =
+      _ssh_get_statusPtr.asFunction<int Function(ssh_session)>();
 
   int ssh_get_poll_flags(
     ssh_session session,
@@ -2796,14 +3117,17 @@ class LibsshBinding {
   }
 
   late final _ssh_get_poll_flagsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_get_poll_flags');
-  late final _ssh_get_poll_flags = _ssh_get_poll_flagsPtr.asFunction<int Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_get_poll_flags');
+  late final _ssh_get_poll_flags =
+      _ssh_get_poll_flagsPtr.asFunction<int Function(ssh_session)>();
 
   int ssh_init() {
     return _ssh_init();
   }
 
-  late final _ssh_initPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('ssh_init');
+  late final _ssh_initPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('ssh_init');
   late final _ssh_init = _ssh_initPtr.asFunction<int Function()>();
 
   int ssh_is_blocking(
@@ -2814,8 +3138,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_is_blockingPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_is_blocking');
-  late final _ssh_is_blocking = _ssh_is_blockingPtr.asFunction<int Function(ssh_session)>();
+  late final _ssh_is_blockingPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_is_blocking');
+  late final _ssh_is_blocking =
+      _ssh_is_blockingPtr.asFunction<int Function(ssh_session)>();
 
   int ssh_is_connected(
     ssh_session session,
@@ -2825,8 +3152,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_is_connectedPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_is_connected');
-  late final _ssh_is_connected = _ssh_is_connectedPtr.asFunction<int Function(ssh_session)>();
+  late final _ssh_is_connectedPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_is_connected');
+  late final _ssh_is_connected =
+      _ssh_is_connectedPtr.asFunction<int Function(ssh_session)>();
 
   void ssh_knownhosts_entry_free(
     ffi.Pointer<ssh_knownhosts_entry> entry,
@@ -2836,10 +3166,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_knownhosts_entry_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ssh_knownhosts_entry>)>>('ssh_knownhosts_entry_free');
-  late final _ssh_knownhosts_entry_free =
-      _ssh_knownhosts_entry_freePtr.asFunction<void Function(ffi.Pointer<ssh_knownhosts_entry>)>();
+  late final _ssh_knownhosts_entry_freePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<ssh_knownhosts_entry>)>>('ssh_knownhosts_entry_free');
+  late final _ssh_knownhosts_entry_free = _ssh_knownhosts_entry_freePtr
+      .asFunction<void Function(ffi.Pointer<ssh_knownhosts_entry>)>();
 
   int ssh_known_hosts_parse_line(
     ffi.Pointer<ffi.Int8> host,
@@ -2854,11 +3186,14 @@ class LibsshBinding {
   }
 
   late final _ssh_known_hosts_parse_linePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>,
-              ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>>('ssh_known_hosts_parse_line');
-  late final _ssh_known_hosts_parse_line = _ssh_known_hosts_parse_linePtr.asFunction<
-      int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>();
+          ffi.NativeFunction<
+              ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>,
+                  ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>>(
+      'ssh_known_hosts_parse_line');
+  late final _ssh_known_hosts_parse_line =
+      _ssh_known_hosts_parse_linePtr.asFunction<
+          int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>();
 
   int ssh_session_has_known_hosts_entry(
     ssh_session session,
@@ -2869,9 +3204,11 @@ class LibsshBinding {
   }
 
   late final _ssh_session_has_known_hosts_entryPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_session_has_known_hosts_entry');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_session_has_known_hosts_entry');
   late final _ssh_session_has_known_hosts_entry =
-      _ssh_session_has_known_hosts_entryPtr.asFunction<int Function(ssh_session)>();
+      _ssh_session_has_known_hosts_entryPtr
+          .asFunction<int Function(ssh_session)>();
 
   int ssh_session_export_known_hosts_entry(
     ssh_session session,
@@ -2883,11 +3220,14 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_session_export_known_hosts_entryPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>(
-          'ssh_session_export_known_hosts_entry');
-  late final _ssh_session_export_known_hosts_entry = _ssh_session_export_known_hosts_entryPtr
-      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
+  late final _ssh_session_export_known_hosts_entryPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ssh_session, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>(
+      'ssh_session_export_known_hosts_entry');
+  late final _ssh_session_export_known_hosts_entry =
+      _ssh_session_export_known_hosts_entryPtr.asFunction<
+          int Function(ssh_session, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
 
   int ssh_session_update_known_hosts(
     ssh_session session,
@@ -2898,9 +3238,11 @@ class LibsshBinding {
   }
 
   late final _ssh_session_update_known_hostsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_session_update_known_hosts');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_session_update_known_hosts');
   late final _ssh_session_update_known_hosts =
-      _ssh_session_update_known_hostsPtr.asFunction<int Function(ssh_session)>();
+      _ssh_session_update_known_hostsPtr
+          .asFunction<int Function(ssh_session)>();
 
   int ssh_session_get_known_hosts_entry(
     ssh_session session,
@@ -2912,11 +3254,15 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_session_get_known_hosts_entryPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>>(
-          'ssh_session_get_known_hosts_entry');
-  late final _ssh_session_get_known_hosts_entry = _ssh_session_get_known_hosts_entryPtr
-      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>();
+  late final _ssh_session_get_known_hosts_entryPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(ssh_session,
+                  ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>>(
+      'ssh_session_get_known_hosts_entry');
+  late final _ssh_session_get_known_hosts_entry =
+      _ssh_session_get_known_hosts_entryPtr.asFunction<
+          int Function(
+              ssh_session, ffi.Pointer<ffi.Pointer<ssh_knownhosts_entry>>)>();
 
   int ssh_session_is_known_server(
     ssh_session session,
@@ -2927,8 +3273,10 @@ class LibsshBinding {
   }
 
   late final _ssh_session_is_known_serverPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_session_is_known_server');
-  late final _ssh_session_is_known_server = _ssh_session_is_known_serverPtr.asFunction<int Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_session_is_known_server');
+  late final _ssh_session_is_known_server =
+      _ssh_session_is_known_serverPtr.asFunction<int Function(ssh_session)>();
 
   int ssh_set_log_level(
     int level,
@@ -2938,23 +3286,30 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_log_levelPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Int32)>>('ssh_set_log_level');
-  late final _ssh_set_log_level = _ssh_set_log_levelPtr.asFunction<int Function(int)>();
+  late final _ssh_set_log_levelPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Int32)>>(
+          'ssh_set_log_level');
+  late final _ssh_set_log_level =
+      _ssh_set_log_levelPtr.asFunction<int Function(int)>();
 
   int ssh_get_log_level() {
     return _ssh_get_log_level();
   }
 
-  late final _ssh_get_log_levelPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('ssh_get_log_level');
-  late final _ssh_get_log_level = _ssh_get_log_levelPtr.asFunction<int Function()>();
+  late final _ssh_get_log_levelPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('ssh_get_log_level');
+  late final _ssh_get_log_level =
+      _ssh_get_log_levelPtr.asFunction<int Function()>();
 
   ffi.Pointer<ffi.Void> ssh_get_log_userdata() {
     return _ssh_get_log_userdata();
   }
 
   late final _ssh_get_log_userdataPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function()>>('ssh_get_log_userdata');
-  late final _ssh_get_log_userdata = _ssh_get_log_userdataPtr.asFunction<ffi.Pointer<ffi.Void> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function()>>(
+          'ssh_get_log_userdata');
+  late final _ssh_get_log_userdata =
+      _ssh_get_log_userdataPtr.asFunction<ffi.Pointer<ffi.Void> Function()>();
 
   int ssh_set_log_userdata(
     ffi.Pointer<ffi.Void> data,
@@ -2965,8 +3320,10 @@ class LibsshBinding {
   }
 
   late final _ssh_set_log_userdataPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Void>)>>('ssh_set_log_userdata');
-  late final _ssh_set_log_userdata = _ssh_set_log_userdataPtr.asFunction<int Function(ffi.Pointer<ffi.Void>)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Void>)>>(
+          'ssh_set_log_userdata');
+  late final _ssh_set_log_userdata = _ssh_set_log_userdataPtr
+      .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
 
   /*void _ssh_log(
     int verbosity,
@@ -2997,9 +3354,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_logPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session, ffi.Int32, ffi.Pointer<ffi.Int8>)>>('ssh_log');
-  late final _ssh_log1 = _ssh_logPtr.asFunction<void Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_logPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ssh_session, ffi.Int32, ffi.Pointer<ffi.Int8>)>>('ssh_log');
+  late final _ssh_log1 = _ssh_logPtr
+      .asFunction<void Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
 
   ssh_channel ssh_message_channel_request_open_reply_accept(
     ssh_message msg,
@@ -3010,9 +3370,11 @@ class LibsshBinding {
   }
 
   late final _ssh_message_channel_request_open_reply_acceptPtr =
-      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_message)>>('ssh_message_channel_request_open_reply_accept');
+      _lookup<ffi.NativeFunction<ssh_channel Function(ssh_message)>>(
+          'ssh_message_channel_request_open_reply_accept');
   late final _ssh_message_channel_request_open_reply_accept =
-      _ssh_message_channel_request_open_reply_acceptPtr.asFunction<ssh_channel Function(ssh_message)>();
+      _ssh_message_channel_request_open_reply_acceptPtr
+          .asFunction<ssh_channel Function(ssh_message)>();
 
   int ssh_message_channel_request_open_reply_accept_channel(
     ssh_message msg,
@@ -3028,7 +3390,8 @@ class LibsshBinding {
       _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message, ssh_channel)>>(
           'ssh_message_channel_request_open_reply_accept_channel');
   late final _ssh_message_channel_request_open_reply_accept_channel =
-      _ssh_message_channel_request_open_reply_accept_channelPtr.asFunction<int Function(ssh_message, ssh_channel)>();
+      _ssh_message_channel_request_open_reply_accept_channelPtr
+          .asFunction<int Function(ssh_message, ssh_channel)>();
 
   int ssh_message_channel_request_reply_success(
     ssh_message msg,
@@ -3039,9 +3402,11 @@ class LibsshBinding {
   }
 
   late final _ssh_message_channel_request_reply_successPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message)>>('ssh_message_channel_request_reply_success');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message)>>(
+          'ssh_message_channel_request_reply_success');
   late final _ssh_message_channel_request_reply_success =
-      _ssh_message_channel_request_reply_successPtr.asFunction<int Function(ssh_message)>();
+      _ssh_message_channel_request_reply_successPtr
+          .asFunction<int Function(ssh_message)>();
 
   void ssh_message_free(
     ssh_message msg,
@@ -3051,8 +3416,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_message_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_message)>>('ssh_message_free');
-  late final _ssh_message_free = _ssh_message_freePtr.asFunction<void Function(ssh_message)>();
+  late final _ssh_message_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_message)>>(
+          'ssh_message_free');
+  late final _ssh_message_free =
+      _ssh_message_freePtr.asFunction<void Function(ssh_message)>();
 
   ssh_message ssh_message_get(
     ssh_session session,
@@ -3062,8 +3430,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_message_getPtr = _lookup<ffi.NativeFunction<ssh_message Function(ssh_session)>>('ssh_message_get');
-  late final _ssh_message_get = _ssh_message_getPtr.asFunction<ssh_message Function(ssh_session)>();
+  late final _ssh_message_getPtr =
+      _lookup<ffi.NativeFunction<ssh_message Function(ssh_session)>>(
+          'ssh_message_get');
+  late final _ssh_message_get =
+      _ssh_message_getPtr.asFunction<ssh_message Function(ssh_session)>();
 
   int ssh_message_subtype(
     ssh_message msg,
@@ -3074,8 +3445,10 @@ class LibsshBinding {
   }
 
   late final _ssh_message_subtypePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message)>>('ssh_message_subtype');
-  late final _ssh_message_subtype = _ssh_message_subtypePtr.asFunction<int Function(ssh_message)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message)>>(
+          'ssh_message_subtype');
+  late final _ssh_message_subtype =
+      _ssh_message_subtypePtr.asFunction<int Function(ssh_message)>();
 
   int ssh_message_type(
     ssh_message msg,
@@ -3085,8 +3458,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_message_typePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message)>>('ssh_message_type');
-  late final _ssh_message_type = _ssh_message_typePtr.asFunction<int Function(ssh_message)>();
+  late final _ssh_message_typePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_message)>>(
+          'ssh_message_type');
+  late final _ssh_message_type =
+      _ssh_message_typePtr.asFunction<int Function(ssh_message)>();
 
   int ssh_mkdir(
     ffi.Pointer<ffi.Int8> pathname,
@@ -3098,15 +3474,18 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_mkdirPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>, mode_t)>>('ssh_mkdir');
-  late final _ssh_mkdir = _ssh_mkdirPtr.asFunction<int Function(ffi.Pointer<ffi.Int8>, int)>();
+  late final _ssh_mkdirPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, mode_t)>>('ssh_mkdir');
+  late final _ssh_mkdir =
+      _ssh_mkdirPtr.asFunction<int Function(ffi.Pointer<ffi.Int8>, int)>();
 
   ssh_session ssh_new() {
     return _ssh_new();
   }
 
-  late final _ssh_newPtr = _lookup<ffi.NativeFunction<ssh_session Function()>>('ssh_new');
+  late final _ssh_newPtr =
+      _lookup<ffi.NativeFunction<ssh_session Function()>>('ssh_new');
   late final _ssh_new = _ssh_newPtr.asFunction<ssh_session Function()>();
 
   int ssh_options_copy(
@@ -3119,9 +3498,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_options_copyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ssh_session>)>>('ssh_options_copy');
-  late final _ssh_options_copy = _ssh_options_copyPtr.asFunction<int Function(ssh_session, ffi.Pointer<ssh_session>)>();
+  late final _ssh_options_copyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ssh_session>)>>('ssh_options_copy');
+  late final _ssh_options_copy = _ssh_options_copyPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ssh_session>)>();
 
   int ssh_options_getopt(
     ssh_session session,
@@ -3137,10 +3519,11 @@ class LibsshBinding {
 
   late final _ssh_options_getoptPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ssh_session, ffi.Pointer<ffi.Int32>, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>('ssh_options_getopt');
-  late final _ssh_options_getopt = _ssh_options_getoptPtr
-      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int32>, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int32>,
+              ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>('ssh_options_getopt');
+  late final _ssh_options_getopt = _ssh_options_getoptPtr.asFunction<
+      int Function(ssh_session, ffi.Pointer<ffi.Int32>,
+          ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
 
   int ssh_options_parse_config(
     ssh_session session,
@@ -3152,10 +3535,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_options_parse_configPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_options_parse_config');
-  late final _ssh_options_parse_config =
-      _ssh_options_parse_configPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_options_parse_configPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_options_parse_config');
+  late final _ssh_options_parse_config = _ssh_options_parse_configPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_options_set(
     ssh_session session,
@@ -3169,9 +3554,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_options_setPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Int32, ffi.Pointer<ffi.Void>)>>('ssh_options_set');
-  late final _ssh_options_set = _ssh_options_setPtr.asFunction<int Function(ssh_session, int, ffi.Pointer<ffi.Void>)>();
+  late final _ssh_options_setPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Int32,
+              ffi.Pointer<ffi.Void>)>>('ssh_options_set');
+  late final _ssh_options_set = _ssh_options_setPtr
+      .asFunction<int Function(ssh_session, int, ffi.Pointer<ffi.Void>)>();
 
   int ssh_options_get(
     ssh_session session,
@@ -3185,11 +3573,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_options_getPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Int32, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>(
-          'ssh_options_get');
-  late final _ssh_options_get =
-      _ssh_options_getPtr.asFunction<int Function(ssh_session, int, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
+  late final _ssh_options_getPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Int32,
+              ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>('ssh_options_get');
+  late final _ssh_options_get = _ssh_options_getPtr.asFunction<
+      int Function(ssh_session, int, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
 
   int ssh_options_get_port(
     ssh_session session,
@@ -3201,10 +3590,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_options_get_portPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Uint32>)>>('ssh_options_get_port');
-  late final _ssh_options_get_port =
-      _ssh_options_get_portPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Uint32>)>();
+  late final _ssh_options_get_portPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ffi.Uint32>)>>('ssh_options_get_port');
+  late final _ssh_options_get_port = _ssh_options_get_portPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Uint32>)>();
 
   int ssh_pcap_file_close(
     ssh_pcap_file pcap,
@@ -3215,8 +3606,10 @@ class LibsshBinding {
   }
 
   late final _ssh_pcap_file_closePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_pcap_file)>>('ssh_pcap_file_close');
-  late final _ssh_pcap_file_close = _ssh_pcap_file_closePtr.asFunction<int Function(ssh_pcap_file)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_pcap_file)>>(
+          'ssh_pcap_file_close');
+  late final _ssh_pcap_file_close =
+      _ssh_pcap_file_closePtr.asFunction<int Function(ssh_pcap_file)>();
 
   void ssh_pcap_file_free(
     ssh_pcap_file pcap,
@@ -3227,15 +3620,20 @@ class LibsshBinding {
   }
 
   late final _ssh_pcap_file_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_pcap_file)>>('ssh_pcap_file_free');
-  late final _ssh_pcap_file_free = _ssh_pcap_file_freePtr.asFunction<void Function(ssh_pcap_file)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_pcap_file)>>(
+          'ssh_pcap_file_free');
+  late final _ssh_pcap_file_free =
+      _ssh_pcap_file_freePtr.asFunction<void Function(ssh_pcap_file)>();
 
   ssh_pcap_file ssh_pcap_file_new() {
     return _ssh_pcap_file_new();
   }
 
-  late final _ssh_pcap_file_newPtr = _lookup<ffi.NativeFunction<ssh_pcap_file Function()>>('ssh_pcap_file_new');
-  late final _ssh_pcap_file_new = _ssh_pcap_file_newPtr.asFunction<ssh_pcap_file Function()>();
+  late final _ssh_pcap_file_newPtr =
+      _lookup<ffi.NativeFunction<ssh_pcap_file Function()>>(
+          'ssh_pcap_file_new');
+  late final _ssh_pcap_file_new =
+      _ssh_pcap_file_newPtr.asFunction<ssh_pcap_file Function()>();
 
   int ssh_pcap_file_open(
     ssh_pcap_file pcap,
@@ -3247,17 +3645,20 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pcap_file_openPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_pcap_file, ffi.Pointer<ffi.Int8>)>>('ssh_pcap_file_open');
-  late final _ssh_pcap_file_open =
-      _ssh_pcap_file_openPtr.asFunction<int Function(ssh_pcap_file, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_pcap_file_openPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_pcap_file, ffi.Pointer<ffi.Int8>)>>('ssh_pcap_file_open');
+  late final _ssh_pcap_file_open = _ssh_pcap_file_openPtr
+      .asFunction<int Function(ssh_pcap_file, ffi.Pointer<ffi.Int8>)>();
 
   /// @}
   ssh_key ssh_key_new() {
     return _ssh_key_new();
   }
 
-  late final _ssh_key_newPtr = _lookup<ffi.NativeFunction<ssh_key Function()>>('ssh_key_new');
+  late final _ssh_key_newPtr =
+      _lookup<ffi.NativeFunction<ssh_key Function()>>('ssh_key_new');
   late final _ssh_key_new = _ssh_key_newPtr.asFunction<ssh_key Function()>();
 
   void ssh_key_free(
@@ -3268,8 +3669,10 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_key_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_key)>>('ssh_key_free');
-  late final _ssh_key_free = _ssh_key_freePtr.asFunction<void Function(ssh_key)>();
+  late final _ssh_key_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_key)>>('ssh_key_free');
+  late final _ssh_key_free =
+      _ssh_key_freePtr.asFunction<void Function(ssh_key)>();
 
   int ssh_key_type(
     ssh_key key,
@@ -3279,8 +3682,10 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_key_typePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key)>>('ssh_key_type');
-  late final _ssh_key_type = _ssh_key_typePtr.asFunction<int Function(ssh_key)>();
+  late final _ssh_key_typePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key)>>('ssh_key_type');
+  late final _ssh_key_type =
+      _ssh_key_typePtr.asFunction<int Function(ssh_key)>();
 
   ffi.Pointer<ffi.Int8> ssh_key_type_to_char(
     int type,
@@ -3291,8 +3696,10 @@ class LibsshBinding {
   }
 
   late final _ssh_key_type_to_charPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Int32)>>('ssh_key_type_to_char');
-  late final _ssh_key_type_to_char = _ssh_key_type_to_charPtr.asFunction<ffi.Pointer<ffi.Int8> Function(int)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Int32)>>(
+          'ssh_key_type_to_char');
+  late final _ssh_key_type_to_char = _ssh_key_type_to_charPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(int)>();
 
   int ssh_key_type_from_name(
     ffi.Pointer<ffi.Int8> name,
@@ -3303,8 +3710,10 @@ class LibsshBinding {
   }
 
   late final _ssh_key_type_from_namePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>)>>('ssh_key_type_from_name');
-  late final _ssh_key_type_from_name = _ssh_key_type_from_namePtr.asFunction<int Function(ffi.Pointer<ffi.Int8>)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>)>>(
+          'ssh_key_type_from_name');
+  late final _ssh_key_type_from_name = _ssh_key_type_from_namePtr
+      .asFunction<int Function(ffi.Pointer<ffi.Int8>)>();
 
   int ssh_key_is_public(
     ssh_key k,
@@ -3314,8 +3723,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_key_is_publicPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key)>>('ssh_key_is_public');
-  late final _ssh_key_is_public = _ssh_key_is_publicPtr.asFunction<int Function(ssh_key)>();
+  late final _ssh_key_is_publicPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key)>>(
+          'ssh_key_is_public');
+  late final _ssh_key_is_public =
+      _ssh_key_is_publicPtr.asFunction<int Function(ssh_key)>();
 
   int ssh_key_is_private(
     ssh_key k,
@@ -3325,8 +3737,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_key_is_privatePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key)>>('ssh_key_is_private');
-  late final _ssh_key_is_private = _ssh_key_is_privatePtr.asFunction<int Function(ssh_key)>();
+  late final _ssh_key_is_privatePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key)>>(
+          'ssh_key_is_private');
+  late final _ssh_key_is_private =
+      _ssh_key_is_privatePtr.asFunction<int Function(ssh_key)>();
 
   int ssh_key_cmp(
     ssh_key k1,
@@ -3340,9 +3755,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_key_cmpPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key, ssh_key, ffi.Int32)>>('ssh_key_cmp');
-  late final _ssh_key_cmp = _ssh_key_cmpPtr.asFunction<int Function(ssh_key, ssh_key, int)>();
+  late final _ssh_key_cmpPtr = _lookup<
+          ffi.NativeFunction<ffi.Int32 Function(ssh_key, ssh_key, ffi.Int32)>>(
+      'ssh_key_cmp');
+  late final _ssh_key_cmp =
+      _ssh_key_cmpPtr.asFunction<int Function(ssh_key, ssh_key, int)>();
 
   int ssh_pki_generate(
     int type,
@@ -3356,9 +3773,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_generatePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Int32, ffi.Int32, ffi.Pointer<ssh_key>)>>('ssh_pki_generate');
-  late final _ssh_pki_generate = _ssh_pki_generatePtr.asFunction<int Function(int, int, ffi.Pointer<ssh_key>)>();
+  late final _ssh_pki_generatePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Int32, ffi.Int32, ffi.Pointer<ssh_key>)>>('ssh_pki_generate');
+  late final _ssh_pki_generate = _ssh_pki_generatePtr
+      .asFunction<int Function(int, int, ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_import_privkey_base64(
     ffi.Pointer<ffi.Int8> b64_key,
@@ -3378,11 +3798,20 @@ class LibsshBinding {
 
   late final _ssh_pki_import_privkey_base64Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>,
+              ssh_auth_callback,
+              ffi.Pointer<ffi.Void>,
               ffi.Pointer<ssh_key>)>>('ssh_pki_import_privkey_base64');
-  late final _ssh_pki_import_privkey_base64 = _ssh_pki_import_privkey_base64Ptr.asFunction<
-      int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
-          ffi.Pointer<ssh_key>)>();
+  late final _ssh_pki_import_privkey_base64 =
+      _ssh_pki_import_privkey_base64Ptr.asFunction<
+          int Function(
+              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>,
+              ssh_auth_callback,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_export_privkey_base64(
     ssh_key privkey,
@@ -3401,12 +3830,18 @@ class LibsshBinding {
   }
 
   late final _ssh_pki_export_privkey_base64Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ssh_key, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
-              ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>('ssh_pki_export_privkey_base64');
-  late final _ssh_pki_export_privkey_base64 = _ssh_pki_export_privkey_base64Ptr.asFunction<
-      int Function(ssh_key, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
-          ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ssh_key,
+                  ffi.Pointer<ffi.Int8>,
+                  ssh_auth_callback,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>(
+      'ssh_pki_export_privkey_base64');
+  late final _ssh_pki_export_privkey_base64 =
+      _ssh_pki_export_privkey_base64Ptr.asFunction<
+          int Function(ssh_key, ffi.Pointer<ffi.Int8>, ssh_auth_callback,
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
 
   int ssh_pki_import_privkey_file(
     ffi.Pointer<ffi.Int8> filename,
@@ -3426,11 +3861,20 @@ class LibsshBinding {
 
   late final _ssh_pki_import_privkey_filePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>,
+              ssh_auth_callback,
+              ffi.Pointer<ffi.Void>,
               ffi.Pointer<ssh_key>)>>('ssh_pki_import_privkey_file');
-  late final _ssh_pki_import_privkey_file = _ssh_pki_import_privkey_filePtr.asFunction<
-      int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
-          ffi.Pointer<ssh_key>)>();
+  late final _ssh_pki_import_privkey_file =
+      _ssh_pki_import_privkey_filePtr.asFunction<
+          int Function(
+              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>,
+              ssh_auth_callback,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_export_privkey_file(
     ssh_key privkey,
@@ -3450,10 +3894,16 @@ class LibsshBinding {
 
   late final _ssh_pki_export_privkey_filePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ssh_key, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>,
+          ffi.Int32 Function(
+              ssh_key,
+              ffi.Pointer<ffi.Int8>,
+              ssh_auth_callback,
+              ffi.Pointer<ffi.Void>,
               ffi.Pointer<ffi.Int8>)>>('ssh_pki_export_privkey_file');
-  late final _ssh_pki_export_privkey_file = _ssh_pki_export_privkey_filePtr.asFunction<
-      int Function(ssh_key, ffi.Pointer<ffi.Int8>, ssh_auth_callback, ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_pki_export_privkey_file =
+      _ssh_pki_export_privkey_filePtr.asFunction<
+          int Function(ssh_key, ffi.Pointer<ffi.Int8>, ssh_auth_callback,
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_pki_copy_cert_to_privkey(
     ssh_key cert_key,
@@ -3466,9 +3916,10 @@ class LibsshBinding {
   }
 
   late final _ssh_pki_copy_cert_to_privkeyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key, ssh_key)>>('ssh_pki_copy_cert_to_privkey');
-  late final _ssh_pki_copy_cert_to_privkey =
-      _ssh_pki_copy_cert_to_privkeyPtr.asFunction<int Function(ssh_key, ssh_key)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key, ssh_key)>>(
+          'ssh_pki_copy_cert_to_privkey');
+  late final _ssh_pki_copy_cert_to_privkey = _ssh_pki_copy_cert_to_privkeyPtr
+      .asFunction<int Function(ssh_key, ssh_key)>();
 
   int ssh_pki_import_pubkey_base64(
     ffi.Pointer<ffi.Int8> b64_key,
@@ -3482,11 +3933,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_import_pubkey_base64Ptr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Int32, ffi.Pointer<ssh_key>)>>(
-          'ssh_pki_import_pubkey_base64');
+  late final _ssh_pki_import_pubkey_base64Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Int32,
+              ffi.Pointer<ssh_key>)>>('ssh_pki_import_pubkey_base64');
   late final _ssh_pki_import_pubkey_base64 =
-      _ssh_pki_import_pubkey_base64Ptr.asFunction<int Function(ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ssh_key>)>();
+      _ssh_pki_import_pubkey_base64Ptr.asFunction<
+          int Function(ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_import_pubkey_file(
     ffi.Pointer<ffi.Int8> filename,
@@ -3498,11 +3951,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_import_pubkey_filePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ssh_key>)>>(
-          'ssh_pki_import_pubkey_file');
-  late final _ssh_pki_import_pubkey_file =
-      _ssh_pki_import_pubkey_filePtr.asFunction<int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ssh_key>)>();
+  late final _ssh_pki_import_pubkey_filePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ssh_key>)>>('ssh_pki_import_pubkey_file');
+  late final _ssh_pki_import_pubkey_file = _ssh_pki_import_pubkey_filePtr
+      .asFunction<int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_import_cert_base64(
     ffi.Pointer<ffi.Int8> b64_cert,
@@ -3516,11 +3970,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_import_cert_base64Ptr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Int32, ffi.Pointer<ssh_key>)>>(
-          'ssh_pki_import_cert_base64');
+  late final _ssh_pki_import_cert_base64Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Int32,
+              ffi.Pointer<ssh_key>)>>('ssh_pki_import_cert_base64');
   late final _ssh_pki_import_cert_base64 =
-      _ssh_pki_import_cert_base64Ptr.asFunction<int Function(ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ssh_key>)>();
+      _ssh_pki_import_cert_base64Ptr.asFunction<
+          int Function(ffi.Pointer<ffi.Int8>, int, ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_import_cert_file(
     ffi.Pointer<ffi.Int8> filename,
@@ -3532,11 +3988,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_import_cert_filePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ssh_key>)>>(
-          'ssh_pki_import_cert_file');
-  late final _ssh_pki_import_cert_file =
-      _ssh_pki_import_cert_filePtr.asFunction<int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ssh_key>)>();
+  late final _ssh_pki_import_cert_filePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ssh_key>)>>('ssh_pki_import_cert_file');
+  late final _ssh_pki_import_cert_file = _ssh_pki_import_cert_filePtr
+      .asFunction<int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_export_privkey_to_pubkey(
     ssh_key privkey,
@@ -3548,11 +4005,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_export_privkey_to_pubkeyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key, ffi.Pointer<ssh_key>)>>(
-          'ssh_pki_export_privkey_to_pubkey');
+  late final _ssh_pki_export_privkey_to_pubkeyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_key,
+              ffi.Pointer<ssh_key>)>>('ssh_pki_export_privkey_to_pubkey');
   late final _ssh_pki_export_privkey_to_pubkey =
-      _ssh_pki_export_privkey_to_pubkeyPtr.asFunction<int Function(ssh_key, ffi.Pointer<ssh_key>)>();
+      _ssh_pki_export_privkey_to_pubkeyPtr
+          .asFunction<int Function(ssh_key, ffi.Pointer<ssh_key>)>();
 
   int ssh_pki_export_pubkey_base64(
     ssh_key key,
@@ -3564,11 +4023,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_export_pubkey_base64Ptr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>(
-          'ssh_pki_export_pubkey_base64');
-  late final _ssh_pki_export_pubkey_base64 =
-      _ssh_pki_export_pubkey_base64Ptr.asFunction<int Function(ssh_key, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
+  late final _ssh_pki_export_pubkey_base64Ptr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(ssh_key, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>>(
+      'ssh_pki_export_pubkey_base64');
+  late final _ssh_pki_export_pubkey_base64 = _ssh_pki_export_pubkey_base64Ptr
+      .asFunction<int Function(ssh_key, ffi.Pointer<ffi.Pointer<ffi.Int8>>)>();
 
   int ssh_pki_export_pubkey_file(
     ssh_key key,
@@ -3580,10 +4040,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_pki_export_pubkey_filePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_key, ffi.Pointer<ffi.Int8>)>>('ssh_pki_export_pubkey_file');
-  late final _ssh_pki_export_pubkey_file =
-      _ssh_pki_export_pubkey_filePtr.asFunction<int Function(ssh_key, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_pki_export_pubkey_filePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_key, ffi.Pointer<ffi.Int8>)>>('ssh_pki_export_pubkey_file');
+  late final _ssh_pki_export_pubkey_file = _ssh_pki_export_pubkey_filePtr
+      .asFunction<int Function(ssh_key, ffi.Pointer<ffi.Int8>)>();
 
   ffi.Pointer<ffi.Int8> ssh_pki_key_ecdsa_name(
     ssh_key key,
@@ -3594,8 +4056,10 @@ class LibsshBinding {
   }
 
   late final _ssh_pki_key_ecdsa_namePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_key)>>('ssh_pki_key_ecdsa_name');
-  late final _ssh_pki_key_ecdsa_name = _ssh_pki_key_ecdsa_namePtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_key)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_key)>>(
+          'ssh_pki_key_ecdsa_name');
+  late final _ssh_pki_key_ecdsa_name = _ssh_pki_key_ecdsa_namePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_key)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_fingerprint_hash(
     int type,
@@ -3609,11 +4073,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_get_fingerprint_hashPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Int32, ffi.Pointer<ffi.Uint8>, size_t)>>(
-          'ssh_get_fingerprint_hash');
+  late final _ssh_get_fingerprint_hashPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(ffi.Int32, ffi.Pointer<ffi.Uint8>,
+              size_t)>>('ssh_get_fingerprint_hash');
   late final _ssh_get_fingerprint_hash =
-      _ssh_get_fingerprint_hashPtr.asFunction<ffi.Pointer<ffi.Int8> Function(int, ffi.Pointer<ffi.Uint8>, int)>();
+      _ssh_get_fingerprint_hashPtr.asFunction<
+          ffi.Pointer<ffi.Int8> Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 
   void ssh_print_hash(
     int type,
@@ -3627,9 +4093,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_print_hashPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int32, ffi.Pointer<ffi.Uint8>, size_t)>>('ssh_print_hash');
-  late final _ssh_print_hash = _ssh_print_hashPtr.asFunction<void Function(int, ffi.Pointer<ffi.Uint8>, int)>();
+  late final _ssh_print_hashPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int32, ffi.Pointer<ffi.Uint8>, size_t)>>('ssh_print_hash');
+  late final _ssh_print_hash = _ssh_print_hashPtr
+      .asFunction<void Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 
   int ssh_send_ignore(
     ssh_session session,
@@ -3641,9 +4110,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_send_ignorePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_send_ignore');
-  late final _ssh_send_ignore = _ssh_send_ignorePtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_send_ignorePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_send_ignore');
+  late final _ssh_send_ignore = _ssh_send_ignorePtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_send_debug(
     ssh_session session,
@@ -3657,9 +4129,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_send_debugPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Int32)>>('ssh_send_debug');
-  late final _ssh_send_debug = _ssh_send_debugPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int)>();
+  late final _ssh_send_debugPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('ssh_send_debug');
+  late final _ssh_send_debug = _ssh_send_debugPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, int)>();
 
   void ssh_gssapi_set_creds(
     ssh_session session,
@@ -3671,10 +4146,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_gssapi_set_credsPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session, ssh_gssapi_creds)>>('ssh_gssapi_set_creds');
-  late final _ssh_gssapi_set_creds =
-      _ssh_gssapi_set_credsPtr.asFunction<void Function(ssh_session, ssh_gssapi_creds)>();
+  late final _ssh_gssapi_set_credsPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ssh_session, ssh_gssapi_creds)>>(
+      'ssh_gssapi_set_creds');
+  late final _ssh_gssapi_set_creds = _ssh_gssapi_set_credsPtr
+      .asFunction<void Function(ssh_session, ssh_gssapi_creds)>();
 
   int ssh_scp_accept_request(
     ssh_scp scp,
@@ -3685,8 +4161,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_accept_requestPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_accept_request');
-  late final _ssh_scp_accept_request = _ssh_scp_accept_requestPtr.asFunction<int Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>(
+          'ssh_scp_accept_request');
+  late final _ssh_scp_accept_request =
+      _ssh_scp_accept_requestPtr.asFunction<int Function(ssh_scp)>();
 
   int ssh_scp_close(
     ssh_scp scp,
@@ -3696,8 +4174,10 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_closePtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_close');
-  late final _ssh_scp_close = _ssh_scp_closePtr.asFunction<int Function(ssh_scp)>();
+  late final _ssh_scp_closePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_close');
+  late final _ssh_scp_close =
+      _ssh_scp_closePtr.asFunction<int Function(ssh_scp)>();
 
   int ssh_scp_deny_request(
     ssh_scp scp,
@@ -3709,10 +4189,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_deny_requestPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>)>>('ssh_scp_deny_request');
-  late final _ssh_scp_deny_request =
-      _ssh_scp_deny_requestPtr.asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_scp_deny_requestPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_scp, ffi.Pointer<ffi.Int8>)>>('ssh_scp_deny_request');
+  late final _ssh_scp_deny_request = _ssh_scp_deny_requestPtr
+      .asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>)>();
 
   void ssh_scp_free(
     ssh_scp scp,
@@ -3722,8 +4204,10 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_scp)>>('ssh_scp_free');
-  late final _ssh_scp_free = _ssh_scp_freePtr.asFunction<void Function(ssh_scp)>();
+  late final _ssh_scp_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_scp)>>('ssh_scp_free');
+  late final _ssh_scp_free =
+      _ssh_scp_freePtr.asFunction<void Function(ssh_scp)>();
 
   int ssh_scp_init(
     ssh_scp scp,
@@ -3733,8 +4217,10 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_initPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_init');
-  late final _ssh_scp_init = _ssh_scp_initPtr.asFunction<int Function(ssh_scp)>();
+  late final _ssh_scp_initPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_init');
+  late final _ssh_scp_init =
+      _ssh_scp_initPtr.asFunction<int Function(ssh_scp)>();
 
   int ssh_scp_leave_directory(
     ssh_scp scp,
@@ -3745,8 +4231,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_leave_directoryPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_leave_directory');
-  late final _ssh_scp_leave_directory = _ssh_scp_leave_directoryPtr.asFunction<int Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>(
+          'ssh_scp_leave_directory');
+  late final _ssh_scp_leave_directory =
+      _ssh_scp_leave_directoryPtr.asFunction<int Function(ssh_scp)>();
 
   ssh_scp ssh_scp_new(
     ssh_session session,
@@ -3760,9 +4248,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_newPtr =
-      _lookup<ffi.NativeFunction<ssh_scp Function(ssh_session, ffi.Int32, ffi.Pointer<ffi.Int8>)>>('ssh_scp_new');
-  late final _ssh_scp_new = _ssh_scp_newPtr.asFunction<ssh_scp Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_scp_newPtr = _lookup<
+      ffi.NativeFunction<
+          ssh_scp Function(
+              ssh_session, ffi.Int32, ffi.Pointer<ffi.Int8>)>>('ssh_scp_new');
+  late final _ssh_scp_new = _ssh_scp_newPtr
+      .asFunction<ssh_scp Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_scp_pull_request(
     ssh_scp scp,
@@ -3773,8 +4264,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_pull_requestPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_pull_request');
-  late final _ssh_scp_pull_request = _ssh_scp_pull_requestPtr.asFunction<int Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>(
+          'ssh_scp_pull_request');
+  late final _ssh_scp_pull_request =
+      _ssh_scp_pull_requestPtr.asFunction<int Function(ssh_scp)>();
 
   int ssh_scp_push_directory(
     ssh_scp scp,
@@ -3788,11 +4281,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_push_directoryPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>, ffi.Int32)>>(
-          'ssh_scp_push_directory');
-  late final _ssh_scp_push_directory =
-      _ssh_scp_push_directoryPtr.asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>, int)>();
+  late final _ssh_scp_push_directoryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('ssh_scp_push_directory');
+  late final _ssh_scp_push_directory = _ssh_scp_push_directoryPtr
+      .asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>, int)>();
 
   int ssh_scp_push_file(
     ssh_scp scp,
@@ -3808,11 +4302,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_push_filePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>, size_t, ffi.Int32)>>(
-          'ssh_scp_push_file');
-  late final _ssh_scp_push_file =
-      _ssh_scp_push_filePtr.asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>, int, int)>();
+  late final _ssh_scp_push_filePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>, size_t,
+              ffi.Int32)>>('ssh_scp_push_file');
+  late final _ssh_scp_push_file = _ssh_scp_push_filePtr
+      .asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>, int, int)>();
 
   int ssh_scp_push_file64(
     ssh_scp scp,
@@ -3828,11 +4323,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_push_file64Ptr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>, ffi.Uint64, ffi.Int32)>>(
-          'ssh_scp_push_file64');
-  late final _ssh_scp_push_file64 =
-      _ssh_scp_push_file64Ptr.asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>, int, int)>();
+  late final _ssh_scp_push_file64Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Int8>, ffi.Uint64,
+              ffi.Int32)>>('ssh_scp_push_file64');
+  late final _ssh_scp_push_file64 = _ssh_scp_push_file64Ptr
+      .asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Int8>, int, int)>();
 
   int ssh_scp_read(
     ssh_scp scp,
@@ -3846,9 +4342,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_readPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Void>, size_t)>>('ssh_scp_read');
-  late final _ssh_scp_read = _ssh_scp_readPtr.asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_scp_readPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_scp, ffi.Pointer<ffi.Void>, size_t)>>('ssh_scp_read');
+  late final _ssh_scp_read = _ssh_scp_readPtr
+      .asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Void>, int)>();
 
   ffi.Pointer<ffi.Int8> ssh_scp_request_get_filename(
     ssh_scp scp,
@@ -3859,10 +4358,18 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_request_get_filenamePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>>('ssh_scp_request_get_filename');
-  late final _ssh_scp_request_get_filename =
-      _ssh_scp_request_get_filenamePtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>>(
+          'ssh_scp_request_get_filename');
+  late final _ssh_scp_request_get_filename = _ssh_scp_request_get_filenamePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>();
 
+/**
+ * @brief Convert a scp text mode to an integer.
+ *
+ * @param[in]  mode     The mode to convert, e.g. "0644".
+ *
+ * @returns             An integer value, e.g. 420 for "0644".
+ */
   int ssh_scp_request_get_permissions(
     ssh_scp scp,
   ) {
@@ -3872,8 +4379,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_request_get_permissionsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>('ssh_scp_request_get_permissions');
-  late final _ssh_scp_request_get_permissions = _ssh_scp_request_get_permissionsPtr.asFunction<int Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp)>>(
+          'ssh_scp_request_get_permissions');
+  late final _ssh_scp_request_get_permissions =
+      _ssh_scp_request_get_permissionsPtr.asFunction<int Function(ssh_scp)>();
 
   int ssh_scp_request_get_size(
     ssh_scp scp,
@@ -3884,8 +4393,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_request_get_sizePtr =
-      _lookup<ffi.NativeFunction<size_t Function(ssh_scp)>>('ssh_scp_request_get_size');
-  late final _ssh_scp_request_get_size = _ssh_scp_request_get_sizePtr.asFunction<int Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<size_t Function(ssh_scp)>>(
+          'ssh_scp_request_get_size');
+  late final _ssh_scp_request_get_size =
+      _ssh_scp_request_get_sizePtr.asFunction<int Function(ssh_scp)>();
 
   int ssh_scp_request_get_size64(
     ssh_scp scp,
@@ -3896,8 +4407,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_request_get_size64Ptr =
-      _lookup<ffi.NativeFunction<ffi.Uint64 Function(ssh_scp)>>('ssh_scp_request_get_size64');
-  late final _ssh_scp_request_get_size64 = _ssh_scp_request_get_size64Ptr.asFunction<int Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Uint64 Function(ssh_scp)>>(
+          'ssh_scp_request_get_size64');
+  late final _ssh_scp_request_get_size64 =
+      _ssh_scp_request_get_size64Ptr.asFunction<int Function(ssh_scp)>();
 
   ffi.Pointer<ffi.Int8> ssh_scp_request_get_warning(
     ssh_scp scp,
@@ -3908,9 +4421,10 @@ class LibsshBinding {
   }
 
   late final _ssh_scp_request_get_warningPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>>('ssh_scp_request_get_warning');
-  late final _ssh_scp_request_get_warning =
-      _ssh_scp_request_get_warningPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>>(
+          'ssh_scp_request_get_warning');
+  late final _ssh_scp_request_get_warning = _ssh_scp_request_get_warningPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_scp)>();
 
   int ssh_scp_write(
     ssh_scp scp,
@@ -3924,9 +4438,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_scp_writePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_scp, ffi.Pointer<ffi.Void>, size_t)>>('ssh_scp_write');
-  late final _ssh_scp_write = _ssh_scp_writePtr.asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_scp_writePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_scp, ffi.Pointer<ffi.Void>, size_t)>>('ssh_scp_write');
+  late final _ssh_scp_write = _ssh_scp_writePtr
+      .asFunction<int Function(ssh_scp, ffi.Pointer<ffi.Void>, int)>();
 
   int ssh_select(
     ffi.Pointer<ssh_channel> channels,
@@ -3946,11 +4463,15 @@ class LibsshBinding {
 
   late final _ssh_selectPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>, socket_t, ffi.Pointer<fd_set>,
+          ffi.Int32 Function(
+              ffi.Pointer<ssh_channel>,
+              ffi.Pointer<ssh_channel>,
+              socket_t,
+              ffi.Pointer<fd_set>,
               ffi.Pointer<timeval>)>>('ssh_select');
   late final _ssh_select = _ssh_selectPtr.asFunction<
-      int Function(
-          ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>, int, ffi.Pointer<fd_set>, ffi.Pointer<timeval>)>();
+      int Function(ffi.Pointer<ssh_channel>, ffi.Pointer<ssh_channel>, int,
+          ffi.Pointer<fd_set>, ffi.Pointer<timeval>)>();
 
   int ssh_service_request(
     ssh_session session,
@@ -3962,10 +4483,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_service_requestPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_service_request');
-  late final _ssh_service_request =
-      _ssh_service_requestPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_service_requestPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_service_request');
+  late final _ssh_service_request = _ssh_service_requestPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_set_agent_channel(
     ssh_session session,
@@ -3978,8 +4501,10 @@ class LibsshBinding {
   }
 
   late final _ssh_set_agent_channelPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ssh_channel)>>('ssh_set_agent_channel');
-  late final _ssh_set_agent_channel = _ssh_set_agent_channelPtr.asFunction<int Function(ssh_session, ssh_channel)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ssh_channel)>>(
+          'ssh_set_agent_channel');
+  late final _ssh_set_agent_channel = _ssh_set_agent_channelPtr
+      .asFunction<int Function(ssh_session, ssh_channel)>();
 
   int ssh_set_agent_socket(
     ssh_session session,
@@ -3992,8 +4517,10 @@ class LibsshBinding {
   }
 
   late final _ssh_set_agent_socketPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, socket_t)>>('ssh_set_agent_socket');
-  late final _ssh_set_agent_socket = _ssh_set_agent_socketPtr.asFunction<int Function(ssh_session, int)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, socket_t)>>(
+          'ssh_set_agent_socket');
+  late final _ssh_set_agent_socket =
+      _ssh_set_agent_socketPtr.asFunction<int Function(ssh_session, int)>();
 
   void ssh_set_blocking(
     ssh_session session,
@@ -4006,8 +4533,10 @@ class LibsshBinding {
   }
 
   late final _ssh_set_blockingPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session, ffi.Int32)>>('ssh_set_blocking');
-  late final _ssh_set_blocking = _ssh_set_blockingPtr.asFunction<void Function(ssh_session, int)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session, ffi.Int32)>>(
+          'ssh_set_blocking');
+  late final _ssh_set_blocking =
+      _ssh_set_blockingPtr.asFunction<void Function(ssh_session, int)>();
 
   void ssh_set_counters(
     ssh_session session,
@@ -4021,10 +4550,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_countersPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session, ssh_counter, ssh_counter)>>('ssh_set_counters');
-  late final _ssh_set_counters =
-      _ssh_set_countersPtr.asFunction<void Function(ssh_session, ssh_counter, ssh_counter)>();
+  late final _ssh_set_countersPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ssh_session, ssh_counter, ssh_counter)>>('ssh_set_counters');
+  late final _ssh_set_counters = _ssh_set_countersPtr
+      .asFunction<void Function(ssh_session, ssh_counter, ssh_counter)>();
 
   void ssh_set_fd_except(
     ssh_session session,
@@ -4034,8 +4565,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_fd_exceptPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_set_fd_except');
-  late final _ssh_set_fd_except = _ssh_set_fd_exceptPtr.asFunction<void Function(ssh_session)>();
+  late final _ssh_set_fd_exceptPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>(
+          'ssh_set_fd_except');
+  late final _ssh_set_fd_except =
+      _ssh_set_fd_exceptPtr.asFunction<void Function(ssh_session)>();
 
   void ssh_set_fd_toread(
     ssh_session session,
@@ -4045,8 +4579,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_fd_toreadPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_set_fd_toread');
-  late final _ssh_set_fd_toread = _ssh_set_fd_toreadPtr.asFunction<void Function(ssh_session)>();
+  late final _ssh_set_fd_toreadPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>(
+          'ssh_set_fd_toread');
+  late final _ssh_set_fd_toread =
+      _ssh_set_fd_toreadPtr.asFunction<void Function(ssh_session)>();
 
   void ssh_set_fd_towrite(
     ssh_session session,
@@ -4056,8 +4593,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_fd_towritePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_set_fd_towrite');
-  late final _ssh_set_fd_towrite = _ssh_set_fd_towritePtr.asFunction<void Function(ssh_session)>();
+  late final _ssh_set_fd_towritePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>(
+          'ssh_set_fd_towrite');
+  late final _ssh_set_fd_towrite =
+      _ssh_set_fd_towritePtr.asFunction<void Function(ssh_session)>();
 
   void ssh_silent_disconnect(
     ssh_session session,
@@ -4068,8 +4608,10 @@ class LibsshBinding {
   }
 
   late final _ssh_silent_disconnectPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>('ssh_silent_disconnect');
-  late final _ssh_silent_disconnect = _ssh_silent_disconnectPtr.asFunction<void Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_session)>>(
+          'ssh_silent_disconnect');
+  late final _ssh_silent_disconnect =
+      _ssh_silent_disconnectPtr.asFunction<void Function(ssh_session)>();
 
   int ssh_set_pcap_file(
     ssh_session session,
@@ -4081,9 +4623,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_set_pcap_filePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ssh_pcap_file)>>('ssh_set_pcap_file');
-  late final _ssh_set_pcap_file = _ssh_set_pcap_filePtr.asFunction<int Function(ssh_session, ssh_pcap_file)>();
+  late final _ssh_set_pcap_filePtr = _lookup<
+          ffi.NativeFunction<ffi.Int32 Function(ssh_session, ssh_pcap_file)>>(
+      'ssh_set_pcap_file');
+  late final _ssh_set_pcap_file = _ssh_set_pcap_filePtr
+      .asFunction<int Function(ssh_session, ssh_pcap_file)>();
 
   int ssh_userauth_none(
     ssh_session session,
@@ -4095,9 +4639,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_nonePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_userauth_none');
-  late final _ssh_userauth_none = _ssh_userauth_nonePtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_nonePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_userauth_none');
+  late final _ssh_userauth_none = _ssh_userauth_nonePtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_userauth_list(
     ssh_session session,
@@ -4109,9 +4656,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_listPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_userauth_list');
-  late final _ssh_userauth_list = _ssh_userauth_listPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_listPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_session, ffi.Pointer<ffi.Int8>)>>('ssh_userauth_list');
+  late final _ssh_userauth_list = _ssh_userauth_listPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_userauth_try_publickey(
     ssh_session session,
@@ -4125,11 +4675,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_try_publickeyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ssh_key)>>(
-          'ssh_userauth_try_publickey');
-  late final _ssh_userauth_try_publickey =
-      _ssh_userauth_try_publickeyPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ssh_key)>();
+  late final _ssh_userauth_try_publickeyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ssh_key)>>('ssh_userauth_try_publickey');
+  late final _ssh_userauth_try_publickey = _ssh_userauth_try_publickeyPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ssh_key)>();
 
   int ssh_userauth_publickey(
     ssh_session session,
@@ -4143,11 +4694,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_publickeyPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ssh_key)>>(
-          'ssh_userauth_publickey');
-  late final _ssh_userauth_publickey =
-      _ssh_userauth_publickeyPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ssh_key)>();
+  late final _ssh_userauth_publickeyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ssh_key)>>('ssh_userauth_publickey');
+  late final _ssh_userauth_publickey = _ssh_userauth_publickeyPtr
+      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ssh_key)>();
 
   int ssh_userauth_publickey_auto(
     ssh_session session,
@@ -4161,11 +4713,14 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_publickey_autoPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_userauth_publickey_auto');
-  late final _ssh_userauth_publickey_auto = _ssh_userauth_publickey_autoPtr
-      .asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_publickey_autoPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('ssh_userauth_publickey_auto');
+  late final _ssh_userauth_publickey_auto =
+      _ssh_userauth_publickey_autoPtr.asFunction<
+          int Function(
+              ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_userauth_password(
     ssh_session session,
@@ -4179,11 +4734,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_passwordPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_userauth_password');
-  late final _ssh_userauth_password =
-      _ssh_userauth_passwordPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_passwordPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('ssh_userauth_password');
+  late final _ssh_userauth_password = _ssh_userauth_passwordPtr.asFunction<
+      int Function(
+          ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_userauth_kbdint(
     ssh_session session,
@@ -4197,11 +4754,13 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_kbdintPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_userauth_kbdint');
-  late final _ssh_userauth_kbdint =
-      _ssh_userauth_kbdintPtr.asFunction<int Function(ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_kbdintPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>>('ssh_userauth_kbdint');
+  late final _ssh_userauth_kbdint = _ssh_userauth_kbdintPtr.asFunction<
+      int Function(
+          ssh_session, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
 
   ffi.Pointer<ffi.Int8> ssh_userauth_kbdint_getinstruction(
     ssh_session session,
@@ -4212,9 +4771,11 @@ class LibsshBinding {
   }
 
   late final _ssh_userauth_kbdint_getinstructionPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_userauth_kbdint_getinstruction');
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_userauth_kbdint_getinstruction');
   late final _ssh_userauth_kbdint_getinstruction =
-      _ssh_userauth_kbdint_getinstructionPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _ssh_userauth_kbdint_getinstructionPtr
+          .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_userauth_kbdint_getname(
     ssh_session session,
@@ -4225,9 +4786,10 @@ class LibsshBinding {
   }
 
   late final _ssh_userauth_kbdint_getnamePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_userauth_kbdint_getname');
-  late final _ssh_userauth_kbdint_getname =
-      _ssh_userauth_kbdint_getnamePtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_userauth_kbdint_getname');
+  late final _ssh_userauth_kbdint_getname = _ssh_userauth_kbdint_getnamePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   int ssh_userauth_kbdint_getnprompts(
     ssh_session session,
@@ -4238,9 +4800,11 @@ class LibsshBinding {
   }
 
   late final _ssh_userauth_kbdint_getnpromptsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_userauth_kbdint_getnprompts');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_userauth_kbdint_getnprompts');
   late final _ssh_userauth_kbdint_getnprompts =
-      _ssh_userauth_kbdint_getnpromptsPtr.asFunction<int Function(ssh_session)>();
+      _ssh_userauth_kbdint_getnpromptsPtr
+          .asFunction<int Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_userauth_kbdint_getprompt(
     ssh_session session,
@@ -4254,11 +4818,14 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_kbdint_getpromptPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session, ffi.Uint32, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_userauth_kbdint_getprompt');
-  late final _ssh_userauth_kbdint_getprompt = _ssh_userauth_kbdint_getpromptPtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_kbdint_getpromptPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(ssh_session, ffi.Uint32,
+              ffi.Pointer<ffi.Int8>)>>('ssh_userauth_kbdint_getprompt');
+  late final _ssh_userauth_kbdint_getprompt =
+      _ssh_userauth_kbdint_getpromptPtr.asFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              ssh_session, int, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_userauth_kbdint_getnanswers(
     ssh_session session,
@@ -4269,9 +4836,11 @@ class LibsshBinding {
   }
 
   late final _ssh_userauth_kbdint_getnanswersPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_userauth_kbdint_getnanswers');
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_userauth_kbdint_getnanswers');
   late final _ssh_userauth_kbdint_getnanswers =
-      _ssh_userauth_kbdint_getnanswersPtr.asFunction<int Function(ssh_session)>();
+      _ssh_userauth_kbdint_getnanswersPtr
+          .asFunction<int Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_userauth_kbdint_getanswer(
     ssh_session session,
@@ -4283,11 +4852,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_kbdint_getanswerPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session, ffi.Uint32)>>(
-          'ssh_userauth_kbdint_getanswer');
-  late final _ssh_userauth_kbdint_getanswer =
-      _ssh_userauth_kbdint_getanswerPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session, int)>();
+  late final _ssh_userauth_kbdint_getanswerPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              ssh_session, ffi.Uint32)>>('ssh_userauth_kbdint_getanswer');
+  late final _ssh_userauth_kbdint_getanswer = _ssh_userauth_kbdint_getanswerPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session, int)>();
 
   int ssh_userauth_kbdint_setanswer(
     ssh_session session,
@@ -4301,11 +4871,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_userauth_kbdint_setanswerPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session, ffi.Uint32, ffi.Pointer<ffi.Int8>)>>(
-          'ssh_userauth_kbdint_setanswer');
-  late final _ssh_userauth_kbdint_setanswer =
-      _ssh_userauth_kbdint_setanswerPtr.asFunction<int Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
+  late final _ssh_userauth_kbdint_setanswerPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_session, ffi.Uint32,
+              ffi.Pointer<ffi.Int8>)>>('ssh_userauth_kbdint_setanswer');
+  late final _ssh_userauth_kbdint_setanswer = _ssh_userauth_kbdint_setanswerPtr
+      .asFunction<int Function(ssh_session, int, ffi.Pointer<ffi.Int8>)>();
 
   int ssh_userauth_gssapi(
     ssh_session session,
@@ -4316,8 +4887,10 @@ class LibsshBinding {
   }
 
   late final _ssh_userauth_gssapiPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>('ssh_userauth_gssapi');
-  late final _ssh_userauth_gssapi = _ssh_userauth_gssapiPtr.asFunction<int Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_session)>>(
+          'ssh_userauth_gssapi');
+  late final _ssh_userauth_gssapi =
+      _ssh_userauth_gssapiPtr.asFunction<int Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_version(
     int req_version,
@@ -4327,8 +4900,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_versionPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Int32)>>('ssh_version');
-  late final _ssh_version = _ssh_versionPtr.asFunction<ffi.Pointer<ffi.Int8> Function(int)>();
+  late final _ssh_versionPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ffi.Int32)>>(
+          'ssh_version');
+  late final _ssh_version =
+      _ssh_versionPtr.asFunction<ffi.Pointer<ffi.Int8> Function(int)>();
 
   void ssh_string_burn(
     ssh_string str,
@@ -4338,8 +4914,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_string_burnPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_string)>>('ssh_string_burn');
-  late final _ssh_string_burn = _ssh_string_burnPtr.asFunction<void Function(ssh_string)>();
+  late final _ssh_string_burnPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_string)>>(
+          'ssh_string_burn');
+  late final _ssh_string_burn =
+      _ssh_string_burnPtr.asFunction<void Function(ssh_string)>();
 
   ssh_string ssh_string_copy(
     ssh_string str,
@@ -4349,8 +4928,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_string_copyPtr = _lookup<ffi.NativeFunction<ssh_string Function(ssh_string)>>('ssh_string_copy');
-  late final _ssh_string_copy = _ssh_string_copyPtr.asFunction<ssh_string Function(ssh_string)>();
+  late final _ssh_string_copyPtr =
+      _lookup<ffi.NativeFunction<ssh_string Function(ssh_string)>>(
+          'ssh_string_copy');
+  late final _ssh_string_copy =
+      _ssh_string_copyPtr.asFunction<ssh_string Function(ssh_string)>();
 
   ffi.Pointer<ffi.Void> ssh_string_data(
     ssh_string str,
@@ -4361,8 +4943,10 @@ class LibsshBinding {
   }
 
   late final _ssh_string_dataPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function(ssh_string)>>('ssh_string_data');
-  late final _ssh_string_data = _ssh_string_dataPtr.asFunction<ffi.Pointer<ffi.Void> Function(ssh_string)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function(ssh_string)>>(
+          'ssh_string_data');
+  late final _ssh_string_data = _ssh_string_dataPtr
+      .asFunction<ffi.Pointer<ffi.Void> Function(ssh_string)>();
 
   int ssh_string_fill(
     ssh_string str,
@@ -4376,9 +4960,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_string_fillPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_string, ffi.Pointer<ffi.Void>, size_t)>>('ssh_string_fill');
-  late final _ssh_string_fill = _ssh_string_fillPtr.asFunction<int Function(ssh_string, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_string_fillPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ssh_string, ffi.Pointer<ffi.Void>, size_t)>>('ssh_string_fill');
+  late final _ssh_string_fill = _ssh_string_fillPtr
+      .asFunction<int Function(ssh_string, ffi.Pointer<ffi.Void>, int)>();
 
   void ssh_string_free(
     ssh_string str,
@@ -4388,8 +4975,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_string_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_string)>>('ssh_string_free');
-  late final _ssh_string_free = _ssh_string_freePtr.asFunction<void Function(ssh_string)>();
+  late final _ssh_string_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_string)>>(
+          'ssh_string_free');
+  late final _ssh_string_free =
+      _ssh_string_freePtr.asFunction<void Function(ssh_string)>();
 
   ssh_string ssh_string_from_char(
     ffi.Pointer<ffi.Int8> what,
@@ -4400,8 +4990,10 @@ class LibsshBinding {
   }
 
   late final _ssh_string_from_charPtr =
-      _lookup<ffi.NativeFunction<ssh_string Function(ffi.Pointer<ffi.Int8>)>>('ssh_string_from_char');
-  late final _ssh_string_from_char = _ssh_string_from_charPtr.asFunction<ssh_string Function(ffi.Pointer<ffi.Int8>)>();
+      _lookup<ffi.NativeFunction<ssh_string Function(ffi.Pointer<ffi.Int8>)>>(
+          'ssh_string_from_char');
+  late final _ssh_string_from_char = _ssh_string_from_charPtr
+      .asFunction<ssh_string Function(ffi.Pointer<ffi.Int8>)>();
 
   int ssh_string_len(
     ssh_string str,
@@ -4411,8 +5003,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_string_lenPtr = _lookup<ffi.NativeFunction<size_t Function(ssh_string)>>('ssh_string_len');
-  late final _ssh_string_len = _ssh_string_lenPtr.asFunction<int Function(ssh_string)>();
+  late final _ssh_string_lenPtr =
+      _lookup<ffi.NativeFunction<size_t Function(ssh_string)>>(
+          'ssh_string_len');
+  late final _ssh_string_len =
+      _ssh_string_lenPtr.asFunction<int Function(ssh_string)>();
 
   ssh_string ssh_string_new(
     int size,
@@ -4422,8 +5017,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_string_newPtr = _lookup<ffi.NativeFunction<ssh_string Function(size_t)>>('ssh_string_new');
-  late final _ssh_string_new = _ssh_string_newPtr.asFunction<ssh_string Function(int)>();
+  late final _ssh_string_newPtr =
+      _lookup<ffi.NativeFunction<ssh_string Function(size_t)>>(
+          'ssh_string_new');
+  late final _ssh_string_new =
+      _ssh_string_newPtr.asFunction<ssh_string Function(int)>();
 
   ffi.Pointer<ffi.Int8> ssh_string_get_char(
     ssh_string str,
@@ -4434,8 +5032,10 @@ class LibsshBinding {
   }
 
   late final _ssh_string_get_charPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>>('ssh_string_get_char');
-  late final _ssh_string_get_char = _ssh_string_get_charPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>>(
+          'ssh_string_get_char');
+  late final _ssh_string_get_char = _ssh_string_get_charPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>();
 
   ffi.Pointer<ffi.Int8> ssh_string_to_char(
     ssh_string str,
@@ -4446,8 +5046,10 @@ class LibsshBinding {
   }
 
   late final _ssh_string_to_charPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>>('ssh_string_to_char');
-  late final _ssh_string_to_char = _ssh_string_to_charPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>>(
+          'ssh_string_to_char');
+  late final _ssh_string_to_char = _ssh_string_to_charPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_string)>();
 
   void ssh_string_free_char(
     ffi.Pointer<ffi.Int8> s,
@@ -4458,8 +5060,10 @@ class LibsshBinding {
   }
 
   late final _ssh_string_free_charPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Int8>)>>('ssh_string_free_char');
-  late final _ssh_string_free_char = _ssh_string_free_charPtr.asFunction<void Function(ffi.Pointer<ffi.Int8>)>();
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Int8>)>>(
+          'ssh_string_free_char');
+  late final _ssh_string_free_char = _ssh_string_free_charPtr
+      .asFunction<void Function(ffi.Pointer<ffi.Int8>)>();
 
   int ssh_getpass(
     ffi.Pointer<ffi.Int8> prompt,
@@ -4479,17 +5083,20 @@ class LibsshBinding {
 
   late final _ssh_getpassPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, size_t, ffi.Int32, ffi.Int32)>>('ssh_getpass');
-  late final _ssh_getpass =
-      _ssh_getpassPtr.asFunction<int Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, int, int, int)>();
+          ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>,
+              size_t, ffi.Int32, ffi.Int32)>>('ssh_getpass');
+  late final _ssh_getpass = _ssh_getpassPtr.asFunction<
+      int Function(
+          ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, int, int, int)>();
 
   ssh_event ssh_event_new() {
     return _ssh_event_new();
   }
 
-  late final _ssh_event_newPtr = _lookup<ffi.NativeFunction<ssh_event Function()>>('ssh_event_new');
-  late final _ssh_event_new = _ssh_event_newPtr.asFunction<ssh_event Function()>();
+  late final _ssh_event_newPtr =
+      _lookup<ffi.NativeFunction<ssh_event Function()>>('ssh_event_new');
+  late final _ssh_event_new =
+      _ssh_event_newPtr.asFunction<ssh_event Function()>();
 
   int ssh_event_add_fd(
     ssh_event event,
@@ -4509,10 +5116,11 @@ class LibsshBinding {
 
   late final _ssh_event_add_fdPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ssh_event, socket_t, ffi.Int16, ssh_event_callback, ffi.Pointer<ffi.Void>)>>('ssh_event_add_fd');
-  late final _ssh_event_add_fd =
-      _ssh_event_add_fdPtr.asFunction<int Function(ssh_event, int, int, ssh_event_callback, ffi.Pointer<ffi.Void>)>();
+          ffi.Int32 Function(ssh_event, socket_t, ffi.Int16, ssh_event_callback,
+              ffi.Pointer<ffi.Void>)>>('ssh_event_add_fd');
+  late final _ssh_event_add_fd = _ssh_event_add_fdPtr.asFunction<
+      int Function(
+          ssh_event, int, int, ssh_event_callback, ffi.Pointer<ffi.Void>)>();
 
   int ssh_event_add_session(
     ssh_event event,
@@ -4525,8 +5133,10 @@ class LibsshBinding {
   }
 
   late final _ssh_event_add_sessionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_session)>>('ssh_event_add_session');
-  late final _ssh_event_add_session = _ssh_event_add_sessionPtr.asFunction<int Function(ssh_event, ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_session)>>(
+          'ssh_event_add_session');
+  late final _ssh_event_add_session = _ssh_event_add_sessionPtr
+      .asFunction<int Function(ssh_event, ssh_session)>();
 
   int ssh_event_add_connector(
     ssh_event event,
@@ -4539,9 +5149,10 @@ class LibsshBinding {
   }
 
   late final _ssh_event_add_connectorPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_connector)>>('ssh_event_add_connector');
-  late final _ssh_event_add_connector =
-      _ssh_event_add_connectorPtr.asFunction<int Function(ssh_event, ssh_connector)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_connector)>>(
+          'ssh_event_add_connector');
+  late final _ssh_event_add_connector = _ssh_event_add_connectorPtr
+      .asFunction<int Function(ssh_event, ssh_connector)>();
 
   int ssh_event_dopoll(
     ssh_event event,
@@ -4554,8 +5165,10 @@ class LibsshBinding {
   }
 
   late final _ssh_event_dopollPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ffi.Int32)>>('ssh_event_dopoll');
-  late final _ssh_event_dopoll = _ssh_event_dopollPtr.asFunction<int Function(ssh_event, int)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ffi.Int32)>>(
+          'ssh_event_dopoll');
+  late final _ssh_event_dopoll =
+      _ssh_event_dopollPtr.asFunction<int Function(ssh_event, int)>();
 
   int ssh_event_remove_fd(
     ssh_event event,
@@ -4568,8 +5181,10 @@ class LibsshBinding {
   }
 
   late final _ssh_event_remove_fdPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, socket_t)>>('ssh_event_remove_fd');
-  late final _ssh_event_remove_fd = _ssh_event_remove_fdPtr.asFunction<int Function(ssh_event, int)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, socket_t)>>(
+          'ssh_event_remove_fd');
+  late final _ssh_event_remove_fd =
+      _ssh_event_remove_fdPtr.asFunction<int Function(ssh_event, int)>();
 
   int ssh_event_remove_session(
     ssh_event event,
@@ -4582,9 +5197,10 @@ class LibsshBinding {
   }
 
   late final _ssh_event_remove_sessionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_session)>>('ssh_event_remove_session');
-  late final _ssh_event_remove_session =
-      _ssh_event_remove_sessionPtr.asFunction<int Function(ssh_event, ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_session)>>(
+          'ssh_event_remove_session');
+  late final _ssh_event_remove_session = _ssh_event_remove_sessionPtr
+      .asFunction<int Function(ssh_event, ssh_session)>();
 
   int ssh_event_remove_connector(
     ssh_event event,
@@ -4597,9 +5213,10 @@ class LibsshBinding {
   }
 
   late final _ssh_event_remove_connectorPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_connector)>>('ssh_event_remove_connector');
-  late final _ssh_event_remove_connector =
-      _ssh_event_remove_connectorPtr.asFunction<int Function(ssh_event, ssh_connector)>();
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_event, ssh_connector)>>(
+          'ssh_event_remove_connector');
+  late final _ssh_event_remove_connector = _ssh_event_remove_connectorPtr
+      .asFunction<int Function(ssh_event, ssh_connector)>();
 
   void ssh_event_free(
     ssh_event event,
@@ -4609,8 +5226,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_event_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_event)>>('ssh_event_free');
-  late final _ssh_event_free = _ssh_event_freePtr.asFunction<void Function(ssh_event)>();
+  late final _ssh_event_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_event)>>(
+          'ssh_event_free');
+  late final _ssh_event_free =
+      _ssh_event_freePtr.asFunction<void Function(ssh_event)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_clientbanner(
     ssh_session session,
@@ -4621,8 +5241,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_clientbannerPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_clientbanner');
-  late final _ssh_get_clientbanner = _ssh_get_clientbannerPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_clientbanner');
+  late final _ssh_get_clientbanner = _ssh_get_clientbannerPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_serverbanner(
     ssh_session session,
@@ -4633,8 +5255,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_serverbannerPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_serverbanner');
-  late final _ssh_get_serverbanner = _ssh_get_serverbannerPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_serverbanner');
+  late final _ssh_get_serverbanner = _ssh_get_serverbannerPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_kex_algo(
     ssh_session session,
@@ -4645,8 +5269,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_kex_algoPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_kex_algo');
-  late final _ssh_get_kex_algo = _ssh_get_kex_algoPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_kex_algo');
+  late final _ssh_get_kex_algo = _ssh_get_kex_algoPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_cipher_in(
     ssh_session session,
@@ -4657,8 +5283,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_cipher_inPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_cipher_in');
-  late final _ssh_get_cipher_in = _ssh_get_cipher_inPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_cipher_in');
+  late final _ssh_get_cipher_in = _ssh_get_cipher_inPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_cipher_out(
     ssh_session session,
@@ -4669,8 +5297,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_cipher_outPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_cipher_out');
-  late final _ssh_get_cipher_out = _ssh_get_cipher_outPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_cipher_out');
+  late final _ssh_get_cipher_out = _ssh_get_cipher_outPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_hmac_in(
     ssh_session session,
@@ -4681,8 +5311,10 @@ class LibsshBinding {
   }
 
   late final _ssh_get_hmac_inPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_hmac_in');
-  late final _ssh_get_hmac_in = _ssh_get_hmac_inPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_hmac_in');
+  late final _ssh_get_hmac_in = _ssh_get_hmac_inPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ffi.Pointer<ffi.Int8> ssh_get_hmac_out(
     ssh_session session,
@@ -4693,15 +5325,19 @@ class LibsshBinding {
   }
 
   late final _ssh_get_hmac_outPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>('ssh_get_hmac_out');
-  late final _ssh_get_hmac_out = _ssh_get_hmac_outPtr.asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>>(
+          'ssh_get_hmac_out');
+  late final _ssh_get_hmac_out = _ssh_get_hmac_outPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ssh_session)>();
 
   ssh_buffer ssh_buffer_new() {
     return _ssh_buffer_new();
   }
 
-  late final _ssh_buffer_newPtr = _lookup<ffi.NativeFunction<ssh_buffer Function()>>('ssh_buffer_new');
-  late final _ssh_buffer_new = _ssh_buffer_newPtr.asFunction<ssh_buffer Function()>();
+  late final _ssh_buffer_newPtr =
+      _lookup<ffi.NativeFunction<ssh_buffer Function()>>('ssh_buffer_new');
+  late final _ssh_buffer_new =
+      _ssh_buffer_newPtr.asFunction<ssh_buffer Function()>();
 
   void ssh_buffer_free(
     ssh_buffer buffer,
@@ -4711,8 +5347,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_buffer_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ssh_buffer)>>('ssh_buffer_free');
-  late final _ssh_buffer_free = _ssh_buffer_freePtr.asFunction<void Function(ssh_buffer)>();
+  late final _ssh_buffer_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ssh_buffer)>>(
+          'ssh_buffer_free');
+  late final _ssh_buffer_free =
+      _ssh_buffer_freePtr.asFunction<void Function(ssh_buffer)>();
 
   int ssh_buffer_reinit(
     ssh_buffer buffer,
@@ -4722,8 +5361,11 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_buffer_reinitPtr = _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_buffer)>>('ssh_buffer_reinit');
-  late final _ssh_buffer_reinit = _ssh_buffer_reinitPtr.asFunction<int Function(ssh_buffer)>();
+  late final _ssh_buffer_reinitPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_buffer)>>(
+          'ssh_buffer_reinit');
+  late final _ssh_buffer_reinit =
+      _ssh_buffer_reinitPtr.asFunction<int Function(ssh_buffer)>();
 
   int ssh_buffer_add_data(
     ssh_buffer buffer,
@@ -4737,11 +5379,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_buffer_add_dataPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ssh_buffer, ffi.Pointer<ffi.Void>, ffi.Uint32)>>(
-          'ssh_buffer_add_data');
-  late final _ssh_buffer_add_data =
-      _ssh_buffer_add_dataPtr.asFunction<int Function(ssh_buffer, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_buffer_add_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ssh_buffer, ffi.Pointer<ffi.Void>,
+              ffi.Uint32)>>('ssh_buffer_add_data');
+  late final _ssh_buffer_add_data = _ssh_buffer_add_dataPtr
+      .asFunction<int Function(ssh_buffer, ffi.Pointer<ffi.Void>, int)>();
 
   int ssh_buffer_get_data(
     ssh_buffer buffer,
@@ -4755,11 +5398,12 @@ class LibsshBinding {
     );
   }
 
-  late final _ssh_buffer_get_dataPtr =
-      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ssh_buffer, ffi.Pointer<ffi.Void>, ffi.Uint32)>>(
-          'ssh_buffer_get_data');
-  late final _ssh_buffer_get_data =
-      _ssh_buffer_get_dataPtr.asFunction<int Function(ssh_buffer, ffi.Pointer<ffi.Void>, int)>();
+  late final _ssh_buffer_get_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Uint32 Function(ssh_buffer, ffi.Pointer<ffi.Void>,
+              ffi.Uint32)>>('ssh_buffer_get_data');
+  late final _ssh_buffer_get_data = _ssh_buffer_get_dataPtr
+      .asFunction<int Function(ssh_buffer, ffi.Pointer<ffi.Void>, int)>();
 
   ffi.Pointer<ffi.Void> ssh_buffer_get(
     ssh_buffer buffer,
@@ -4770,8 +5414,10 @@ class LibsshBinding {
   }
 
   late final _ssh_buffer_getPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function(ssh_buffer)>>('ssh_buffer_get');
-  late final _ssh_buffer_get = _ssh_buffer_getPtr.asFunction<ffi.Pointer<ffi.Void> Function(ssh_buffer)>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Void> Function(ssh_buffer)>>(
+          'ssh_buffer_get');
+  late final _ssh_buffer_get = _ssh_buffer_getPtr
+      .asFunction<ffi.Pointer<ffi.Void> Function(ssh_buffer)>();
 
   int ssh_buffer_get_len(
     ssh_buffer buffer,
@@ -4782,8 +5428,10 @@ class LibsshBinding {
   }
 
   late final _ssh_buffer_get_lenPtr =
-      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ssh_buffer)>>('ssh_buffer_get_len');
-  late final _ssh_buffer_get_len = _ssh_buffer_get_lenPtr.asFunction<int Function(ssh_buffer)>();
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ssh_buffer)>>(
+          'ssh_buffer_get_len');
+  late final _ssh_buffer_get_len =
+      _ssh_buffer_get_lenPtr.asFunction<int Function(ssh_buffer)>();
 }
 
 class ssh_counter_struct extends ffi.Struct {
@@ -5077,8 +5725,8 @@ typedef ssh_pcap_file = ffi.Pointer<ssh_pcap_file_struct>;
 /// @return              0 on success, < 0 on error.
 typedef ssh_auth_callback = ffi.Pointer<
     ffi.NativeFunction<
-        ffi.Int32 Function(
-            ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, size_t, ffi.Int32, ffi.Int32, ffi.Pointer<ffi.Void>)>>;
+        ffi.Int32 Function(ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>, size_t,
+            ffi.Int32, ffi.Int32, ffi.Pointer<ffi.Void>)>>;
 typedef ssh_gssapi_creds = ffi.Pointer<ffi.Void>;
 typedef ssh_scp = ffi.Pointer<ssh_scp_struct>;
 
@@ -5093,8 +5741,9 @@ class fd_set extends ffi.Struct {
 typedef u_int = ffi.Uint32;
 typedef ssh_string = ffi.Pointer<ssh_string_struct>;
 typedef ssh_event = ffi.Pointer<ssh_event_struct>;
-typedef ssh_event_callback
-    = ffi.Pointer<ffi.NativeFunction<ffi.Int32 Function(socket_t, ffi.Int32, ffi.Pointer<ffi.Void>)>>;
+typedef ssh_event_callback = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(socket_t, ffi.Int32, ffi.Pointer<ffi.Void>)>>;
 typedef ssh_buffer = ffi.Pointer<ssh_buffer_struct>;
 
 const int SSH_LOG_NOLOG = 0;

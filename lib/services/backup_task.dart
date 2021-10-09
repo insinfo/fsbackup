@@ -26,6 +26,7 @@ class BackupTask implements FileTask<Future<bool>> {
     var destinationDirectory = '';
     var zipFileName = '';
     try {
+      final start = DateTime.now();
       //var progress = ((loaded / total) * 100).round();
       var server = rotinaBackup.servers.first;
       libssh = LibsshWrapper(
@@ -43,12 +44,12 @@ class BackupTask implements FileTask<Future<bool>> {
       tasklogCallback('create destination directory if not exist');
 
       if (rotinaBackup.compressAsZip == true) {
-        destinationDirectory = Utils.createDirectoryIfNotExist(
+        destinationDirectory = await Utils.createDirectoryIfNotExist(
             '${rotinaBackup.destinationDirectory}/tmp_$now');
         zipFileName =
             '${rotinaBackup.destinationDirectory}/${slugify(rotinaBackup.name, delimiter: "_")}_$now.zip';
       } else {
-        destinationDirectory = Utils.createDirectoryIfNotExist(
+        destinationDirectory = await Utils.createDirectoryIfNotExist(
             '${rotinaBackup.destinationDirectory}/${slugify(rotinaBackup.name, delimiter: "_")}');
       }
 
@@ -61,7 +62,6 @@ class BackupTask implements FileTask<Future<bool>> {
           .toList()
           .reduce((value, element) => value + element);
 
-      final start = DateTime.now();
       for (var item in fileObjects) {
         if (item.type == DirectoryItemType.directory) {
           await libssh.scpDownloadDirectory(
@@ -76,6 +76,8 @@ class BackupTask implements FileTask<Future<bool>> {
               taskProgressCallback(totalSize, totalLoaded, 'copy');
             },
             cancelCallback: cancelCallback,
+            updateStatsOnFileEnd: false,
+            dontStopIfFileException: rotinaBackup.dontStopIfFileException,
           );
         } else if (item.type == DirectoryItemType.file) {
           var currentFileSize = 0;
@@ -86,6 +88,7 @@ class BackupTask implements FileTask<Future<bool>> {
               currentFileSize = loaded;
             },
             recursive: false,
+            dontStopIfFileException: rotinaBackup.dontStopIfFileException,
           );
 
           totalLoaded += currentFileSize;
@@ -113,8 +116,9 @@ class BackupTask implements FileTask<Future<bool>> {
       tasklogCallback(
           'total backup run time: ${DateTime.now().difference(start)}');
       completer.complete(true);
-    } catch (e) {
-      tasklogCallback('BackupTask ${rotinaBackup.name} error: $e ');
+    } catch (e, s) {
+      tasklogCallback(
+          'BackupTask ${rotinaBackup.name} error:\r\n$e\r\nStacktrace:\r\n$s');
       //remove o arquivo imcompleto
       if (rotinaBackup.compressAsZip == true && zipFileName.isNotEmpty) {
         if (await File(zipFileName).exists()) {
@@ -127,7 +131,8 @@ class BackupTask implements FileTask<Future<bool>> {
         tasklogCallback('remove $destinationDirectory');
       }
 
-      //print('backupTask ${rotinaBackup.name} error: $e $s');
+      print(
+          'BackupTask ${rotinaBackup.name} error:\r\n$e\r\nStacktrace:\r\n$s');
       completer.completeError(e);
     } finally {
       // completer.complete(true);

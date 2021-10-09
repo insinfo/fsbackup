@@ -18,6 +18,7 @@ class CustomTextField extends StatefulWidget {
   final bool autocorrect;
   final String initialValue;
   final String hintText;
+  final readOnly;
   //custom
   final bool isPassword;
 
@@ -38,6 +39,7 @@ class CustomTextField extends StatefulWidget {
     this.onChanged,
     this.initialValue,
     this.hintText,
+    this.readOnly = false,
   }) : super(key: key);
 
   @override
@@ -70,6 +72,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly,
       obscureText: widget.isPassword == false ? widget.obscureText : _isObscure,
       enableSuggestions: widget.enableSuggestions,
       autocorrect: widget.autocorrect,
@@ -95,7 +98,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           label: Text(widget.label),
           suffixIcon: widget.isPassword
               ? IconButton(
-                  icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                      _isObscure ? Icons.visibility : Icons.visibility_off),
                   onPressed: () {
                     setState(() {
                       _isObscure = !_isObscure;

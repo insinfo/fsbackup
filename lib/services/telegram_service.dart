@@ -24,10 +24,7 @@ class TelegramService {
       // print('teledart $teledart');
       // teledart.start();
     } catch (e) {
-      FLog.info(
-          className: 'TelegramService',
-          methodName: 'init',
-          text: 'TelegramService: Telegram failed $e');
+      FLog.info(className: 'TelegramService', methodName: 'init', text: 'TelegramService: Telegram failed $e');
       isFailed = true;
     }
   }
@@ -37,8 +34,13 @@ class TelegramService {
     print('message $message');
     teledart.telegram.sendMessage(message.chat.id, message.chat.id.toString());
   });*/
-    if (isFailed == false) {
-      teledart.telegram.sendMessage(groupId, msg);
+    try {
+      if (isFailed == false) {
+        teledart.telegram.sendMessage(groupId, msg);
+      }
+    } catch (e) {
+      FLog.info(className: 'TelegramService', methodName: 'sendMessage', text: 'TelegramService: Telegram failed $e');
+      isFailed = true;
     }
   }
 

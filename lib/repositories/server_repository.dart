@@ -1,3 +1,4 @@
+import 'package:fsbackup/repositories/backup_routine_repository.dart';
 import 'package:fsbackup/services/mongodb_service.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -5,8 +6,10 @@ import 'package:mongo_dart/mongo_dart.dart';
 class ServerRepository {
   final MongodbService mongo;
   DbCollection collection;
+  BackupRoutineRepository backupRoutineRepository;
   ServerRepository(this.mongo) {
     collection = mongo.db.collection('servidores');
+    backupRoutineRepository = BackupRoutineRepository(mongo);
   }
 
   Future<List<ServerModel>> all() async {
@@ -44,10 +47,10 @@ class ServerRepository {
   }
 
   Future<void> remove(ServerModel server) async {
+    var vinculadors = await backupRoutineRepository.findAllOfServer(server.id);
+    if (vinculadors.isNotEmpty) {
+      throw Exception('It was not possible to remove this server as it is linked to a routine');
+    }
     await collection.remove({'id': server.id});
-  }
-
-  Future<void> removeById(String id) async {
-    await collection.remove({'id': id});
   }
 }

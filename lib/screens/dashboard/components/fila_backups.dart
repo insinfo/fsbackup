@@ -15,11 +15,6 @@ class FilaBackupWidget extends StatefulWidget {
 
 class _FilaBackupWidgetState extends State<FilaBackupWidget> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(defaultPadding),
@@ -39,15 +34,13 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
             width: double.infinity,
             child: ChangeNotifierProvider.value(
               value: locator<FilaProvider>(),
-              builder: (context, w) =>
-                  Consumer<FilaProvider>(builder: (ctx, data, child) {
+              builder: (context, w) => Consumer<FilaProvider>(builder: (ctx, data, child) {
                 return FutureBuilder<List<BackupRoutineModel>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(
-                              child: Text('Não ha Tarefas em execução!'));
+                          return Center(child: Text('Não ha Tarefas em execução!'));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
@@ -60,10 +53,7 @@ class _FilaBackupWidgetState extends State<FilaBackupWidget> {
                                 DataColumn(label: Text('')),
                                 //DataColumn(label: Text('Ações')),
                               ],
-                              rows: snapshot.data
-                                  .map<DataRow>(
-                                      (server) => createItem(server, ctx))
-                                  .toList());
+                              rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
                         }
                       }
                       return Center(child: CircularProgressIndicator());
@@ -94,8 +84,7 @@ DataRow createItem(BackupRoutineModel routine, BuildContext ctx) {
           ],
         ),
       ),
-      DataCell(Text(
-          '${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
+      DataCell(Text('${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
       DataCell(Text('${routine.percent.toStringAsFixed(2)}%')),
       DataCell(Text('${routine.status.text}')),
       DataCell(

@@ -19,18 +19,24 @@ class BackupRoutineProvider with ChangeNotifier {
     return repository.all();
   }
 
-  Future<void> insert(BackupRoutineModel server) async {
-    await repository.insert(server);
+  Future<void> insert(BackupRoutineModel routine) async {
+    await repository.insert(routine);
     notifyListeners();
   }
 
-  Future<void> update(BackupRoutineModel server) async {
-    await repository.update(server);
+  Future<void> update(BackupRoutineModel routine) async {
+    await repository.update(routine);
     notifyListeners();
   }
 
   Future<void> delete(String id) async {
     await repository.removeById(id);
+    notifyListeners();
+  }
+
+  Future<void> cleanLog(BackupRoutineModel routine) async {
+    routine.log = '';
+    await repository.update(routine);
     notifyListeners();
   }
 

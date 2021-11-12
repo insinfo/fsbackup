@@ -154,6 +154,7 @@ extension ScpExtension on LibsshBinding {
   int getSizeOfDirectory(Pointer<ssh_session_struct> session, String remoteDirectoryPath,
       {bool isThrowException = true}) {
     //windows = 1041090242
+    //debian < 6 : find /var/www -type f -print0 | xargs -0 stat --format=%s |  paste -sd+ - | bc -l
     //ls -lAR | grep -v '^d' | awk '{total += $5} END {print "Total:", total}'
     //linux = 1041090469 -> find ./dart/  -type f -print | xargs -d '\n' du -bs | awk '{ sum+=$1} END {print sum}'
     var cmdToGetTotaSize =
@@ -175,11 +176,28 @@ extension ScpExtension on LibsshBinding {
           }
         }
       }
+      //para debian antigos como debian 6
+      //exeplo 1.57903e+10
+      if (cmdRes.contains('e+')) {
+        cmdRes = execCommandSync(
+            session, 'find $remoteDirectoryPath -type f -print0 | xargs -0 stat --format=%s |  paste -sd+ - | bc -l');
+      } else if (int.tryParse(cmdRes) == null) {
+        //du -s -B1 /var/www
+        //4096 * 23775 = 97382400
+        //obter total de diretorios => find /var/www  -type d -print| wc -l
+        // find /var/www -type f -print0 | du -scb -L --apparent-size --files0-from=- | tail -n 1
+        //cmdRes = execCommandSync(session, 'du -sb --apparent-size --block-size=1 $remoteDirectoryPath');
+        cmdRes = execCommandSync(session,
+            'find $remoteDirectoryPath -type f -print0 | du -scb -L --apparent-size --files0-from=- | tail -n 1');
+        return int.parse(cmdRes.split(' ').first.trim());
+      }
+
       return int.parse(cmdRes);
     } catch (e) {
       print('getSizeOfDirectory: $e \r\n cmdToGetTotaSize: $cmdToGetTotaSize \r\n cmdRes: $cmdRes');
       if (isThrowException) {
-        throw LibsshGetFileSizeException('Unable to get the size of a directory in bytes');
+        throw LibsshGetFileSizeException(
+            'Unable to get the size of a directory in bytes, \r\n cmd: $cmdToGetTotaSize cmdResult: $cmdRes');
       }
     }
     return 0;
@@ -261,7 +279,7 @@ extension ScpExtension on LibsshBinding {
       }
     } on FileSystemException catch (e) {
       if (dontStopIfFileException) {
-        printFunc('scpReadFileAndSave $e');
+        printFunc('scpReadFileAndSave: $e');
       } else {
         rethrow;
       }
@@ -303,14 +321,15 @@ extension ScpExtension on LibsshBinding {
     //function used to print log info
     var printFunc = printLog != null ? printLog : print;
 
-    String currentPath = '${fullLocalDirectoryPathTarget.replaceAll('\\', '/')}';
+    var currentPath = '${fullLocalDirectoryPathTarget.replaceAll('\\', '/')}';
 
     int totalSize = 0, loaded = 0, countDirectory = 0, countFiles = 0;
     int currentFileSize = 0;
-    String currentDirName = '';
+    var currentDirName = '';
 
     totalSize = getSizeOfDirectory(session, remoteDirectoryPath, isThrowException: isThrowException);
-    printFunc('scpDownloadDirectory: total size: $totalSize of directory $remoteDirectoryPath');
+    printFunc(
+        'scpDownloadDirectory: total size: $totalSize in bytes | ${totalSize > 0 ? totalSize / 1024 / 1024 : totalSize} megabytes of directory $remoteDirectoryPath');
     var scp = initDirectoryScp(session, source);
 
     var rc = 0;
@@ -335,10 +354,19 @@ extension ScpExtension on LibsshBinding {
         //Um novo arquivo será obtido
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
           var rawFilename = nativeInt8ToCodeUnits(ssh_scp_request_get_filename(scp));
+
+          var tempFilename = uint8ListToString(rawFilename);
+
+          if (isInvalidFilename(tempFilename)) {
+            var newFilename = sanitizeFilename(tempFilename);
+            printFunc('invalid filename:  $currentPath/$tempFilename \r\n renamed to:  $newFilename');
+            rawFilename = Uint8List.fromList(newFilename.codeUnits);
+          }
+
           currentFileSize = ssh_scp_request_get_size64(scp);
           //concatena o caminho atual com o nome do arquivo
           //'$currentPath/$filename'
-          var filename = concatUint8List(
+          var fullLocalPathTarget = concatUint8List(
               [Uint8List.fromList(currentPath.codeUnits), Uint8List.fromList('/'.codeUnits), rawFilename]);
 
           ssh_scp_accept_request(scp);
@@ -346,8 +374,8 @@ extension ScpExtension on LibsshBinding {
           await scpReadFileAndSave(
             session,
             scp,
-            filename,
-            recursive: false,
+            fullLocalPathTarget,
+            recursive: true,
             allocator: allocator,
             cancelCallback: cancelCallback,
             dontStopIfFileException: dontStopIfFileException,
@@ -379,6 +407,14 @@ extension ScpExtension on LibsshBinding {
         //Um novo diretório será puxado
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
           currentDirName = nativeInt8ToString(ssh_scp_request_get_filename(scp), allowMalformed: true);
+
+          if (isInvalidFilename(currentDirName)) {
+            var newDirname = sanitizeFilename(currentDirName);
+            var p = '$currentPath/$currentDirName';
+            printFunc('invalid directory name:  $p \r\n renamed to:  $newDirname');
+            currentDirName = newDirname;
+          }
+
           //currentDirSize = ssh_scp_request_get_size64(scp);
           //var mode = ssh_scp_request_get_permissions(scp);
           currentPath += '/$currentDirName';

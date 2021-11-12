@@ -5,6 +5,7 @@ import 'package:fsbackup/providers/fila_provider.dart';
 import 'package:fsbackup/providers/log_provider.dart';
 import 'package:fsbackup/repositories/backup_routine_repository.dart';
 import 'package:fsbackup/services/backup_task.dart';
+import 'package:fsbackup/services/email_service.dart';
 import 'package:fsbackup/services/telegram_service.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:queue/queue.dart';
@@ -74,19 +75,23 @@ class BackupService {
       rotina.percent = 0;
       rotina.status = RoutineStatus.failed;
 
+      var log = 'Erro na execução da rotina de backup: ${rotina.name}\r\nLog:\r\n${rotina.log}';
+
       FLog.info(
         className: 'BackupService',
         methodName: '_task',
-        text: 'Erro na execução da rotina de backup: ${rotina.name}',
+        text: log,
         /* type: LogLevel.SEVERE,
           exception: e,
           stacktrace: s*/
       );
 
-      var t = TelegramService();
-      await t.init();
-      await t.sendMessage(
-          'Erro na execução da rotina de backup: ${rotina.name}\r\nLog:\r\n${rotina.log}');
+      final telegram = TelegramService();
+      await telegram.init();
+      await telegram.sendMessage(log);
+
+      final email = EmailService();
+      await email.sendLog(log);
     }
 
     repository.update(rotina);

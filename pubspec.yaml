@@ -26,6 +26,7 @@ dependencies:
     #path: 
       #../dartssh
   path_provider: ^2.0.2 
+  mailer: ^5.0.2 #Null safety
   dio: any
   http: any
   url_launcher: ^6.0.9

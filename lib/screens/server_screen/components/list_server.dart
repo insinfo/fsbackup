@@ -9,13 +9,19 @@ import 'package:fsbackup_shared/fsbackup_shared.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
 
-class ListServer extends StatelessWidget {
-  ListServer({
-    Key key,
-  }) : super(key: key);
+class ListServer extends StatefulWidget {
+  ListServer({Key key}) : super(key: key);
+
+  @override
+  State<ListServer> createState() => _ListServerState();
+}
+
+class _ListServerState extends State<ListServer> {
+  String mensagemDelete = '';
 
   @override
   Widget build(BuildContext context) {
+    mensagemDelete = AppLocalizations.of(context).confirmDeletionMessage;
     return Container(
       padding: EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
@@ -29,30 +35,21 @@ class ListServer extends StatelessWidget {
             width: double.infinity,
             child: ChangeNotifierProvider.value(
               value: locator<ServerProvider>(),
-              builder: (context, w) =>
-                  Consumer<ServerProvider>(builder: (ctx, data, child) {
+              builder: (context, w) => Consumer<ServerProvider>(builder: (ctx, data, child) {
                 return FutureBuilder<List<ServerModel>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(
-                              child:
-                                  Text(AppLocalizations.of(context).noItems));
+                          return Center(child: Text(AppLocalizations.of(context).noItems));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnName)),
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnHost)),
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnPort)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnHost)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnPort)),
                                 DataColumn(
                                     label: Center(
                                   child: Text(
@@ -61,10 +58,7 @@ class ListServer extends StatelessWidget {
                                   ),
                                 )),
                               ],
-                              rows: snapshot.data
-                                  .map<DataRow>(
-                                      (server) => servidorDataRow(server, ctx))
-                                  .toList());
+                              rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
                         }
                       }
                       return Center(child: CircularProgressIndicator());
@@ -116,21 +110,27 @@ class ListServer extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text("Alert"),
-                        content: Text(AppLocalizations.of(context)
-                            .confirmDeletionMessage),
+                        content: Text(mensagemDelete),
                         actions: <Widget>[
                           TextButton(
                               onPressed: () async {
+                                try {
+                                  await locator<ServerProvider>().delete(server);
+                                } catch (e) {
+                                  ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+                                    backgroundColor: Colors.pink,
+                                    content: Text(
+                                      'Não foi possivel remover este servidor pois ele esta vinculado a uma rotina!',
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ));
+                                }
                                 Navigator.of(context).pop(true);
-                                await locator<ServerProvider>()
-                                    .delete(server.id);
                               },
-                              child:
-                                  Text(AppLocalizations.of(context).btnDelete)),
+                              child: Text(AppLocalizations.of(context).btnDelete)),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child:
-                                Text(AppLocalizations.of(context).btnCancelar),
+                            child: Text(AppLocalizations.of(context).btnCancelar),
                           ),
                         ],
                       );

@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 
@@ -28,8 +29,11 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
   var dirDestinoControl = TextEditingController();
   var whenToBackupControl = TextEditingController();
   var dropdownValue = StartBackup.manual;
-  var compressAsZip = false;
-  var dontStopIfFileException = false;
+  //var holdOldFilesInDaysControl = TextEditingController();
+  bool compressAsZip = false;
+  bool dontStopIfFileException = false;
+  int holdOldFilesInDays = 5;
+  bool removeOld = true;
   ServerModel server;
 
   @override
@@ -40,18 +44,14 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
 
   void fillControls() {
     nomeControl.text = widget.routine == null ? '' : widget.routine.name;
-    dirDestinoControl.text =
-        widget.routine == null ? '' : widget.routine.destinationDirectory;
-    dropdownValue = widget.routine == null
-        ? StartBackup.manual
-        : widget.routine.startBackup;
-    whenToBackupControl.text =
-        widget.routine == null ? '' : widget.routine.whenToBackup;
+    dirDestinoControl.text = widget.routine == null ? '' : widget.routine.destinationDirectory;
+    dropdownValue = widget.routine == null ? StartBackup.manual : widget.routine.startBackup;
+    whenToBackupControl.text = widget.routine == null ? '' : widget.routine.whenToBackup;
     server = widget.routine == null ? null : widget.routine.servers.first;
-    compressAsZip =
-        widget.routine == null ? false : widget.routine.compressAsZip;
-    dontStopIfFileException =
-        widget.routine == null ? false : widget.routine.dontStopIfFileException;
+    compressAsZip = widget.routine == null ? false : widget.routine.compressAsZip;
+    dontStopIfFileException = widget.routine == null ? false : widget.routine.dontStopIfFileException;
+    holdOldFilesInDays = widget.routine == null ? holdOldFilesInDays : widget.routine.holdOldFilesInDays;
+    removeOld = widget.routine == null ? removeOld : widget.routine.removeOld;
     /*if (widget.rotina != null) {
       if (widget.rotina.servidores != null && widget.rotina.servidores.isNotEmpty) {
         servidor = widget.rotina.servidores.first;
@@ -71,6 +71,8 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
     model.servers = [server];
     model.compressAsZip = compressAsZip;
     model.dontStopIfFileException = dontStopIfFileException;
+    model.holdOldFilesInDays = holdOldFilesInDays;
+    model.removeOld = removeOld;
   }
 
   void edit() async {
@@ -112,9 +114,7 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomTextField(
-                  nameControl: nomeControl,
-                  label: AppLocalizations.of(context).columnName),
+              CustomTextField(nameControl: nomeControl, label: AppLocalizations.of(context).columnName),
               CustomTextField(
                 nameControl: dirDestinoControl,
                 label: 'Diretorio destino do backup',
@@ -138,13 +138,11 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(right: 20),
-                    child: Text('Como iniciar:',
-                        style: TextStyle(color: Colors.white.withAlpha(150))),
+                    child: Text('Como iniciar:', style: TextStyle(color: Colors.white.withAlpha(150))),
                   ),
                   DropdownButton<StartBackup>(
                     value: dropdownValue,
-                    items:
-                        [StartBackup.manual, StartBackup.scheduled].map((opt) {
+                    items: [StartBackup.manual, StartBackup.scheduled].map((opt) {
                       return DropdownMenuItem<StartBackup>(
                         value: opt,
                         child: Text(opt.text.toUpperCase()),
@@ -159,13 +157,11 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Servidor:',
-                        style: TextStyle(color: Colors.white.withAlpha(150))),
+                    child: Text('Servidor:', style: TextStyle(color: Colors.white.withAlpha(150))),
                   ),
                   ChangeNotifierProvider.value(
                     value: locator<ServerProvider>(),
-                    builder: (context, w) =>
-                        Consumer<ServerProvider>(builder: (ctx, data, child) {
+                    builder: (context, w) => Consumer<ServerProvider>(builder: (ctx, data, child) {
                       return FutureBuilder<List<ServerModel>>(
                           future: data.getAll(),
                           builder: (context, snapshot) {
@@ -203,16 +199,14 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                     )*/
                       CustomTextField(
                           nameControl: whenToBackupControl,
-                          hintText:
-                              'Ex: A cada minuto: "* * * * *" ou todos os dias às 18h: "0 18 * * *"',
+                          hintText: 'Ex: A cada minuto: "* * * * *" ou todos os dias às 18h: "0 18 * * *"',
                           label: 'Quando fazer?'),
                 ),
-              Row(children: [
+              Wrap(direction: Axis.horizontal, children: [
                 //Comprimir
                 Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: Text('Comprimir:',
-                      style: TextStyle(color: Colors.white.withAlpha(150))),
+                  padding: EdgeInsets.only(right: 10, left: 20),
+                  child: Text('Comprimir:', style: TextStyle(color: Colors.white.withAlpha(150))),
                 ),
                 Switch(
                   activeColor: Colors.pinkAccent,
@@ -225,9 +219,8 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                 ),
                 //não pare
                 Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: Text('Ignorar falha de arquivo:',
-                      style: TextStyle(color: Colors.white.withAlpha(150))),
+                  padding: EdgeInsets.only(right: 10, left: 20),
+                  child: Text('Ignorar falha de arquivo:', style: TextStyle(color: Colors.white.withAlpha(150))),
                 ),
                 Switch(
                   activeColor: Colors.pinkAccent,
@@ -235,6 +228,40 @@ class _EditBackupRoutineState extends State<EditBackupRoutine> {
                   onChanged: (value) {
                     setState(() {
                       dontStopIfFileException = value;
+                    });
+                  },
+                ),
+                //holdOldFilesInDays
+                Padding(
+                  padding: EdgeInsets.only(right: 10, left: 20),
+                  child: Text('Tempo de vida old files:', style: TextStyle(color: Colors.white.withAlpha(150))),
+                ),
+                Container(
+                  width: 100,
+                  height: 30,
+                  child: CustomTextField(
+                    initialValue: holdOldFilesInDays.toString(),
+                    onChanged: (v) {
+                      setState(() {
+                        holdOldFilesInDays = int.tryParse(v);
+                      });
+                    },
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                    ],
+                  ),
+                ),
+                //não pare
+                Padding(
+                  padding: EdgeInsets.only(right: 10, left: 20),
+                  child: Text('Remover old files:', style: TextStyle(color: Colors.white.withAlpha(150))),
+                ),
+                Switch(
+                  activeColor: Colors.pinkAccent,
+                  value: removeOld,
+                  onChanged: (value) {
+                    setState(() {
+                      removeOld = value;
                     });
                   },
                 ),

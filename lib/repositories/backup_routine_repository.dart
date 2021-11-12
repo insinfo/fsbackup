@@ -30,8 +30,7 @@ class BackupRoutineRepository {
         routines?.forEach((rotina) {
           var rotinaServersIds = rotina.servers?.map((e) => e.id)?.toList();
           if (rotinaServersIds is List) {
-            rotina.servers =
-                servers.where((s) => rotinaServersIds.contains(s.id))?.toList();
+            rotina.servers = servers.where((s) => rotinaServersIds.contains(s.id))?.toList();
           }
         });
       }
@@ -45,6 +44,13 @@ class BackupRoutineRepository {
   Future<List<BackupRoutineModel>> findAllByIds(List<String> ids) async {
     final result = await collection.find({
       'id': {r'$in': ids}
+    }).toList();
+    return result.map((m) => BackupRoutineModel.fromMap(m)).toList();
+  }
+
+  Future<List<BackupRoutineModel>> findAllOfServer(String idServer) async {
+    final result = await collection.find({
+      'servers.id': idServer,
     }).toList();
     return result.map((m) => BackupRoutineModel.fromMap(m)).toList();
   }

@@ -32,49 +32,29 @@ class ListBackupRoutine extends StatelessWidget {
             width: double.infinity,
             child: ChangeNotifierProvider.value(
               value: locator<BackupRoutineProvider>(),
-              builder: (context, w) =>
-                  Consumer<BackupRoutineProvider>(builder: (ctx, data, child) {
+              builder: (context, w) => Consumer<BackupRoutineProvider>(builder: (ctx, data, child) {
                 return FutureBuilder<List<BackupRoutineModel>>(
                     future: data.getAll(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data.length == 0) {
-                          return Center(
-                              child:
-                                  Text(AppLocalizations.of(context).noItems));
+                          return Center(child: Text(AppLocalizations.of(context).noItems));
                         } else if (snapshot.data.length > 0) {
                           return DataTable2(
                               columnSpacing: defaultPadding,
                               minWidth: 600,
                               columns: [
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnName)),
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnBackupDestination)),
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnStartHow)),
-                                DataColumn(
-                                    label: Text(AppLocalizations.of(context)
-                                        .columnServer)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnBackupDestination)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnStartHow)),
+                                DataColumn(label: Text(AppLocalizations.of(context).columnServer)),
                                 DataColumn(
                                     label: Center(
-                                  child: Text(
-                                      AppLocalizations.of(context)
-                                          .columnActions,
-                                      textAlign: TextAlign.center),
+                                  child: Text(AppLocalizations.of(context).columnActions, textAlign: TextAlign.center),
                                 )),
-                                DataColumn(
-                                    label: Center(
-                                        child: Text('Log',
-                                            textAlign: TextAlign.center))),
+                                DataColumn(label: Center(child: Text('Log', textAlign: TextAlign.center))),
                               ],
-                              rows: snapshot.data
-                                  .map<DataRow>(
-                                      (server) => createItem(server, ctx))
-                                  .toList());
+                              rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
                         }
                       }
                       return Center(child: CircularProgressIndicator());
@@ -104,11 +84,9 @@ class ListBackupRoutine extends StatelessWidget {
             ],
           ),
         ),
-        DataCell(Text(
-            '${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
+        DataCell(Text('${CoreUtils.truncateMidleString(routine.destinationDirectory, 20)}')),
         DataCell(Text('${routine.startBackup.text}')),
-        DataCell(Text(
-            '${routine.servers?.isNotEmpty == true ? routine.servers.first.name : "Sem servidor"}')),
+        DataCell(Text('${routine.servers?.isNotEmpty == true ? routine.servers.first.name : "Sem servidor"}')),
         DataCell(Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -129,21 +107,17 @@ class ListBackupRoutine extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text("Alert"),
-                        content: Text(AppLocalizations.of(context)
-                            .confirmDeletionMessage),
+                        content: Text(AppLocalizations.of(context).confirmDeletionMessage),
                         actions: <Widget>[
                           TextButton(
                               onPressed: () async {
                                 Navigator.of(context).pop(true);
-                                await locator<BackupRoutineProvider>()
-                                    .delete(routine.id);
+                                await locator<BackupRoutineProvider>().delete(routine.id);
                               },
-                              child:
-                                  Text(AppLocalizations.of(context).btnDelete)),
+                              child: Text(AppLocalizations.of(context).btnDelete)),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child:
-                                Text(AppLocalizations.of(context).btnCancelar),
+                            child: Text(AppLocalizations.of(context).btnCancelar),
                           ),
                         ],
                       );
@@ -156,7 +130,7 @@ class ListBackupRoutine extends StatelessWidget {
           child: IconButton(
               icon: Icon(Icons.visibility),
               onPressed: () {
-                Navigator.of(ctx).push(new MaterialPageRoute<Null>(
+                Navigator.of(ctx).push(MaterialPageRoute<Null>(
                     builder: (BuildContext context) {
                       return RoutineLogViewDialog(routine);
                     },

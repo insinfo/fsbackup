@@ -44,22 +44,28 @@ class BackupRoutineModel {
   /// não parar backup em casa de falha em algum arquivo
   bool dontStopIfFileException = false;
 
+  bool removeOld = true;
+
+  /// tempo de permanencia de backups antigos
+  int holdOldFilesInDays = 5;
+
   dynamic handleCancel;
 
-  BackupRoutineModel({
-    this.id,
-    this.servers,
-    this.name,
-    this.destinationDirectory,
-    this.startBackup,
-    this.status,
-    this.percent,
-    this.lastBackup,
-    this.log,
-    this.whenToBackup,
-    this.compressAsZip,
-    this.dontStopIfFileException = false,
-  });
+  BackupRoutineModel(
+      {this.id,
+      this.servers,
+      this.name,
+      this.destinationDirectory,
+      this.startBackup,
+      this.status,
+      this.percent,
+      this.lastBackup,
+      this.log,
+      this.whenToBackup,
+      this.compressAsZip,
+      this.dontStopIfFileException = false,
+      this.removeOld = true,
+      this.holdOldFilesInDays = 5});
 
   static RoutineStatus statusFromString(String str) {
     if (str == null) {
@@ -89,27 +95,29 @@ class BackupRoutineModel {
       whenToBackup: whenToBackup,
       compressAsZip: compressAsZip,
       dontStopIfFileException: dontStopIfFileException,
+      removeOld: removeOld,
+      holdOldFilesInDays: holdOldFilesInDays,
     );
   }
 
   factory BackupRoutineModel.fromMap(Map<String, dynamic> map) {
     var s = BackupRoutineModel(
-        id: map['id'] as String,
-        name: map['name'],
-        destinationDirectory: map['destinationDirectory'],
-        startBackup: map['startBackup'].toString().contains('manual')
-            ? StartBackup.manual
-            : StartBackup.scheduled,
-        status: statusFromString(map['status']),
-        percent: map['percent'] is double ? map['percent'] : 0,
-        lastBackup: DateTime.tryParse(map['lastBackup'].toString()),
-        log: map['log'],
-        whenToBackup: map['whenToBackup'],
-        compressAsZip: map['compressAsZip'],
-        dontStopIfFileException: map['dontStopIfFileException']);
+      id: map['id'] as String,
+      name: map['name'],
+      destinationDirectory: map['destinationDirectory'],
+      startBackup: map['startBackup'].toString().contains('manual') ? StartBackup.manual : StartBackup.scheduled,
+      status: statusFromString(map['status']),
+      percent: map['percent'] is double ? map['percent'] : 0,
+      lastBackup: DateTime.tryParse(map['lastBackup'].toString()),
+      log: map['log'],
+      whenToBackup: map['whenToBackup'],
+      compressAsZip: map['compressAsZip'],
+      removeOld: map.containsKey('removeOld') ? map['removeOld'] : false,
+      holdOldFilesInDays: map.containsKey('holdOldFilesInDays') ? map['holdOldFilesInDays'] : 5,
+      dontStopIfFileException: map['dontStopIfFileException'],
+    );
     if (map.containsKey('servers')) {
-      s.servers = List<ServerModel>.from(
-          map['servers'].map((x) => ServerModel.fromMap(x)));
+      s.servers = List<ServerModel>.from(map['servers'].map((x) => ServerModel.fromMap(x)));
     }
 
     return s;
@@ -128,6 +136,8 @@ class BackupRoutineModel {
       'whenToBackup': whenToBackup,
       'compressAsZip': compressAsZip,
       'dontStopIfFileException': dontStopIfFileException,
+      'removeOld': removeOld,
+      'holdOldFilesInDays': holdOldFilesInDays,
     };
     if (servers != null) {
       map['servers'] = servers.map((x) => x.toMap()).toList();

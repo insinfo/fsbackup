@@ -54,6 +54,70 @@ Uint8List nativeInt8ToUint8List(Pointer<Int8> pointer) {
   return list;
 }
 
+/// Sanitize-filename removes the following:
+/// Control characters (0x00–0x1f and 0x80–0x9f)
+/// Reserved characters (/, ?, <, >, \, :, *, |, and ")
+/// Unix reserved filenames (. and ..)
+/// Trailing periods and spaces (for Windows)
+/// Windows reserved filenames (CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9)
+String sanitizeFilename(String input, [replacement = '_']) {
+  var illegalRe = RegExp(r'[\/\?<>\\:\*\|"]', multiLine: true);
+  var controlRe = RegExp(r'[\x00-\x1f\x80-\x9f]', multiLine: true);
+  var reservedRe = RegExp(r'^\.+$');
+  var windowsReservedRe = RegExp(r'^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$', caseSensitive: false);
+  var windowsTrailingRe = RegExp(r'[\. ]+$');
+
+  //╟O caractere invalido
+
+  var sanitized = input
+      .replaceAll('�', replacement)
+      .replaceAll('А╟', replacement)
+      .replaceAll('╟', replacement)
+      .replaceAll(illegalRe, replacement)
+      .replaceAll(controlRe, replacement)
+      .replaceAll(reservedRe, replacement)
+      .replaceAll(windowsReservedRe, replacement)
+      .replaceAll(windowsTrailingRe, replacement);
+  return sanitized;
+  //return truncate(sanitized, 255);
+}
+
+bool isInvalidFilename(String filename) {
+  /*  
+  sanitize-filename removes the following:
+Control characters (0x00–0x1f and 0x80–0x9f)
+Reserved characters (/, ?, <, >, \, :, *, |, and ")
+Unix reserved filenames (. and ..)
+Trailing periods and spaces (for Windows)
+Windows reserved filenames (CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9)
+ */
+//[\/\?<>\\:\*\|"]
+  var rg1 = RegExp(r'[\/\?<>\\:\*\|"]', multiLine: true);
+
+  // forbidden characters  / : * ? " < > |
+  // var rg2 = RegExp(r'^.'); // cannot start with dot (.)
+  var rg3 = RegExp(r'^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$',
+      caseSensitive: false, multiLine: true); //i; // forbidden file names
+
+  //var result = false;
+  //╟O
+  if (filename.indexOf('╟') != -1) {
+    print('╟O $filename');
+    return true;
+  }
+
+  if (rg1.hasMatch(filename)) {
+    print('rg1 $filename');
+    return true;
+  }
+  if (rg3.hasMatch(filename)) {
+    print('rg3 $filename');
+    return true;
+  }
+
+  return false;
+}
+
 bool isUft8MalformedStringPointer(Pointer<Int8> pointer) {
   try {
     var ptrName = pointer.cast<Utf8>();
@@ -164,21 +228,15 @@ String stringPermissionToOctal(String value, {bool withType = false}) {
     }
 
     // char positions matter drwx-rxw-x
-    if ((i == charPosition ||
-            i == (charPosition + 3) ||
-            i == (charPosition + 6)) &&
+    if ((i == charPosition || i == (charPosition + 3) || i == (charPosition + 6)) &&
         (alpha.allMatches('[r-]').toList().isEmpty == true)) {
       return "Invalid";
     }
-    if ((i == (charPosition + 1) ||
-            i == (charPosition + 4) ||
-            i == (charPosition + 7)) &&
+    if ((i == (charPosition + 1) || i == (charPosition + 4) || i == (charPosition + 7)) &&
         (alpha.allMatches('[w-]').toList().isEmpty == true)) {
       return "Invalid";
     }
-    if ((i == (charPosition + 2) ||
-            i == (charPosition + 5) ||
-            i == (charPosition + 8)) &&
+    if ((i == (charPosition + 2) || i == (charPosition + 5) || i == (charPosition + 8)) &&
         (alpha.allMatches('[x-]').toList().isEmpty == true)) {
       return "Invalid";
     }
@@ -219,8 +277,7 @@ String stringPermissionToOctal(String value, {bool withType = false}) {
 
 /// input Ex: 511  out: 777 => rwxrwxrwx
 /// [type] file | dir | link
-String intToPermissionString(int intPermission,
-    {String type = 'file', bool withType = true}) {
+String intToPermissionString(int intPermission, {String type = 'file', bool withType = true}) {
   //lrwxrwxrwx
   //0777 = -rwxrwxrwx
   //drwxr-xr-x 755 bancoDeEmpregos
@@ -285,8 +342,7 @@ Pointer<Void> intToNativeVoid(int number) {
   return ptr.cast();
 }
 
-Pointer<Int8> uint8ListToPointerInt8(Uint8List units,
-    {Allocator allocator = calloc}) {
+Pointer<Int8> uint8ListToPointerInt8(Uint8List units, {Allocator allocator = calloc}) {
   /*final pointer = allocator<Uint8>(list.length);
   for (int i = 0; i < list.length; i++) {
     pointer[i] = list[i];

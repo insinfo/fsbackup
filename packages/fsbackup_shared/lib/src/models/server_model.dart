@@ -10,7 +10,7 @@ class ServerModel {
     this.id,
     this.name,
     this.host,
-    this.port,
+    this.port = 22,
     this.fileObjects,
     this.user,
     this.password,
@@ -19,7 +19,7 @@ class ServerModel {
   String id;
   String name;
   String host;
-  int port;
+  int port = 22;
   String user;
   String password;
 

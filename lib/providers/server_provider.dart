@@ -30,8 +30,8 @@ class ServerProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> delete(String id) async {
-    await repository.removeById(id);
+  Future<void> delete(ServerModel server) async {
+    await repository.remove(server);
     notifyListeners();
   }
 

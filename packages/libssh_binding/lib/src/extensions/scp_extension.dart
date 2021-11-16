@@ -357,6 +357,7 @@ extension ScpExtension on LibsshBinding {
 
           var tempFilename = uint8ListToString(rawFilename);
 
+          ///TODO checar arquivos com o caracter �
           if (isInvalidFilename(tempFilename)) {
             var newFilename = sanitizeFilename(tempFilename);
             printFunc('invalid filename:  $currentPath/$tempFilename \r\n renamed to:  $newFilename');

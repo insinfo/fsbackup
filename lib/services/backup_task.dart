@@ -39,16 +39,17 @@ class BackupTask implements FileTask<Future<bool>> {
       addToLog('establishing SSH connection');
       libssh.connect();
 
-      var now = DateFormat("yyyy_MM_dd_HH_mm_ss").format(DateTime.now());
+      var now = DateFormat("yyyy.MM.dd.HH.mm.ss").format(DateTime.now());
 
       addToLog('create destination directory if not exist');
 
       if (rotinaBackup.compressAsZip == true) {
-        destinationDirectory = await Utils.createDirectoryIfNotExist('${rotinaBackup.destinationDirectory}/tmp_$now');
-        zipFileName = '${rotinaBackup.destinationDirectory}/${slugify(rotinaBackup.name, delimiter: "_")}_$now.zip';
+        destinationDirectory = await Utils.createDirectoryIfNotExist(
+            '${rotinaBackup.destinationDirectory}\\tmp_${slugify(rotinaBackup.name, delimiter: "_")}_$now');
+        zipFileName = '${rotinaBackup.destinationDirectory}\\${slugify(rotinaBackup.name, delimiter: "_")}_$now.zip';
       } else {
         destinationDirectory = await Utils.createDirectoryIfNotExist(
-            '${rotinaBackup.destinationDirectory}/${slugify(rotinaBackup.name, delimiter: "_")}');
+            '${rotinaBackup.destinationDirectory}\\${slugify(rotinaBackup.name, delimiter: "_")}');
       }
 
       List<DirectoryItem> fileObjects = server.fileObjects;
@@ -82,7 +83,7 @@ class BackupTask implements FileTask<Future<bool>> {
           var currentFileSize = 0;
           await libssh.scpDownloadFileTo(
             item.path,
-            '$destinationDirectory/${item.name}',
+            '$destinationDirectory\\${item.name}',
             callbackStats: (int total, int loaded) {
               currentFileSize = loaded;
             },
@@ -96,34 +97,48 @@ class BackupTask implements FileTask<Future<bool>> {
       }
 
       addToLog('end of copy');
+      addToLog('copy run time: ${DateTime.now().difference(start)}');
 
       if (rotinaBackup.compressAsZip == true) {
         final encoder = ZipFileEncoder();
         addToLog('start compress');
         taskProgressCallback(totalSize, 0, 'compress');
-
+        final start2 = DateTime.now();
+        // destinationDirectory
         encoder.zipDirectory(Directory(destinationDirectory), filename: zipFileName);
-
         addToLog('end compress');
+        addToLog('compress run time: ${DateTime.now().difference(start2)}');
         taskProgressCallback(totalSize, totalSize, 'compress');
-        addToLog('remove tmp directory');
-        await Directory(destinationDirectory).delete(recursive: true);
-        addToLog('tmp directory removed');
+        try {
+          addToLog('remove tmp directory');
+          //await Directory(destinationDirectory).delete(recursive: true);
+          // rmdir /s /q
+          var r = await Process.run('rmdir', ['/s', '/q', destinationDirectory], runInShell: true);
+          addToLog('del command stdout: ${r.stdout} ${r.stderr}');
+
+          addToLog('tmp directory removed');
+        } catch (e) {
+          addToLog('error on remove tmp directory ($destinationDirectory) $e');
+        }
       }
 
       if (rotinaBackup.removeOld == true) {
-        addToLog('deleting old backups');
-        var dias = rotinaBackup.holdOldFilesInDays;
-        final dir = Directory(rotinaBackup.destinationDirectory);
-        final entities = await dir.list(recursive: false).toList();
-        for (var entity in entities) {
-          if (entity is File) {
-            var lastModified = await entity.lastModified();
-            if (DateTime.now().difference(lastModified).inDays > dias) {
-              entity.deleteSync();
-              addToLog('deleted ${entity.path}');
+        try {
+          addToLog('deleting old backups');
+          var dias = rotinaBackup.holdOldFilesInDays;
+          final dir = Directory(rotinaBackup.destinationDirectory);
+          final entities = await dir.list(recursive: false).toList();
+          for (var entity in entities) {
+            if (entity is File) {
+              var lastModified = await entity.lastModified();
+              if (DateTime.now().difference(lastModified).inDays > dias) {
+                entity.deleteSync();
+                addToLog('deleted ${entity.path}');
+              }
             }
           }
+        } catch (e) {
+          addToLog('error on deleting old backups $e');
         }
       }
       addToLog('total backup run time: ${DateTime.now().difference(start)}');
@@ -131,8 +146,9 @@ class BackupTask implements FileTask<Future<bool>> {
       completer.complete(true);
     } catch (e, s) {
       addToLog('BackupTask ${rotinaBackup.name} error:\r\n$e\r\nStacktrace:\r\n$s');
+      addToLog('remova o diretorio/arquivo temporario: zipFileName: $zipFileName | tmp dir: $destinationDirectory');
       //remove o arquivo imcompleto
-      if (rotinaBackup.compressAsZip == true && zipFileName.isNotEmpty) {
+      /*if (rotinaBackup.compressAsZip == true && zipFileName.isNotEmpty) {
         if (await File(zipFileName).exists()) {
           await File(zipFileName).delete();
           addToLog('remove $zipFileName');
@@ -141,7 +157,7 @@ class BackupTask implements FileTask<Future<bool>> {
       if (await Directory(destinationDirectory).exists()) {
         await Directory(destinationDirectory).delete(recursive: true);
         addToLog('remove $destinationDirectory');
-      }
+      }*/
 
       print('BackupTask ${rotinaBackup.name} error:\r\n$e\r\nStacktrace:\r\n$s');
       completer.completeError(e);

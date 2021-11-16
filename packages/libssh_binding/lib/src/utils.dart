@@ -64,8 +64,8 @@ String sanitizeFilename(String input, [replacement = '_']) {
   var illegalRe = RegExp(r'[\/\?<>\\:\*\|"]', multiLine: true);
   var controlRe = RegExp(r'[\x00-\x1f\x80-\x9f]', multiLine: true);
   var reservedRe = RegExp(r'^\.+$');
-  var windowsReservedRe = RegExp(r'^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$', caseSensitive: false);
-  var windowsTrailingRe = RegExp(r'[\. ]+$');
+  var windowsReservedRe = RegExp(r'^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$', caseSensitive: false);
+  // var windowsTrailingRe = RegExp(r'[\. ]+$');
 
   //╟O caractere invalido
 
@@ -75,9 +75,16 @@ String sanitizeFilename(String input, [replacement = '_']) {
       .replaceAll('╟', replacement)
       .replaceAll(illegalRe, replacement)
       .replaceAll(controlRe, replacement)
-      .replaceAll(reservedRe, replacement)
-      .replaceAll(windowsReservedRe, replacement)
-      .replaceAll(windowsTrailingRe, replacement);
+      .replaceAll(reservedRe, replacement);
+  //  .replaceAll(windowsReservedRe, replacement)
+  // .replaceAll(windowsTrailingRe, replacement);
+
+  if (windowsReservedRe.hasMatch(input)) {
+    if (!input.contains('.')) {
+      sanitized = replacement + sanitized;
+    }
+  }
+
   return sanitized;
   //return truncate(sanitized, 255);
 }

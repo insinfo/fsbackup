@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:fsbackup/providers/server_provider.dart';
 import 'package:fsbackup/screens/server_screen/components/edit_server.dart';
 import 'package:fsbackup_shared/fsbackup_shared.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to multi-language-support
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart'; //Add this line to multi-language-support
 
 class ListServer extends StatefulWidget {
   ListServer({Key key}) : super(key: key);
@@ -23,50 +24,43 @@ class _ListServerState extends State<ListServer> {
   Widget build(BuildContext context) {
     mensagemDelete = AppLocalizations.of(context).confirmDeletionMessage;
     return Container(
+      // height: 550,
       padding: EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: secondaryColor,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: ChangeNotifierProvider.value(
-              value: locator<ServerProvider>(),
-              builder: (context, w) => Consumer<ServerProvider>(builder: (ctx, data, child) {
-                return FutureBuilder<List<ServerModel>>(
-                    future: data.getAll(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data.length == 0) {
-                          return Center(child: Text(AppLocalizations.of(context).noItems));
-                        } else if (snapshot.data.length > 0) {
-                          return DataTable2(
-                              columnSpacing: defaultPadding,
-                              minWidth: 600,
-                              columns: [
-                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnHost)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnPort)),
-                                DataColumn(
-                                    label: Center(
-                                  child: Text(
-                                    AppLocalizations.of(context).columnActions,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                )),
-                              ],
-                              rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
-                        }
-                      }
-                      return Center(child: CircularProgressIndicator());
-                    });
-              }),
-            ),
-          ),
-        ],
+      child: ChangeNotifierProvider.value(
+        value: locator<ServerProvider>(),
+        builder: (context, w) => Consumer<ServerProvider>(builder: (ctx, data, child) {
+          return FutureBuilder<List<ServerModel>>(
+              future: data.getAll(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data.length == 0) {
+                    return Center(child: Text(AppLocalizations.of(context).noItems));
+                  } else if (snapshot.data.length > 0) {
+                    return DataTable2(
+                        columnSpacing: defaultPadding,
+                        minWidth: 600,
+                        columns: [
+                          DataColumn(label: Text(AppLocalizations.of(context).columnName)),
+                          DataColumn(label: Text(AppLocalizations.of(context).columnHost)),
+                          DataColumn(label: Text(AppLocalizations.of(context).columnPort)),
+                          DataColumn(
+                              label: Center(
+                            child: Text(
+                              AppLocalizations.of(context).columnActions,
+                              textAlign: TextAlign.center,
+                            ),
+                          )),
+                        ],
+                        rows: snapshot.data.map<DataRow>((server) => servidorDataRow(server, ctx)).toList());
+                  }
+                }
+                return Center(child: CircularProgressIndicator());
+              });
+        }),
       ),
     );
   }

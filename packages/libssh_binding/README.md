@@ -1,5 +1,7 @@
 ### Dart Binding to libssh version 0.9.6
 
+binding and high-level wrapper on top of libssh - The SSH library! libssh is a multiplatform C library implementing the SSHv2 protocol on client and server side. With libssh, you can remotely execute programs, transfer files, use a secure and transparent tunnel https://www.libssh.org
+
 ##### example of low level
 
 ```dart
@@ -15,10 +17,10 @@ void main() async {
   final dll = ffi.DynamicLibrary.open(libraryPath);
   var libssh = Libssh(dll);
 
-  var host = "192.168.133.13";
+  var host = "localhost";
   var port = 22;
-  var password = "Ins257257";
-  var username = "isaque.neves";
+  var password = "pass";
+  var username = "root";
 
   // Abra a sessão e define as opções
   var my_ssh_session = libssh.ssh_new();
@@ -71,7 +73,7 @@ void main() async {
 import 'package:libssh_binding/libssh_binding.dart';
 
 void main() {
-  final libssh = LibsshWrapper('192.168.133.13', username: 'isaque.neves', password: 'Ins257257', port: 22);
+  final libssh = LibsshWrapper('localhost', username: 'root', password: 'pass', port: 22);
   libssh.connect();
   final start = DateTime.now();
 
@@ -96,7 +98,10 @@ void main() {
   /* await libssh.sftpDownloadFileTo(my_ssh_session, '/home/isaque.neves/go1.11.4.linux-amd64.tar.gz',
       path.join(Directory.current.path, 'go1.11.4.linux-amd64.tar.gz'));*/
 
- 
+ //download directory recursive
+  await libssh.scpDownloadDirectory('/var/www',
+      path.join(Directory.current.path, 'download'));
+
   print('${DateTime.now().difference(start)}');
   libssh.dispose();
 }

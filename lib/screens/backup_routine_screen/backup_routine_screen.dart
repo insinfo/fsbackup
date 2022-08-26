@@ -10,8 +10,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart'; //Add this line to
 class BackupRoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
+    return Scaffold(
+      body: Padding(
         padding: EdgeInsets.all(defaultPadding),
         child: Column(
           children: [
@@ -34,20 +34,9 @@ class BackupRoutineScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: defaultPadding),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Column(
-                    children: [
-                      SizedBox(height: defaultPadding),
-                      ListBackupRoutine(),
-                    ],
-                  ),
-                ),
-              ],
-            )
+            Expanded(
+              child: ListBackupRoutine(),
+            ),
           ],
         ),
       ),

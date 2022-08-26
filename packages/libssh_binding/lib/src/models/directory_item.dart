@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:libssh_binding/libssh_binding.dart';
@@ -32,7 +33,11 @@ class DirectoryItem {
   late DirectoryItemType type;
   late String path;
   String? longname;
-  bool? isSymbolicLink = false;
+  bool isSymbolicLink = false;
+  bool isRegularFile = false;
+  bool isDirectory = true;
+  bool isSpecialFile = false;
+  bool isUnknownFile = false;
   int? flags = 0;
   int? atime = 0;
   int? mtime = 0;
@@ -41,8 +46,8 @@ class DirectoryItem {
   /// quando é link começã com L Ex: lrwxrwxrwx, quando é diretorio começa com d Ex: drwxr-xr-x
   int? permissions = 0;
 
-  ///Uint8Lost of  fullRemotePath
-  List<int>? nativePath;
+  ///Uint8List of  fullRemotePath
+  Uint8List? nativePath;
 
   DirectoryItem({
     required this.name,
@@ -51,26 +56,48 @@ class DirectoryItem {
     required this.path,
     this.longname,
     this.nativePath,
-    this.isSymbolicLink = false,
     this.flags = 0,
     this.atime = 0,
     this.mtime = 0,
     this.createtime = 0,
     this.permissions = 0,
+    this.isSymbolicLink = false,
+    this.isRegularFile = false,
+    this.isDirectory = false,
+    this.isSpecialFile = false,
+    this.isUnknownFile = false,
   });
 
-  factory DirectoryItem.fromPath(String strPath) {
+  /// create regular directory instance of DirectoryItem ( isDirectory: true)
+  factory DirectoryItem.fromDirPath(String strPath) {
     var separator = strPath.contains('/') ? '/' : '\\';
-    var name = strPath.split(separator).length > 2
-        ? strPath.split(separator).last
-        : strPath;
+    var name = strPath.split(separator).length > 2 ? strPath.split(separator).last : strPath;
 
     var dir = DirectoryItem(
         name: name,
         path: strPath,
-        nativePath: strPath.codeUnits,
+        nativePath: Utf8Encoder().convert(strPath),
         size: 0,
         type: DirectoryItemType.directory,
+        isDirectory: true,
+        isSymbolicLink: false);
+
+    return dir;
+  }
+
+  /// create regular file instance of DirectoryItem (isRegularFile: true)
+  factory DirectoryItem.fromFilePath(String strPath) {
+    var separator = strPath.contains('/') ? '/' : '\\';
+    var name = strPath.split(separator).length > 2 ? strPath.split(separator).last : strPath;
+
+    var dir = DirectoryItem(
+        name: name,
+        path: strPath,
+        nativePath: Utf8Encoder().convert(strPath),
+        size: 0,
+        type: DirectoryItemType.file,
+        isDirectory: false,
+        isRegularFile: true,
         isSymbolicLink: false);
 
     return dir;
@@ -78,7 +105,7 @@ class DirectoryItem {
 
   String get nativePathAsString {
     if (nativePath != null) {
-      return uint8ListToString(Uint8List.fromList(nativePath!));
+      return uint8ListToString(nativePath!);
     }
     return '';
   }
@@ -86,23 +113,24 @@ class DirectoryItem {
   void fillFromMap(Map<String, dynamic> map) {
     name = map['name'];
     path = map['path'];
-    type = map['type'] == 'directory'
-        ? DirectoryItemType.directory
-        : DirectoryItemType.file;
+    type = map['type'] == 'directory' ? DirectoryItemType.directory : DirectoryItemType.file;
     if (map.containsKey('nativePath') && map['nativePath'] is List) {
-      nativePath = <int>[];
-      (map['nativePath'] as List).forEach((element) {
-        nativePath!.add(element as int);
-      });
+      nativePath = Uint8List.fromList((map['nativePath'] as List).map<int>((e) => e as int).toList());
     }
     longname = map['longname'];
     size = map['size'];
-    isSymbolicLink = map['isSymbolicLink'];
+
     flags = map['flags'];
     atime = map['atime'];
     mtime = map['mtime'];
     createtime = map['createtime'];
     permissions = map['permissions'];
+
+    isSymbolicLink = map['isSymbolicLink'];
+    isRegularFile = map['isRegularFile'];
+    isDirectory = map['isDirectory'];
+    isSpecialFile = map['isSpecialFile'];
+    isUnknownFile = map['isUnknownFile'];
   }
 
   factory DirectoryItem.fromMap(Map<String, dynamic> map) {
@@ -117,17 +145,23 @@ class DirectoryItem {
       'path': path,
       'type': type == DirectoryItemType.directory ? 'directory' : 'file',
     };
-    if (nativePath != null) {
-      map['nativePath'] = nativePath;
-    }
+
+    map['nativePath'] = nativePath;
+
     map['longname'] = longname;
     map['size'] = size;
-    map['isSymbolicLink'] = isSymbolicLink;
+
     map['flags'] = flags;
     map['atime'] = atime;
     map['mtime'] = mtime;
     map['createtime'] = createtime;
     map['permissions'] = permissions;
+
+    map['isSymbolicLink'] = isSymbolicLink;
+    map['isRegularFile'] = isRegularFile;
+    map['isDirectory'] = isDirectory;
+    map['isSpecialFile'] = isSpecialFile;
+    map['isUnknownFile'] = isUnknownFile;
     return map;
   }
 

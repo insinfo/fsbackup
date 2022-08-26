@@ -4,8 +4,8 @@ import 'package:libssh_binding/libssh_binding.dart';
 import 'package:path/path.dart' as path;
 
 void main() async {
-  final libssh =
-      LibsshWrapper('192.168.133.13', username: 'isaque.neves', password: 'Ins257257', port: 22, verbosity: false);
+  final libssh = LibsshWrapper('localhost',
+      username: 'user', password: 'pass', port: 22, verbosity: false);
   libssh.connect();
   final start = DateTime.now();
 
@@ -18,7 +18,8 @@ void main() async {
     //stdout.write('\r[${List.filled(((progress / 10) * 4).round(), '=').join()}] $progress%');
   });*/
 
-  await libssh.scpDownloadDirectory('/var/www/dart/appsescveraobrowser', path.join(Directory.current.path, 'download'));
+  await libssh.scpDownloadDirectory('/var/www/html/portalPmro',
+      path.join(Directory.current.path, 'download'));
 
   /*var re = libssh.execCommandSync('cd /var/www; ls -l');
   print(re);*/

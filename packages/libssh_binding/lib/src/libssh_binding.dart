@@ -841,6 +841,7 @@ class LibsshBinding {
       ffi.NativeFunction<
           ffi.Int32 Function(
               sftp_session, ffi.Pointer<ffi.Int8>)>>('sftp_rmdir');
+              
   late final _sftp_rmdir = _sftp_rmdirPtr
       .asFunction<int Function(sftp_session, ffi.Pointer<ffi.Int8>)>();
 

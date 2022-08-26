@@ -8,10 +8,11 @@ import 'package:fsbackup/shared/components/header.dart';
 class ServerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
+    return Scaffold(
+      body: Padding(
         padding: EdgeInsets.all(defaultPadding),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Header(
               title: 'Servidores',
@@ -35,21 +36,9 @@ class ServerScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: defaultPadding),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Column(
-                    children: [
-                      //MyFiles(),
-                      SizedBox(height: defaultPadding),
-                      ListServer(),
-                    ],
-                  ),
-                ),
-              ],
-            )
+            Expanded(
+              child: ListServer(),
+            ),
           ],
         ),
       ),

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fsbackup/app_injector.dart';
 import 'package:fsbackup/constants.dart';
 import 'package:fsbackup/providers/backup_routine_provider.dart';
-import 'package:fsbackup/screens/backup_routine_screen/backup_routine_screen.dart';
-import 'package:fsbackup/shared/components/custom_textfield.dart';
+
 import 'package:fsbackup_shared/fsbackup_shared.dart';
 
 class RoutineLogViewDialog extends StatefulWidget {

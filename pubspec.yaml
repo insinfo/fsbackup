@@ -37,7 +37,7 @@ dependencies:
   flutter_svg: ^0.22.0
   fl_chart: ^0.36.4  
   provider: ^6.0.0
-  data_table_2: ^2.1.1
+  data_table_2: ^2.3.6 #^2.1.1
   get_it: ^7.2.0
   page_transition: ^2.0.2
   uuid: any
@@ -71,7 +71,7 @@ dependencies:
   sftp_file_picker:
     path: packages/sftp_file_picker
   #dcli: any
-  archive: ^3.1.5
+  archive:  3.1.6 #^3.3.1 original 3.1.5
   
 dev_dependencies:
   #flutter_test:

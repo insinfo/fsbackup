@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
@@ -39,7 +40,7 @@ class BackupTask implements FileTask<Future<bool>> {
       addToLog('establishing SSH connection');
       libssh.connect();
 
-      var now = DateFormat("yyyy.MM.dd.HH.mm.ss").format(DateTime.now());
+      var now = DateFormat('yyyy.MM.dd.HH.mm.ss').format(DateTime.now());
 
       addToLog('create destination directory if not exist');
 
@@ -81,9 +82,16 @@ class BackupTask implements FileTask<Future<bool>> {
           );
         } else if (item.type == DirectoryItemType.file) {
           var currentFileSize = 0;
-          await libssh.scpDownloadFileTo(
-            item.path,
-            '$destinationDirectory\\${item.name}',
+          final fullLocalPathFileName = '$destinationDirectory\\${item.name}';
+          final localPathBytes = Utf8Encoder().convert(fullLocalPathFileName);
+
+          print(
+              'BackupTask download ${item.nativePathAsString} | ${item.name} | $fullLocalPathFileName | ${utf8.decode(localPathBytes, allowMalformed: true)}');
+          //addToLog('BackupTask download  ${item.nativePathAsString} | ${item.name} | $fullPathFileName');
+
+          await libssh.scpDownloadFileRaw(
+            item.nativePath,
+            localPathBytes,
             callbackStats: (int total, int loaded) {
               currentFileSize = loaded;
             },
@@ -109,7 +117,7 @@ class BackupTask implements FileTask<Future<bool>> {
         addToLog('end compress');
         addToLog('compress run time: ${DateTime.now().difference(start2)}');
         taskProgressCallback(totalSize, totalSize, 'compress');
-        try {
+        /*try {
           addToLog('remove tmp directory');
           //await Directory(destinationDirectory).delete(recursive: true);
           // rmdir /s /q
@@ -119,13 +127,14 @@ class BackupTask implements FileTask<Future<bool>> {
           addToLog('tmp directory removed');
         } catch (e) {
           addToLog('error on remove tmp directory ($destinationDirectory) $e');
-        }
+        }*/
       }
 
       if (rotinaBackup.removeOld == true) {
         try {
           addToLog('deleting old backups');
           var dias = rotinaBackup.holdOldFilesInDays;
+          addToLog('hold Old Files In Days: $dias');
           final dir = Directory(rotinaBackup.destinationDirectory);
           final entities = await dir.list(recursive: false).toList();
           for (var entity in entities) {

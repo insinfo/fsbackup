@@ -385,7 +385,7 @@ const int SSH_FILEXFER_ATTR_UIDGID = 2;
 /// is file
 const int SSH_FILEXFER_TYPE_REGULAR = 1;
 
-///i s directory
+/// is directory
 const int SSH_FILEXFER_TYPE_DIRECTORY = 2;
 
 /// is symbolic link

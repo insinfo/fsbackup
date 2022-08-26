@@ -25,44 +25,36 @@ class ListBackupRoutine extends StatelessWidget {
         color: secondaryColor,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: ChangeNotifierProvider.value(
-              value: locator<BackupRoutineProvider>(),
-              builder: (context, w) => Consumer<BackupRoutineProvider>(builder: (ctx, data, child) {
-                return FutureBuilder<List<BackupRoutineModel>>(
-                    future: data.getAll(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data.length == 0) {
-                          return Center(child: Text(AppLocalizations.of(context).noItems));
-                        } else if (snapshot.data.length > 0) {
-                          return DataTable2(
-                              columnSpacing: defaultPadding,
-                              minWidth: 600,
-                              columns: [
-                                DataColumn(label: Text(AppLocalizations.of(context).columnName)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnBackupDestination)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnStartHow)),
-                                DataColumn(label: Text(AppLocalizations.of(context).columnServer)),
-                                DataColumn(
-                                    label: Center(
-                                  child: Text(AppLocalizations.of(context).columnActions, textAlign: TextAlign.center),
-                                )),
-                                DataColumn(label: Center(child: Text('Log', textAlign: TextAlign.center))),
-                              ],
-                              rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
-                        }
-                      }
-                      return Center(child: CircularProgressIndicator());
-                    });
-              }),
-            ),
-          ),
-        ],
+      child: ChangeNotifierProvider.value(
+        value: locator<BackupRoutineProvider>(),
+        builder: (context, w) => Consumer<BackupRoutineProvider>(builder: (ctx, data, child) {
+          return FutureBuilder<List<BackupRoutineModel>>(
+              future: data.getAll(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data.length == 0) {
+                    return Center(child: Text(AppLocalizations.of(context).noItems));
+                  } else if (snapshot.data.length > 0) {
+                    return DataTable2(
+                        columnSpacing: defaultPadding,
+                        minWidth: 600,
+                        columns: [
+                          DataColumn(label: Text(AppLocalizations.of(context).columnName)),
+                          DataColumn(label: Text(AppLocalizations.of(context).columnBackupDestination)),
+                          DataColumn(label: Text(AppLocalizations.of(context).columnStartHow)),
+                          DataColumn(label: Text(AppLocalizations.of(context).columnServer)),
+                          DataColumn(
+                              label: Center(
+                            child: Text(AppLocalizations.of(context).columnActions, textAlign: TextAlign.center),
+                          )),
+                          DataColumn(label: Center(child: Text('Log', textAlign: TextAlign.center))),
+                        ],
+                        rows: snapshot.data.map<DataRow>((server) => createItem(server, ctx)).toList());
+                  }
+                }
+                return Center(child: CircularProgressIndicator());
+              });
+        }),
       ),
     );
   }

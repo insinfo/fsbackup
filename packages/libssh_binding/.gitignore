@@ -63,3 +63,13 @@ ipch/
 pubspec.lock
 
 download/
+.dart_tool
+.dart_tool/
+libssh/
+libssh_c_exemple/
+libssh_compiled/
+.packages
+extra/
+putty/
+winscp.bat
+pubspec.lock

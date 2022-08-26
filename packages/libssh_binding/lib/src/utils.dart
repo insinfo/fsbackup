@@ -37,7 +37,7 @@ String nativeInt8ToString(Pointer<Int8> pointer, {allowMalformed: true}) {
   var ptrName = pointer.cast<Utf8>();
   final ptrNameCodeUnits = pointer.cast<Uint8>();
   var list = ptrNameCodeUnits.asTypedList(ptrName.length);
-  return utf8.decode(list, allowMalformed: allowMalformed);
+  return uint8ListToString(list, allowMalformed: allowMalformed);
 }
 
 Uint8List nativeInt8ToCodeUnits(Pointer<Int8> pointer) {
@@ -109,16 +109,21 @@ Windows reserved filenames (CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, CO
   //var result = false;
   //╟O
   if (filename.indexOf('╟') != -1) {
-    print('╟O $filename');
+    //print('╟O $filename');
+    return true;
+  }
+
+  if (filename.indexOf('�') != -1) {
+    //print('� $filename');
     return true;
   }
 
   if (rg1.hasMatch(filename)) {
-    print('rg1 $filename');
+    //print('rg1 $filename');
     return true;
   }
   if (rg3.hasMatch(filename)) {
-    print('rg3 $filename');
+    //print('rg3 $filename');
     return true;
   }
 
@@ -137,8 +142,32 @@ bool isUft8MalformedStringPointer(Pointer<Int8> pointer) {
   }
 }
 
-String uint8ListToString(Uint8List list, {allowMalformed: true}) {
-  return utf8.decode(list, allowMalformed: allowMalformed);
+bool isInvalidFileNamePointer(Pointer<Int8> pointer) {
+  var ptrName = pointer.cast<Utf8>();
+  final ptrNameCodeUnits = pointer.cast<Uint8>();
+  var bytes = ptrNameCodeUnits.asTypedList(ptrName.length);
+  var fileName = uint8ListToString(bytes);
+  return isInvalidFilename(fileName);
+}
+
+/// [codec] auto | utf8 | latin1
+String uint8ListToString(Uint8List bytes, {bool allowMalformed: true, String codec = 'auto'}) {
+  String result = '';
+  try {
+    result = utf8.decode(bytes);
+  } catch (e) {
+    try {
+      // result = utf8.decode(Utf8Encoder().convert(latin1.decode(bytes)));
+      result = latin1.decode(bytes);
+      //var localPathBytes = Utf8Encoder().convert(result);
+      //print('uint8ListToString utf8: | $result | ${utf8.decode(localPathBytes)} ');
+    } catch (e) {
+      //print('uint8ListToString latin1: $e');
+      result = utf8.decode(bytes, allowMalformed: allowMalformed);
+    }
+  }
+  return result;
+  //return utf8.decode(bytes, allowMalformed: allowMalformed);
 }
 
 Uint8List stringToUint8ListTo(String str) {

@@ -122,7 +122,7 @@ class _SftpFilePickerState extends State<SftpFilePicker> {
   void initState() {
     super.initState();
     currentPath = widget.rootDirectory;
-    _setDirectory(DirectoryItem.fromPath(widget.rootDirectory));
+    _setDirectory(DirectoryItem.fromDirPath(widget.rootDirectory));
   }
 
   void _setDirectory(DirectoryItem value) {
@@ -168,7 +168,7 @@ class _SftpFilePickerState extends State<SftpFilePicker> {
                         if (currentPath != '/') {
                           var p = currentPath!.substring(0, currentPath!.lastIndexOf('/'));
                           p = p == '' ? '/' : p;
-                          var dir = DirectoryItem.fromPath(p);
+                          var dir = DirectoryItem.fromDirPath(p);
                           _changeDirectory(dir);
                         }
                       },
@@ -176,7 +176,7 @@ class _SftpFilePickerState extends State<SftpFilePicker> {
                   Expanded(
                     child: TextFormField(
                       onFieldSubmitted: (value) {
-                        _changeDirectory(DirectoryItem.fromPath(value));
+                        _changeDirectory(DirectoryItem.fromDirPath(value));
                       },
                       controller: urlCtr,
                       decoration: InputDecoration(

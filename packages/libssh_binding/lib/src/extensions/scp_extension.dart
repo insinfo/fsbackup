@@ -101,7 +101,7 @@ extension ScpExtension on LibsshBinding {
     return scp;
   }
 
-  Future<void> scpDownloadFileTo(
+  Future<void> scpDownloadFile(
     ssh_session session,
     String fullRemotePathSource,
     String fullLocalPathTarget, {
@@ -111,8 +111,38 @@ extension ScpExtension on LibsshBinding {
     bool Function()? cancelCallback,
     bool dontStopIfFileException = false,
   }) async {
-    var source = fullRemotePathSource.toNativeUtf8(allocator: allocator).cast<Int8>();
+    var utf8Codec = Utf8Encoder();
+    var remotePathBytes = utf8Codec.convert(fullRemotePathSource);
+    var localPathBytes = utf8Codec.convert(fullLocalPathTarget);
 
+    await scpDownloadFileRaw(
+      session,
+      remotePathBytes,
+      localPathBytes,
+      callbackStats: callbackStats,
+      allocator: allocator,
+      cancelCallback: cancelCallback,
+      dontStopIfFileException: dontStopIfFileException,
+    );
+  }
+
+  Future<void> scpDownloadFileRaw(
+    ssh_session session,
+    Uint8List fullRemotePathSource,
+    Uint8List fullLocalPathTarget, {
+    void Function(int totalBytes, int loaded)? callbackStats,
+    Allocator allocator = calloc,
+    bool recursive = true,
+    bool Function()? cancelCallback,
+    bool dontStopIfFileException = false,
+  }) async {
+    //Uint8List to Pointer<Uint8>
+    final Pointer<Uint8> result = allocator<Uint8>(fullRemotePathSource.length + 1);
+    final Uint8List nativeString = result.asTypedList(fullRemotePathSource.length + 1);
+    nativeString.setAll(0, fullRemotePathSource);
+    nativeString[fullRemotePathSource.length] = 0;
+    var source = result.cast<Int8>();
+    // initialize Scp
     var scp = initFileScp(session, source);
     var rc = ssh_scp_pull_request(scp);
     if (rc != ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE) {
@@ -129,7 +159,7 @@ extension ScpExtension on LibsshBinding {
           "Error ssh_scp_accept_request: ${ssh_get_error(session.cast()).cast<Utf8>().toDartString()}");
     }
     try {
-      await scpReadFileAndSave(session, scp, Uint8List.fromList(fullLocalPathTarget.codeUnits),
+      await scpReadFileAndSave(session, scp, fullLocalPathTarget,
           allocator: allocator,
           callbackStats: callbackStats,
           recursive: recursive,
@@ -143,6 +173,7 @@ extension ScpExtension on LibsshBinding {
       ssh_scp_free(scp);
     }
   }
+
   //compress folder tar -zcvf backup-teste.tar.gz /var/run
   //copy all files from a directory to a remote directory using scp?
   //scp -r ~/local_dir user@host.com:/var/www/html/target_dir
@@ -220,6 +251,7 @@ extension ScpExtension on LibsshBinding {
     return 0;
   }
 
+  /// [fullLocalPathTarget]
   Future<void> scpReadFileAndSave(
     Pointer<ssh_session_struct> session,
     Pointer<ssh_scp_struct> scp,
@@ -241,6 +273,9 @@ extension ScpExtension on LibsshBinding {
     //function used to print log info
     var printFunc = printLog != null ? printLog : print;
     try {
+      //var fileName = uint8ListToString(fullLocalPathTarget);
+      // print('scpReadFileAndSave: $fileName');
+      //fromRawPath
       var targetFile = await File.fromRawPath(fullLocalPathTarget).create(recursive: recursive);
       hFile = targetFile.openSync(mode: FileMode.write); // for appending at the end of file
       int lenLoop = remoteFileLength;
@@ -295,7 +330,7 @@ extension ScpExtension on LibsshBinding {
 
   /// [fullLocalDirectoryPathTarget] example c:\downloads
   /// this function work only if remote is linux debian like sytem
-  /// [callbackStats] function to show stattistcs callbackStats(totalSize, loaded, countDirectory, countFiles)
+  /// [callbackStats] function to show statistics callbackStats(totalSize, loaded, countDirectory, countFiles)
   /// [printLog] callback for print log messagens
   /// [updateStatsOnFileEnd] if true call callbackStats on file download end , if false call callbackStats on directory end
   Future<dynamic>? scpDownloadDirectory(
@@ -349,26 +384,28 @@ extension ScpExtension on LibsshBinding {
           throw LibsshCancelException();
         }
       }
-
+      final utf8Codec = Utf8Encoder();
       switch (rc) {
         //Um novo arquivo será obtido
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWFILE:
-          var rawFilename = nativeInt8ToCodeUnits(ssh_scp_request_get_filename(scp));
-
-          var tempFilename = uint8ListToString(rawFilename);
-
-          ///TODO checar arquivos com o caracter �
+          final originalFilename = nativeInt8ToCodeUnits(ssh_scp_request_get_filename(scp));
+          //decode original Filename with Utf8 or Latin charset
+          final tempFilename = uint8ListToString(originalFilename);
+          //print('tempFilename $tempFilename');
+          var rawFilename = utf8Codec.convert(tempFilename);
+          // check files with character �
           if (isInvalidFilename(tempFilename)) {
             var newFilename = sanitizeFilename(tempFilename);
+            //print('newFilename $newFilename');
             printFunc('invalid filename:  $currentPath/$tempFilename \r\n renamed to:  $newFilename');
-            rawFilename = Uint8List.fromList(newFilename.codeUnits);
+            rawFilename = utf8Codec.convert(newFilename);
           }
 
           currentFileSize = ssh_scp_request_get_size64(scp);
           //concatena o caminho atual com o nome do arquivo
           //'$currentPath/$filename'
-          var fullLocalPathTarget = concatUint8List(
-              [Uint8List.fromList(currentPath.codeUnits), Uint8List.fromList('/'.codeUnits), rawFilename]);
+          var fullLocalPathTarget =
+              concatUint8List([utf8Codec.convert(currentPath), utf8Codec.convert('/'), rawFilename]);
 
           ssh_scp_accept_request(scp);
 
@@ -407,7 +444,8 @@ extension ScpExtension on LibsshBinding {
           break;
         //Um novo diretório será puxado
         case ssh_scp_request_types.SSH_SCP_REQUEST_NEWDIR:
-          currentDirName = nativeInt8ToString(ssh_scp_request_get_filename(scp), allowMalformed: true);
+          var rawDirName = nativeInt8ToCodeUnits(ssh_scp_request_get_filename(scp));
+          currentDirName = uint8ListToString(rawDirName);
 
           if (isInvalidFilename(currentDirName)) {
             var newDirname = sanitizeFilename(currentDirName);

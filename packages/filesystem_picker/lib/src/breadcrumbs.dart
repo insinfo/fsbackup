@@ -50,7 +50,7 @@ class Breadcrumbs<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance!.addPostFrameCallback((_) => _scrollToEnd());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
 
     final Color? defaultTextColor = Theme.of(context).textTheme.button!.color;
 
@@ -74,8 +74,7 @@ class Breadcrumbs<T> extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             return ButtonTheme(
               minWidth: 48,
-              padding: EdgeInsets.symmetric(
-                      vertical: ButtonTheme.of(context).padding.vertical) +
+              padding: EdgeInsets.symmetric(vertical: ButtonTheme.of(context).padding.vertical) +
                   const EdgeInsets.symmetric(horizontal: 8),
               child: TextButton(
                 child: Text(
@@ -100,8 +99,7 @@ class Breadcrumbs<T> extends StatelessWidget {
               color: (textColor ?? defaultTextColor)!.withOpacity(0.45),
             ),
           ),
-          headerBuilder: (_) =>
-              SizedBox(width: ButtonTheme.of(context).padding.horizontal - 8),
+          headerBuilder: (_) => SizedBox(width: ButtonTheme.of(context).padding.horizontal - 8),
           footerBuilder: (_) => const SizedBox(width: 70),
         ),
       ),
